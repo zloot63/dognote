@@ -5,7 +5,7 @@ import { fetchDogsFromFirestore } from "@/lib/firestore";
 import Layout from "@/components/layout/Layout";
 import DogProfile from "@/components/dashboard/DogProfile";
 import RecentSchedule from "@/components/dashboard/RecentSchedule";
-import AddDogForm from "@/components/dog/AddDogForm"; 
+import AddDogForm from "@/components/dog/AddDogForm";
 
 export default function Dashboard() {
   const { data: dogs, loading, refetch } = useFetchData(fetchDogsFromFirestore);
