@@ -2,20 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 기본 라이트 모드 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #ffffff; /* 배경 색상 */
+  --foreground: #363636; /* 기본 글자 색상 */
+  --heading-color: #282828; /* 타이틀 색상 */
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 타이틀 스타일 */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--heading-color);
+  font-weight: bold;
 }
