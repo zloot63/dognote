@@ -2,7 +2,8 @@
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase"; // ✅ getAuth() 대신 auth 가져오기
+import { auth } from "@/lib/firebase";
+import LoginButton from "@/components/auth/LoginButton";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,12 +18,11 @@ export default function LoginPage() {
   }, [router]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <h1 className="text-3xl font-bold mb-6">로그인</h1>
-      {/* 로그인 버튼 */}
-      <button className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-        Google 로그인
-      </button>
+
+      {/* ✅ 구글 로그인 */}
+      <LoginButton provider="google" />
     </div>
   );
 }

@@ -27,6 +27,7 @@ export const saveUserToFirestore = async (user: { uid: string; email: string; di
     }
 };
 
+
 /**
  * ✅ Firestore에서 강아지 정보 불러오기
  */
