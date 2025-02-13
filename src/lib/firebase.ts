@@ -2,7 +2,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Firebase 환경 변수 설정
+// Firebase 설정 정보
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -12,10 +12,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Firebase 앱 초기화 (중복 방지)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// ✅ 이미 초기화된 Firebase 앱이 있으면 기존 앱을 사용, 없으면 새로 초기화
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Firebase 서비스 가져오기
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export default app;
+export { auth, db };

@@ -1,5 +1,5 @@
-import Header from "@/app/components/layout/Header";
-import BottomNav from "@/app/components/layout/BottomNav";
+import Header from "@/components/layout/Header";
+import BottomNav from "@/components/layout/BottomNav";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
