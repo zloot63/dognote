@@ -1,5 +1,7 @@
-import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, setDoc } from "firebase/firestore";
+import { db } from "./firebase";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, setDoc } from "firebase/firestore";
 import { auth } from "@/lib/firebase";
+import { getWalkFromIndexedDB, clearIndexedDB } from "./indexedDB";
 
 export const db = getFirestore();
 
@@ -156,3 +158,60 @@ export const deleteWalkFromFirestore = async (walkId: string) => {
         console.error("🔥 산책 기록 삭제 실패:", error);
     }
 };
+
+let walkDocRef = null; // ✅ Firestore 문서 참조 저장
+
+// ✅ Firestore에 최초 저장
+export const startWalkInFirestore = async (userId: string, dogIds: string[]) => {
+  try {
+    walkDocRef = await addDoc(collection(db, "walks"), {
+      userId,
+      dogIds,
+      startTime: new Date().toISOString(),
+      endTime: null,
+      distance: 0,
+      route: [],
+    });
+  } catch (error) {
+    console.error("🚨 Firestore 산책 시작 저장 실패:", error);
+  }
+};
+
+// ✅ Firestore에 5분마다 업데이트
+export const updateWalkInFirestore = async () => {
+  if (!walkDocRef) return;
+
+  try {
+    const allRoutes = await getWalkFromIndexedDB();
+    const filteredRoute = allRoutes.filter((_, index) => index % 3 === 0); // ✅ 데이터 압축
+
+    await updateDoc(walkDocRef, {
+      endTime: allRoutes[allRoutes.length - 1].timestamp,
+      distance: calculateDistance(allRoutes),
+      route: filteredRoute,
+    });
+  } catch (error) {
+    console.error("🚨 Firestore 업데이트 실패:", error);
+  }
+};
+
+// ✅ 산책 종료 후 최종 저장
+export const endWalkInFirestore = async () => {
+  if (!walkDocRef) return;
+
+  try {
+    const allRoutes = await getWalkFromIndexedDB();
+    const filteredRoute = allRoutes.filter((_, index) => index % 3 === 0);
+
+    await updateDoc(walkDocRef, {
+      endTime: new Date().toISOString(),
+      distance: calculateDistance(allRoutes),
+      route: filteredRoute,
+    });
+
+    await clearIndexedDB(); // ✅ IndexedDB 데이터 삭제
+    walkDocRef = null; // ✅ Firestore 문서 참조 초기화
+  } catch (error) {
+    console.error("🚨 Firestore 산책 종료 저장 실패:", error);
+  }
+}
