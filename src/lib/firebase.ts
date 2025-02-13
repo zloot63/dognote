@@ -12,7 +12,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// ✅ 이미 초기화된 Firebase 앱이 있으면 기존 앱을 사용, 없으면 새로 초기화
+// 이미 초기화된 Firebase 앱이 있으면 기존 앱을 사용, 없으면 새로 초기화
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
