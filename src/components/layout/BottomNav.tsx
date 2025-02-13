@@ -1,12 +1,12 @@
 import Link from "next/link";
 import WalkButton from "@/components/walk/WalkButton"; 
 
-export default function QuickActions() {
+export default function BottomNav() {
     return (
         <footer className="fixed bottom-0 left-0 w-full bg-white shadow-md p-4 flex justify-around">
-            <WalkButton className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-green-600"/>
+            <WalkButton />
             <Link href="/add-health">
-                <button className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-green-600">
+                <button className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600">
                     🏥 건강 기록 추가
                 </button>
             </Link>

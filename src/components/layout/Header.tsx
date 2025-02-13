@@ -4,26 +4,30 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
-import { fetchDogsFromFirestore } from "@/lib/firestore"; // ✅ 강아지 정보 가져오기
+import { fetchDogsFromFirestore } from "@/lib/firestore";
 import { Menu, X, ChevronDown } from "lucide-react";
 import Image from "next/image";
+import { Dog } from "@/types/dogs";
 
 export default function Header() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<{ displayName: string; email: string; photoURL?: string } | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedDog, setSelectedDog] = useState(null); // ✅ 현재 선택된 강아지
-  const [dogList, setDogList] = useState([]); // ✅ 강아지 목록
+  const [selectedDog, setSelectedDog] = useState<Dog | null>(null);
+  const [dogList, setDogList] = useState<Dog[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // ✅ 사용자 & 강아지 정보 가져오기
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        setUser(currentUser);
+        setUser({
+          displayName: currentUser.displayName || "사용자",
+          email: currentUser.email || "",
+          photoURL: currentUser.photoURL || "/default-avatar.png",
+        });
         const dogs = await fetchDogsFromFirestore();
         setDogList(dogs);
-        if (dogs.length > 0) setSelectedDog(dogs[0]); // 기본 강아지 설정
+        if (dogs.length > 0) setSelectedDog(dogs[0]);
       } else {
         setUser(null);
         setDogList([]);
@@ -34,7 +38,6 @@ export default function Header() {
     return unsubscribe;
   }, []);
 
-  // ✅ 로그아웃 함수
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -44,19 +47,25 @@ export default function Header() {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const dogs = await fetchDogsFromFirestore();
+      setDogList(dogs);
+      if (dogs.length > 0) setSelectedDog(dogs[0]);
+    };
+    fetchData();
+  }, []);
+  
+
   return (
     <>
-      {/* ✅ 상단 헤더 */}
       <header className="flex justify-between items-center px-6 py-4 bg-white shadow-md">
-        {/* 왼쪽 메뉴 버튼 */}
         <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600">
           <Menu size={28} />
         </button>
 
-        {/* 중앙 로고 */}
         <h1 className="text-2xl font-bold text-gray-800">DogNote</h1>
 
-        {/* ✅ 강아지 전환 버튼 */}
         {selectedDog && (
           <div className="relative">
             <button
@@ -93,14 +102,12 @@ export default function Header() {
         )}
       </header>
 
-      {/* ✅ 사이드 메뉴 (왼쪽에서 슬라이드) */}
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setIsSidebarOpen(false)}>
           <aside
-            className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg p-5 flex flex-col transform transition-transform"
+            className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg p-5 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 사이드바 닫기 버튼 */}
             <button
               onClick={() => setIsSidebarOpen(false)}
               className="self-end text-gray-600 hover:text-gray-800"
@@ -108,7 +115,6 @@ export default function Header() {
               <X size={24} />
             </button>
 
-            {/* ✅ 강아지 프로필 정보 (사용자 등록 강아지) */}
             {selectedDog && (
               <div className="mt-5 flex flex-col items-center text-center">
                 <Image
@@ -123,7 +129,6 @@ export default function Header() {
               </div>
             )}
 
-            {/* 메뉴 항목 */}
             <nav className="mt-8 flex-grow">
               <ul className="space-y-4">
                 <li>
@@ -149,7 +154,6 @@ export default function Header() {
               </ul>
             </nav>
 
-            {/* ✅ 로그아웃 버튼 (사이드바 하단) */}
             <button
               onClick={handleLogout}
               className="mt-auto w-full text-left text-red-600 hover:text-red-800 font-semibold"

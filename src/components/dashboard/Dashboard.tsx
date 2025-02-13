@@ -1,27 +1,22 @@
-"use client"; // ✅ 추가
+"use client";
 
-import { useEffect, useState } from "react";
+import { useFetchData } from "@/hooks/useFetchData";
+import { fetchDogsFromFirestore } from "@/lib/firestore";
 import Layout from "@/components/layout/Layout";
 import DogProfile from "@/components/dashboard/DogProfile";
 import RecentSchedule from "@/components/dashboard/RecentSchedule";
 import AddDogForm from "@/components/dog/AddDogForm"; 
-import { fetchDogsFromFirestore } from "@/lib/firestore";
 
 export default function Dashboard() {
-  const [dogs, setDogs] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const dogData = await fetchDogsFromFirestore();
-      setDogs(dogData);
-    };
-
-    fetchData();
-  }, []);
+  const { data: dogs, loading, refetch } = useFetchData(fetchDogsFromFirestore);
 
   return (
     <Layout>
-      {dogs.length > 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center min-h-screen">
+          <p className="text-lg font-semibold">🐶 데이터를 불러오는 중...</p>
+        </div>
+      ) : dogs && dogs.length > 0 ? (
         <>
           <DogProfile dogs={dogs} />
           <RecentSchedule />
@@ -29,7 +24,7 @@ export default function Dashboard() {
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen">
           <h2 className="text-xl font-bold mb-4">🐶 등록된 강아지가 없습니다.</h2>
-          <AddDogForm />
+          <AddDogForm refetch={refetch} />
         </div>
       )}
     </Layout>
