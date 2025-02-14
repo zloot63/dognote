@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchDogsFromFirestore } from "@/lib/firestore";
+import { fetchDogsFromFirestore } from "@/lib/firebase/dogs";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 

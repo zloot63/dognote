@@ -1,6 +1,6 @@
 "use client";
 
-import { signInWithGoogle } from "@/lib/auth";
+import { signInWithGoogle } from "@/lib/firebase/auth";
 import { FirebaseError } from "firebase/app"; // ✅ FirebaseError 타입 가져오기
 
 export default function LoginButton({ provider }: { provider: string }) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { startWalkInFirestore, endWalkInFirestore } from "@/lib/firestore";
+import { startWalkInFirestore, endWalkInFirestore } from "@/lib/firebase/walks";
 import {
     saveGPSToStorage,
     getCurrentWalkFromDB,

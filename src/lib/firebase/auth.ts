@@ -1,6 +1,6 @@
-import { GoogleAuthProvider, signInWithPopup, signOut, getAuth } from "firebase/auth";
-import { auth } from "./firebase";
-import { saveUserToFirestore } from "./firestore"; // Firestore에 사용자 정보 저장
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { auth } from "../firebase";
+import { saveUserToFirestore } from "@/lib/firebase/users"; // Firestore에 사용자 정보 저장
 
 // ✅ 구글 로그인
 export const signInWithGoogle = async () => {
@@ -40,6 +40,6 @@ export const signInWithApple = async () => {
 };
 
 // ✅ 이메일 로그인
-export const signInWithEmail = async (email: string, password: string) => {
-    // 이메일 로그인 로직 추가 예정
-};
+// export const signInWithEmail = async (email: string, password: string) => {
+// 이메일 로그인 로직 추가 예정
+//};

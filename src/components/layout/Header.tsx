@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
-import { fetchDogsFromFirestore } from "@/lib/firestore";
+import { fetchDogsFromFirestore } from "@/lib/firebase/dogs";
 import { Menu, X, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { Dog } from "@/types/dogs";

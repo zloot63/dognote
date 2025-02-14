@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { saveWalkToFirestore } from "@/lib/firestore";
+import { saveWalkToFirestore } from "@/lib/firebase/walks";
 
 export default function AddWalkForm() {
     const [isWalking, setIsWalking] = useState(false);

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchDogsFromFirestore, saveDogToFirestore, deleteDogFromFirestore } from "@/lib/firestore";
+import { fetchDogsFromFirestore, saveDogToFirestore, deleteDogFromFirestore } from "@/lib/firebase/dogs";
 import { Dog } from "@/types/dogs";
 
 /**
