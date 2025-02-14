@@ -1,10 +1,15 @@
 import { db } from "./firebase";
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, setDoc } from "firebase/firestore";
 import { auth } from "@/lib/firebase";
-import { getWalkFromIndexedDB, clearIndexedDB } from "./indexedDB";
 import { calculateDistance } from "@/utils/distance";
 import { Dog } from "@/types/dogs";
-import { saveCurrentWalkToDB, getCurrentWalkFromDB, removeCurrentWalkFromDB } from "@/lib/indexedDB";
+import {
+    saveWalkIdToStorage,
+    getWalkIdFromStorage,
+    removeWalkIdFromStorage,
+    getGPSFromStorage,
+    removeGPSFromStorage
+} from "@/lib/localStorage"; // ✅ LocalStorage 사용
 
 /**
  * ✅ 현재 로그인한 사용자 ID 반환
@@ -87,7 +92,7 @@ export const deleteDogFromFirestore = async (dogId: string) => {
 export const startWalkInFirestore = async (dogIds: string[]): Promise<string | null> => {
     const userId = getUserId();
     if (!userId) return null;
-    
+
     try {
         const walkDocRef = await addDoc(collection(db, "users", userId, "walks"), {
             dogIds,
@@ -97,39 +102,11 @@ export const startWalkInFirestore = async (dogIds: string[]): Promise<string | n
             route: [],
         });
 
-        await saveCurrentWalkToDB(walkDocRef.id); // ✅ IndexedDB에 산책 ID 저장 (재시작 시 유지)
+        saveWalkIdToStorage(walkDocRef.id); // ✅ LocalStorage에 walkId 저장
         return walkDocRef.id;
     } catch (error) {
         console.error("🚨 Firestore 산책 시작 저장 실패:", error);
         return null;
-    }
-};
-
-/**
- * ✅ Firestore에 산책 경로 업데이트 (5분마다)
- */
-export const updateWalkInFirestore = async (walkId?: string) => {
-    const userId = getUserId();
-    if (!userId) return;
-
-    const currentWalkId = walkId || (await getCurrentWalkFromDB());
-    if (!currentWalkId) {
-        console.warn("🚨 업데이트할 산책 ID가 없습니다.");
-        return;
-    }
-
-    try {
-        const allRoutes = await getWalkFromIndexedDB();
-        const filteredRoute = allRoutes.filter((_, index) => index % 3 === 0); // ✅ 데이터 압축
-
-        await updateDoc(doc(db, "users", userId, "walks", currentWalkId), {
-            distance: calculateDistance(allRoutes),
-            route: filteredRoute,
-        });
-
-        console.log("✅ Firestore 산책 데이터 업데이트 완료:", currentWalkId);
-    } catch (error) {
-        console.error("🚨 Firestore 업데이트 실패:", error);
     }
 };
 
@@ -140,14 +117,14 @@ export const endWalkInFirestore = async (walkId?: string) => {
     const userId = getUserId();
     if (!userId) return;
 
-    const currentWalkId = walkId || (await getCurrentWalkFromDB());
+    const currentWalkId = walkId || getWalkIdFromStorage();
     if (!currentWalkId) {
         console.error("🚨 산책 ID가 없습니다.");
         return;
     }
 
     try {
-        const allRoutes = await getWalkFromIndexedDB();
+        const allRoutes = getGPSFromStorage(); // ✅ LocalStorage에서 GPS 데이터 가져오기
         const filteredRoute = allRoutes.filter((_, index) => index % 3 === 0);
 
         await updateDoc(doc(db, "users", userId, "walks", currentWalkId), {
@@ -156,8 +133,8 @@ export const endWalkInFirestore = async (walkId?: string) => {
             route: filteredRoute,
         });
 
-        await clearIndexedDB(); // ✅ IndexedDB 데이터 삭제
-        await removeCurrentWalkFromDB(); // ✅ 진행 중이던 산책 ID 제거
+        removeGPSFromStorage(); // ✅ LocalStorage에서 GPS 데이터 삭제
+        removeWalkIdFromStorage(); // ✅ LocalStorage에서 walkId 삭제
 
         console.log("✅ Firestore 산책 종료 저장 완료:", currentWalkId);
     } catch (error) {

@@ -3,11 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { startWalkInFirestore, endWalkInFirestore } from "@/lib/firestore";
 import {
-    saveToIndexedDB,
+    saveGPSToStorage,
     getCurrentWalkFromDB,
-    removeCurrentWalkFromDB,
     saveCurrentWalkToDB,
-} from "@/lib/indexedDB";
+    removeCurrentWalkFromDB,
+} from "@/lib/localStorage";
 import { useFetchDogs } from "@/hooks/useDogs";
 import { Dog } from "@/types/dogs";
 
@@ -16,30 +16,67 @@ export default function WalkButton() {
     const { data: dogs, isLoading } = useFetchDogs();
     const watchIdRef = useRef<number | null>(null);
 
-    // ✅ IndexedDB에서 기존 산책 기록 복원
+    // ✅ 기존 진행 중인 산책 ID 복원
     useEffect(() => {
         const restoreWalkState = async () => {
-            console.log("🔄 IndexedDB에서 저장된 walkId 불러오는 중...");
+            console.log("🔄 LocalStorage에서 저장된 walkId 불러오는 중...");
             const savedWalkId = await getCurrentWalkFromDB();
             if (savedWalkId) {
                 setWalkId(savedWalkId);
                 console.log("✅ walkId 복원 성공:", savedWalkId);
             } else {
-                console.log("❌ IndexedDB에 저장된 walkId가 없습니다.");
+                console.log("❌ LocalStorage에 저장된 walkId가 없습니다.");
             }
         };
         restoreWalkState();
     }, []);
 
-    // ✅ 위치 추적 활성화
+    // ✅ 위치 추적 오류 핸들링 함수
+    const handleLocationError = (error: GeolocationPositionError) => {
+        console.error("🚨 위치 추적 실패:", {
+            code: error.code,
+            message: error.message,
+        });
+
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                alert("❌ 위치 정보 제공이 거부되었습니다. 브라우저 설정에서 위치 접근을 허용해주세요.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("⚠️ 위치 정보를 가져올 수 없습니다. 다시 시도해주세요.");
+                break;
+            case error.TIMEOUT:
+                alert("⏳ 위치 정보 요청이 시간 초과되었습니다. 다시 시도해주세요.");
+                break;
+            default:
+                alert("🚨 알 수 없는 오류가 발생했습니다. 다시 시도해주세요.");
+        }
+    };
+
+    // ✅ 위치 권한 확인 함수
+    const checkLocationPermission = async () => {
+        if (!navigator.permissions) {
+            console.warn("🚨 브라우저가 위치 권한 확인을 지원하지 않습니다.");
+            return true; // 권한 확인이 불가능하면 시도는 계속해야 함
+        }
+
+        const permission = await navigator.permissions.query({ name: "geolocation" });
+        if (permission.state === "denied") {
+            alert("❌ 위치 권한이 거부되었습니다. 브라우저 설정에서 위치 접근을 허용해주세요.");
+            return false;
+        }
+        return true;
+    };
+
+    // ✅ 위치 추적 활성화 (GPS 데이터 LocalStorage에 저장)
     const startTracking = () => {
         if (navigator.geolocation) {
             watchIdRef.current = navigator.geolocation.watchPosition(
-                async (position) => {
+                (position) => {
                     const { latitude, longitude } = position.coords;
-                    await saveToIndexedDB({ lat: latitude, lng: longitude, timestamp: new Date().toISOString() });
+                    saveGPSToStorage({ lat: latitude, lng: longitude, timestamp: new Date().toISOString() });
                 },
-                (error) => console.error("🚨 위치 추적 실패:", error),
+                handleLocationError,
                 { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
             );
         } else {
@@ -55,11 +92,13 @@ export default function WalkButton() {
         }
     };
 
-
-
     // ✅ 산책 시작
     const handleStartWalk = async () => {
         console.log("🚀 산책 시작 버튼 클릭됨");
+
+        // ✅ 위치 권한 확인
+        const hasPermission = await checkLocationPermission();
+        if (!hasPermission) return;
 
         if (!dogs || dogs.length === 0) {
             alert("⚠️ 등록된 강아지가 없습니다. 강아지를 먼저 추가해주세요.");
@@ -83,8 +122,7 @@ export default function WalkButton() {
         startTracking();
     };
 
-
-    // ✅ 산책 종료 (삭제 완료 확인 후 상태 업데이트)
+    // ✅ 산책 종료
     const handleEndWalk = async () => {
         console.log("🚀 산책 종료 버튼 클릭됨");
 
@@ -96,20 +134,10 @@ export default function WalkButton() {
         stopTracking();
         setWalkId(null); // ✅ UI 즉시 업데이트
 
-        // ✅ Firestore 및 IndexedDB에서 삭제 후 검증
-        setTimeout(async () => {
-            await endWalkInFirestore(walkId);
-            await removeCurrentWalkFromDB();
+        await endWalkInFirestore(walkId);
+        await removeCurrentWalkFromDB();
 
-            // ✅ 삭제 후 확인 (완전히 삭제되었는지 체크)
-            const checkWalkId = await getCurrentWalkFromDB();
-            if (checkWalkId === null) {
-                console.log("✅ walkId 삭제 완료 확인됨!");
-            } else {
-                console.error("🚨 walkId 삭제 실패, 재삭제 진행");
-                await removeCurrentWalkFromDB();
-            }
-        }, 100);
+        console.log("✅ Firestore & LocalStorage에서 walkId 삭제 완료");
     };
 
     const isWalking = walkId !== null;
@@ -118,8 +146,10 @@ export default function WalkButton() {
     return (
         <button
             onClick={isWalking ? handleEndWalk : handleStartWalk}
-            className={`w-full px-6 py-3 text-white rounded-lg ${isWalking ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"} ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
-            disabled={isButtonDisabled}>
+            className={`w-full px-6 py-3 text-white rounded-lg ${isWalking ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={isButtonDisabled}
+        >
             {isWalking ? "산책 종료" : "산책 시작"}
         </button>
     );
