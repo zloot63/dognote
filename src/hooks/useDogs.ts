@@ -12,6 +12,7 @@ export const useFetchDogs = () => {
     });
 };
 
+
 /**
  * ✅ 강아지 추가 훅
  */
@@ -22,7 +23,7 @@ export const useAddDog = () => {
         mutationFn: async (dog: Dog) => await saveDogToFirestore(dog),
         onSuccess: () => {
             alert("✅ 강아지가 성공적으로 등록되었습니다! 🐶");
-            queryClient.invalidateQueries(["dogs"]); // ✅ 강아지 목록 업데이트
+            queryClient.invalidateQueries(["dogs"]); // ✅ 강아지 목록 즉시 업데이트
         },
         onError: (error) => {
             console.error("🚨 강아지 추가 실패:", error);
