@@ -1,10 +1,15 @@
-import { db, collection, doc, addDoc, updateDoc, getDocs } from "./firestore";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, doc, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore"; // ✅ 추가
 import { getCurrentWalkFromDB } from "@/lib/localStorage";
 import { calculateDistance } from "@/utils/distance";
 import { getGPSFromStorage, removeGPSFromStorage } from "@/lib/localStorage";
 import { auth } from "@/lib/firebase";
+import { Walk } from "@/types/walks";
 
 
+/**
+ * ✅ 현재 로그인한 사용자 ID 반환
+ */
 const getUserId = (): string | null => auth.currentUser?.uid || null;
 
 /**
@@ -94,7 +99,7 @@ export const endWalkInFirestore = async (walkId?: string) => {
 /**
  * ✅ Firestore에서 산책 기록 불러오기
  */
-export const fetchWalksFromFirestore = async (): Promise<any[]> => {
+export const fetchWalksFromFirestore = async (): Promise<Walk[]> => {
     const userId = getUserId();
     if (!userId) {
         console.error("❌ 로그인한 사용자 정보가 없습니다.");
@@ -104,7 +109,7 @@ export const fetchWalksFromFirestore = async (): Promise<any[]> => {
     try {
         const walksCollectionRef = collection(db, "users", userId, "walks");
         const snapshot = await getDocs(walksCollectionRef);
-        return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Walk[];
     } catch (error) {
         console.error("🔥 산책 기록 불러오기 실패:", error);
         return [];
@@ -127,5 +132,28 @@ export const deleteWalkFromFirestore = async (walkId: string) => {
         console.log("✅ 산책 기록 삭제 완료:", walkId);
     } catch (error) {
         console.error("🔥 산책 기록 삭제 실패:", error);
+    }
+};
+
+/**
+ * ✅ Firestore에서 사용자의 산책 기록 가져오기 (최신순)
+ */
+export const getUserWalks = async (): Promise<Walk[]> => {
+    const userId = getUserId();
+    if (!userId) {
+        console.warn("🚨 로그인한 사용자 정보가 없습니다.");
+        return [];
+    }
+
+    try {
+        const walksQuery = query( // ✅ query 사용
+            collection(db, "users", userId, "walks"),
+            orderBy("startTime", "desc") // ✅ 최신순 정렬
+        );
+        const snapshot = await getDocs(walksQuery);
+        return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Walk[];
+    } catch (error) {
+        console.error("🔥 Firestore에서 산책 기록 불러오기 실패:", error);
+        return [];
     }
 };
