@@ -1,10 +1,10 @@
 import { db } from "@/lib/firebase";
-import { collection, query, orderBy, doc, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore"; // ✅ 추가
+import { collection, query, orderBy, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore"; // ✅ 추가
 import { getCurrentWalkFromDB } from "@/lib/localStorage";
 import { calculateDistance } from "@/utils/distance";
 import { getGPSFromStorage, removeGPSFromStorage } from "@/lib/localStorage";
 import { auth } from "@/lib/firebase";
-import { Walk } from "@/types/walks";
+import { Walk, WalkFromFirestore } from "@/types/walks";
 
 
 /**
@@ -155,5 +155,53 @@ export const getUserWalks = async (): Promise<Walk[]> => {
     } catch (error) {
         console.error("🔥 Firestore에서 산책 기록 불러오기 실패:", error);
         return [];
+    }
+};
+
+export const getWalkById = async (walkId: string): Promise<Walk | null> => {
+    const userId = getUserId();
+    if (!userId) return null;
+
+    try {
+        const walkRef = doc(db, "users", userId, "walks", walkId);
+        const walkSnap = await getDoc(walkRef);
+
+        if (!walkSnap.exists()) return null;
+
+        const walkData = walkSnap.data() as WalkFromFirestore;
+
+        return {
+            id: walkSnap.id,
+            userId,
+            dogIds: walkData.dogIds ?? [],
+            startTime: walkData.startTime ?? "",
+            endTime: walkData.endTime ?? null,
+            duration: walkData.duration ?? 0,
+            distance: walkData.distance ?? 0,
+            route: walkData.route ?? [],
+            status: walkData.status ?? "completed",
+            issues: walkData.issues ?? [],
+            notes: walkData.notes ?? "",
+        };
+    } catch (error) {
+        console.error("🚨 Firestore에서 산책 데이터 불러오기 실패:", error);
+        return null;
+    }
+};
+
+
+export const updateWalkDetails = async (walkId: string, data: Partial<Walk>) => {
+    const userId = getUserId();
+    if (!userId) {
+        console.error("🚨 로그인한 사용자 정보가 없습니다.");
+        return;
+    }
+
+    try {
+        const walkRef = doc(db, "users", userId, "walks", walkId);
+        await updateDoc(walkRef, data);
+        console.log("✅ 산책 기록 업데이트 완료:", walkId);
+    } catch (error) {
+        console.error("🚨 Firestore 산책 기록 업데이트 실패:", error);
     }
 };
