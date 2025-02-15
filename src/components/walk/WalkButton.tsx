@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation"; // ✅ 페이지 이동을 위한 router 추가
+import { useRouter } from "next/navigation";
 import { startWalkInFirestore, endWalkInFirestore } from "@/lib/firebase/walks";
 import {
     saveGPSToStorage,
@@ -13,12 +13,14 @@ import {
 } from "@/lib/localStorage";
 import { useFetchDogs } from "@/hooks/useDogs";
 import { Dog } from "@/types/dogs";
+import WalkDetailModal from "@/components/walk/WalkDetailModal"; // ✅ 모달 추가
 
 export default function WalkButton() {
     const [walkId, setWalkId] = useState<string | null>(null);
     const { data: dogs, isLoading } = useFetchDogs();
     const watchIdRef = useRef<number | null>(null);
-    const router = useRouter(); // ✅ 페이지 이동을 위한 router 추가
+    const router = useRouter();
+    const [isWalkDetailOpen, setIsWalkDetailOpen] = useState(false); // ✅ 모달 상태 추가
 
     useEffect(() => {
         console.log("🔄 LocalStorage에서 저장된 walkId 불러오는 중...");
@@ -80,32 +82,39 @@ export default function WalkButton() {
 
     const handleEndWalk = async () => {
         console.log("🚀 산책 종료 버튼 클릭됨");
-    
+
         if (!walkId) {
             alert("❌ 유효한 산책 기록이 없습니다.");
             return;
         }
-    
+
         stopTracking();
         setWalkId(null);
-    
         await endWalkInFirestore(walkId);
         await removeCurrentWalkFromDB();
-    
         console.log("✅ Firestore & LocalStorage에서 walkId 삭제 완료");
-    
-        // ✅ 이동 경로 변경: /walks/${walkId} → /walks/details/${walkId}
-        router.push(`/walks/details/${walkId}`);
+        setIsWalkDetailOpen(true);
     };
 
     return (
-        <button
-            onClick={walkId ? handleEndWalk : handleStartWalk}
-            className={`w-full px-6 py-3 text-white rounded-lg ${walkId ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-            disabled={isLoading}
-        >
-            {walkId ? "산책 종료" : "산책 시작"}
-        </button>
+        <>
+            <button
+                onClick={walkId ? handleEndWalk : handleStartWalk}
+                className={`w-full px-6 py-3 text-white rounded-lg ${walkId ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                    } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isLoading}
+            >
+                {walkId ? "산책 종료" : "산책 시작"}
+            </button>
+
+            {/* ✅ WalkDetailModal 사용 (산책 종료 후 상세 입력) */}
+            {isWalkDetailOpen && walkId && (
+                <WalkDetailModal
+                    walkId={walkId}
+                    isOpen={isWalkDetailOpen}
+                    onClose={() => setIsWalkDetailOpen(false)}
+                />
+            )}
+        </>
     );
 }
