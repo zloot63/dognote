@@ -1,0 +1,9 @@
+// ✅ 1. 변수 및 믹스인 불러오기
+@use "abstracts/variables" as *;
+@use "abstracts/mixins" as *;
+@use "abstracts/functions" as *;
+
+// ✅ 2. 기본 스타일 불러오기
+@use "base/reset";
+@use "base/typography";
+@use "base/globals";

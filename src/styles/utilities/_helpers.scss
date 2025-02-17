@@ -1,0 +1,114 @@
+// 📌 src/styles/utilities/helpers.scss
+
+// ✅ 1. 텍스트 정렬 (Mixin 활용)
+@mixin text-align($align) {
+  text-align: $align;
+}
+
+.text-center {
+  @include text-align(center);
+}
+
+.text-left {
+  @include text-align(left);
+}
+
+.text-right {
+  @include text-align(right);
+}
+
+// ✅ 2. 플렉스 유틸리티 (Mixin 활용)
+@mixin flex($direction: row, $justify: flex-start, $align: stretch) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+}
+
+.flex {
+  @include flex;
+}
+
+.flex-center {
+  @include flex($justify: center, $align: center);
+}
+
+.flex-between {
+  @include flex($justify: space-between, $align: center);
+}
+
+.flex-column {
+  @include flex($direction: column);
+}
+
+// ✅ 3. 마진 & 패딩 유틸리티 (반복되는 값 최소화)
+@function rem($px) {
+  @return calc($px / 16) + rem;
+}
+
+@mixin margin($size) {
+  margin: rem($size);
+}
+
+@mixin padding($size) {
+  padding: rem($size);
+}
+
+// 마진 단축 클래스
+@for $i from 4 through 64 {
+  .m-#{$i} {
+    @include margin($i);
+  }
+}
+
+// 패딩 단축 클래스
+@for $i from 4 through 64 {
+  .p-#{$i} {
+    @include padding($i);
+  }
+}
+
+// ✅ 4. 반응형 헬퍼
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hidden-desktop {
+    display: none !important;
+  }
+}
+
+// ✅ 5. 선택 불가 (유저 선택 방지)
+.no-select {
+  user-select: none;
+}
+
+// ✅ 6. 스크린리더 전용 요소 숨김
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+}
+
+// ✅ 7. 그리드 레이아웃 유틸리티
+@for $i from 2 through 6 {
+  .grid-#{$i} {
+    display: grid;
+    grid-template-columns: repeat($i, 1fr);
+    gap: rem(16);
+  }
+}
+
+// ✅ 8. 버튼 스타일 초기화
+.button-reset {
+  all: unset;
+  cursor: pointer;
+}

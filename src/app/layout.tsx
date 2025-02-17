@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import ClientLayout from "@/components/layout/ClientLayout";
-import "@/styles/globals.css";
+import "@/styles/main.scss"; // ✅ 전역 스타일 적용
 
 export const metadata: Metadata = {
     title: "DogNote",

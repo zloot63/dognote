@@ -1,0 +1,168 @@
+@use "sass:map"; 
+@use "../abstracts/variables" as *; // ✅ `@use` 사용하여 변수 불러오기
+@use "../abstracts/mixins" as *; // ✅ `@use` 사용하여 변수 불러오기
+@use "../abstracts/functions" as *; // ✅ `@use` 사용하여 함수 불러오기
+
+/* ✅ 전역 CSS 변수 정의 */
+:root {
+  // 🎨 기본 색상
+  --primary-color: #007bff;
+  --primary-dark: #0056b3;
+  --secondary-color: #6c757d;
+  --secondary-dark: #495057;
+
+  // ✅ 상태 색상
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+
+  // ✅ 배경 및 텍스트 색상
+  --background-light: #f8f9fa;
+  --background-dark: #343a40;
+  --text-light: #ffffff;
+  --text-dark: #212529;
+  --border-color: #dee2e6;
+
+  // ✅ 테마 색상 (Light / Dark Mode)
+  --theme-bg: var(--background-light);
+  --theme-text: var(--text-dark);
+  --theme-border: var(--border-color);
+
+  // @media (prefers-color-scheme: dark) {
+  //   --theme-bg: var(--background-dark);
+  //   --theme-text: var(--text-light);
+  //   --theme-border: var(--secondary-dark);
+  // }
+
+  // ✅ 여백 시스템
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  // ✅ 타이포그래피
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-xxl: 32px;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  // ✅ 반응형 브레이크포인트
+  --screen-xs: 480px;
+  --screen-sm: 768px;
+  --screen-md: 1024px;
+  --screen-lg: 1280px;
+  --screen-xl: 1440px;
+}
+
+/* ✅ 전역 스타일 */
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: $font-primary;
+  color: $theme-text;
+  background-color: $theme-bg;
+  overflow-x: hidden;
+  line-height: 1.6;
+  font-size: $font-size-md;
+}
+
+/* ✅ 기본 컨테이너 */
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+}
+
+/* ✅ 반응형 컨테이너 */
+@include respond-to(md) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@include respond-to(sm) {
+  .container {
+    max-width: 100%;
+    padding: 0 $spacing-sm;
+  }
+}
+
+/* ✅ 공통 유틸리티 클래스 */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+.font-bold { font-weight: $font-weight-bold; }
+.font-medium { font-weight: $font-weight-medium; }
+.font-light { font-weight: $font-weight-light; }
+
+/* ✅ 버튼 스타일 */
+.btn {
+  display: inline-block;
+  padding: $spacing-sm $spacing-md;
+  border-radius: 8px;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+  border: none;
+
+  @include button-variant($primary-color, $text-light, $primary-dark);
+}
+
+/* ✅ 입력 필드 스타일 */
+.input {
+  width: 100%;
+  padding: $spacing-sm;
+  font-size: $font-size-md;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  transition: border-color 0.2s ease-in-out;
+
+  &:focus {
+    border-color: $primary-color;
+    outline: none;
+  }
+
+  &-error {
+    border-color: $error-color;
+  }
+}
+
+/* ✅ 카드 스타일 */
+.card {
+  background: $text-light;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  @include dark-mode {
+    background: $background-dark;
+    color: $text-light;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ✅ 반응형 미디어 쿼리 */
+@include respond-to(sm) {
+  .btn {
+    font-size: $font-size-sm;
+    padding: $spacing-xs $spacing-sm;
+  }
+
+  .input {
+    font-size: $font-size-sm;
+    padding: $spacing-xs;
+  }
+}

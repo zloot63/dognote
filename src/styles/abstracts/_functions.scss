@@ -1,0 +1,81 @@
+
+/* ✅ px → rem 변환 (기본 16px 기준, 필요 시 다른 값으로 조정 가능) */
+@function rem($size, $base: 16px) {
+  @return calc($size / $base) + rem;
+}
+
+/* ✅ px → em 변환 (기본 16px 기준) */
+@function em($size, $base: 16px) {
+  @return calc($size / $base) + em;
+}
+
+/* ✅ 색상 투명도 조정 */
+@function opacity-level($color, $alpha) {
+  @return rgba($color, $alpha);
+}
+
+/* ✅ 대비 색상 반환 (밝기에 따라 자동으로 흰색 or 검은색 선택) */
+@function contrast-color($color) {
+  @if (lightness($color) > 60) {
+    @return #000; // 밝은 배경일 경우 검정색 글자
+  } @else {
+    @return #fff; // 어두운 배경일 경우 흰색 글자
+  }
+}
+
+/* ✅ 색상 조정 (어둡게 / 밝게) */
+@function adjust-color-lightness($color, $amount: 15%) {
+  @if (lightness($color) > 50) {
+    @return darken($color, $amount);
+  } @else {
+    @return lighten($color, $amount);
+  }
+}
+
+/* ✅ 박스 그림자 스타일 자동 생성 */
+@function box-shadow($level: "soft") {
+  @if $level == "soft" {
+    @return 0 4px 8px rgba(0, 0, 0, 0.1);
+  } @else if $level == "medium" {
+    @return 0 6px 12px rgba(0, 0, 0, 0.15);
+  } @else if $level == "hard" {
+    @return 0 8px 16px rgba(0, 0, 0, 0.2);
+  } @else {
+    @return none;
+  }
+}
+
+/* ✅ 테두리 반경 자동 설정 */
+@function border-radius($size: "md") {
+  @if $size == "sm" {
+    @return 4px;
+  } @else if $size == "md" {
+    @return 8px;
+  } @else if $size == "lg" {
+    @return 12px;
+  } @else if $size == "xl" {
+    @return 16px;
+  } @else {
+    @return 0;
+  }
+}
+
+/* ✅ z-index 자동 설정 */
+@function z-index($level) {
+  @return map.get($z-index, $level);
+}
+
+/* ✅ 폰트 크기 조정 (비율 적용) */
+@function font-scale($size, $factor: 1.2) {
+  @return $size * $factor;
+}
+
+/* ✅ 반응형 크기 조정 (clamp 사용) */
+@function responsive-size($min, $max) {
+  @return clamp(rem($min), 2vw, rem($max));
+}
+
+/* ✅ 반응형 Breakpoint 변환 (미디어쿼리 최적화) */
+@function breakpoint($size) {
+  @return map.get($breakpoints, $size);
+}

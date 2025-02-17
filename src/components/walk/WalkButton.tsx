@@ -14,6 +14,7 @@ import {
 import { useFetchDogs } from "@/hooks/useDogs";
 import { Dog } from "@/types/dogs";
 import WalkDetailModal from "@/components/walk/WalkDetailModal"; // ✅ 모달 추가
+import Button from "../ui/inputs/Button";
 
 export default function WalkButton() {
     const [walkId, setWalkId] = useState<string | null>(null);

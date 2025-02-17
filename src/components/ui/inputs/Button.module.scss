@@ -1,0 +1,52 @@
+@import "@/styles/abstracts/variables";
+@import "@/styles/abstracts/mixins";
+
+.button {
+  @include flex-center;
+  border: none;
+  cursor: pointer;
+  font-size: map.get($font-sizes, "md");
+  font-weight: map.get($font-weights, "bold");
+  padding: map.get($spacing, "sm") map.get($spacing, "md");
+  border-radius: border-radius("md");
+  transition: all 0.2s ease-in-out;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* ✅ 버튼 스타일 변형 */
+.primary {
+  @include button-variant(map.get($colors, "primary"), $text-light);
+}
+
+.secondary {
+  @include button-variant(map.get($colors, "secondary"), $text-light);
+}
+
+.outline {
+  @include button-variant(transparent, map.get($colors, "primary"));
+  border: 1px solid map.get($colors, "primary");
+}
+
+.danger {
+  @include button-variant(map.get($colors, "error"), $text-light);
+}
+
+/* ✅ 버튼 크기 설정 */
+.small {
+  font-size: map.get($font-sizes, "sm");
+  padding: map.get($spacing, "xs") map.get($spacing, "sm");
+}
+
+.medium {
+  font-size: map.get($font-sizes, "md");
+  padding: map.get($spacing, "sm") map.get($spacing, "md");
+}
+
+.large {
+  font-size: map.get($font-sizes, "lg");
+  padding: map.get($spacing, "md") map.get($spacing, "lg");
+}

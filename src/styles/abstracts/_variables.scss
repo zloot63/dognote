@@ -1,0 +1,163 @@
+@use "sass:map";  // 🔥 Sass의 map 함수를 가져옴
+@use "./functions";
+
+// ✅ 색상 변수 정의
+$colors: (
+  "primary": var(--primary-color),
+  "primary-dark": var(--primary-dark),
+  "secondary": var(--secondary-color),
+  "secondary-dark": var(--secondary-dark),
+  "success": var(--success-color),
+  "error": var(--error-color),
+  "warning": var(--warning-color),
+  "info": var(--info-color),
+  "background-light": var(--background-light),
+  "background-dark": var(--background-dark),
+  "text-light": var(--text-light),
+  "text-dark": var(--text-dark),
+  "border": var(--border-color),
+  "muted": var(--muted-color),
+  "highlight": var(--highlight-color),
+  "table-row-alt": var(--table-row-alt),
+  "code-bg": var(--code-bg),
+);
+
+// ✅ 개별 SCSS 변수 추가
+$primary-color: map-get($colors, "primary");
+$primary-dark: map-get($colors, "primary-dark");
+$secondary-color: map-get($colors, "secondary");
+$secondary-dark: map-get($colors, "secondary-dark");
+$success-color: map-get($colors, "success");
+$error-color: map-get($colors, "error");
+$warning-color: map-get($colors, "warning");
+$info-color: map-get($colors, "info");
+$background-light: map-get($colors, "background-light");
+$background-dark: map-get($colors, "background-dark");
+$background-color: $background-light;
+$text-light: map-get($colors, "text-light");
+$text-dark: map-get($colors, "text-dark");
+$text-color: $text-dark;
+$heading-color: $text-dark;
+$border-color: map-get($colors, "border");
+$muted-color: map-get($colors, "muted");
+$highlight-color: map-get($colors, "highlight");
+$table-row-alt: map-get($colors, "table-row-alt");
+$code-bg: map-get($colors, "code-bg");
+
+// ✅ 테마 변수
+$theme: (
+  "bg": var(--theme-bg),
+  "text": var(--theme-text),
+  "border": var(--theme-border),
+);
+
+// ✅ 개별 테마 SCSS 변수 추가
+$theme-bg: map-get($theme, "bg");
+$theme-text: map-get($theme, "text");
+$theme-border: map-get($theme, "border");
+
+// ✅ 타이포그래피 (폰트 크기 & 가중치)
+$font-sizes: (
+  "xs": var(--font-size-xs),
+  "sm": var(--font-size-sm),
+  "md": var(--font-size-md),
+  "lg": var(--font-size-lg),
+  "xl": var(--font-size-xl),
+  "xxl": var(--font-size-xxl),
+);
+
+$font-weights: (
+  "light": var(--font-weight-light),
+  "normal": var(--font-weight-normal),
+  "medium": var(--font-weight-medium),
+  "bold": var(--font-weight-bold),
+);
+
+// ✅ 개별 폰트 크기 변수 추가
+$font-size-xs: map-get($font-sizes, "xs");
+$font-size-sm: map-get($font-sizes, "sm");
+$font-size-md: map-get($font-sizes, "md");
+$font-size-lg: map-get($font-sizes, "lg");
+$font-size-xl: map-get($font-sizes, "xl");
+$font-size-xxl: map-get($font-sizes, "xxl");
+
+// ✅ 개별 폰트 가중치 변수 추가
+$font-weight-light: map-get($font-weights, "light");
+$font-weight-normal: map-get($font-weights, "normal");
+$font-weight-medium: map-get($font-weights, "medium");
+$font-weight-bold: map-get($font-weights, "bold");
+
+$font-primary: "Helvetica, Arial, sans-serif";
+$font-mono: "Courier New, monospace";
+
+// ✅ 여백 시스템 (Spacing - 4px 단위)
+$spacing: (
+  "xs": var(--spacing-xs),
+  "sm": var(--spacing-sm),
+  "md": var(--spacing-md),
+  "lg": var(--spacing-lg),
+  "xl": var(--spacing-xl),
+  "xxl": var(--spacing-xxl),
+);
+
+// ✅ 개별 여백 변수 추가
+$spacing-xs: map-get($spacing, "xs");
+$spacing-sm: map-get($spacing, "sm");
+$spacing-md: map-get($spacing, "md");
+$spacing-lg: map-get($spacing, "lg");
+$spacing-xl: map-get($spacing, "xl");
+$spacing-xxl: map-get($spacing, "xxl");
+
+// ✅ 반응형 브레이크포인트 (SCSS 전용 변수 추가)
+$breakpoints: (
+  "xs": 480px,
+  "sm": 768px,
+  "md": 1024px,
+  "lg": 1280px,
+  "xl": 1440px,
+);
+
+// ✅ 개별 반응형 변수 추가
+$screen-xs: map-get($breakpoints, "xs");
+$screen-sm: map-get($breakpoints, "sm");
+$screen-md: map-get($breakpoints, "md");
+$screen-lg: map-get($breakpoints, "lg");
+$screen-xl: map-get($breakpoints, "xl");
+
+// ✅ 레이아웃 관련 변수
+$container-widths: (
+  "sm": 540px,
+  "md": 768px,
+  "lg": 1024px,
+  "xl": 1200px,
+  "xxl": 1400px,
+);
+
+$container-padding: map-get($spacing, "md");
+
+// ✅ 개별 컨테이너 변수 추가
+$container-width-sm: map-get($container-widths, "sm");
+$container-width-md: map-get($container-widths, "md");
+$container-width-lg: map-get($container-widths, "lg");
+$container-width-xl: map-get($container-widths, "xl");
+$container-width-xxl: map-get($container-widths, "xxl");
+
+// ✅ 그리드 시스템 변수
+$grid-columns: 12;
+$grid-gap: map-get($spacing, "md");
+
+// ✅ z-index 설정 (레이어 관리)
+$z-index: (
+  "modal": 1000,
+  "overlay": 900,
+  "dropdown": 800,
+  "header": 700,
+  "base": 1,
+);
+
+// ✅ 개별 z-index 변수 추가
+$z-index-modal: map-get($z-index, "modal");
+$z-index-overlay: map-get($z-index, "overlay");
+$z-index-dropdown: map-get($z-index, "dropdown");
+$z-index-header: map-get($z-index, "header");
+$z-index-base: map-get($z-index, "base");

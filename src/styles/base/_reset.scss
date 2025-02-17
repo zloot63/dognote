@@ -1,0 +1,128 @@
+@use "sass:map"; 
+@use "abstracts/variables" as *; // ✅ `variables.scss`를 불러옴
+@use "abstracts/mixins" as *;
+
+/* ✅ 박스 모델 초기화 */
+html {
+  box-sizing: border-box;
+  font-size: 100%; // 브라우저 기본 설정 유지
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+/* ✅ 기본적인 body 스타일 */
+body {
+  font-family: $font-primary;
+  font-size: 1rem;
+  font-weight: 400;
+  color: map-get($colors, "text-dark"); // ✅ 올바르게 색상 매핑
+  background-color: map-get($colors, "background-light"); // ✅ 변경됨
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ✅ 링크 및 버튼 초기화 */
+a, button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out, background 0.2s ease-in-out;
+}
+
+button {
+  all: unset;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+/* ✅ 폼 요소 초기화 */
+input, textarea, select, button {
+  font: inherit;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid map-get($colors, "border");
+  transition: border 0.2s ease-in-out;
+
+  &:focus {
+    border-color: map-get($colors, "primary");
+    box-shadow: 0 0 4px rgba(map-get($colors, "primary"), 0.3);
+  }
+
+  &:disabled {
+    background: map-get($colors, "background-light");
+    cursor: not-allowed;
+  }
+}
+
+/* ✅ select 요소 기본 스타일 */
+select {
+  appearance: none;
+  background-image: none;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+/* ✅ 이미지 초기화 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ✅ 테이블 초기화 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid map-get($colors, "border");
+}
+
+/* ✅ 스크롤바 스타일링 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: map-get($colors, "background-light");
+}
+
+::-webkit-scrollbar-thumb {
+  background: map-get($colors, "primary");
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* ✅ 선택된 텍스트 스타일 */
+::selection {
+  background: map-get($colors, "primary");
+  color: #fff;
+}

@@ -1,0 +1,98 @@
+@use "sass:map"; 
+@use "./functions"; // ✅ `_functions.scss`의 함수 활용
+
+/* ✅ 반응형 미디어쿼리 믹스인 (min-width/max-width 모두 지원) */
+@mixin respond-to($size, $type: "max") {
+  @if $type == "max" {
+    @media (max-width: breakpoint($size)) {
+      @content;
+    }
+  } @else if $type == "min" {
+    @media (min-width: breakpoint($size)) {
+      @content;
+    }
+  }
+}
+
+/* ✅ 플렉스 정렬 믹스인 */
+@mixin flex-center($direction: row, $justify: center, $align: center) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+}
+
+/* ✅ 버튼 스타일 믹스인 */
+@mixin button-variant($bg-color, $text-color: #fff, $hover-color: null) {
+  background-color: $bg-color;
+  color: $text-color;
+
+  &:hover {
+    background-color: if($hover-color != null, $hover-color, darken($bg-color, 10%));
+  }
+}
+
+/* ✅ 카드 UI 믹스인 */
+@mixin card($padding: map.get($spacing, "md"), $border-radius: 8px, $shadow: box-shadow("soft")) {
+  background: #fff;
+  padding: $padding;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+}
+
+/* ✅ 다크 모드 적용 믹스인 */
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+/* ✅ 반응형 그리드 레이아웃 (align-items, justify-items 옵션 추가) */
+@mixin grid-layout($columns: 2, $gap: map.get($spacing, "md"), $align: stretch, $justify: stretch) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+  align-items: $align;
+  justify-items: $justify;
+}
+
+/* ✅ 입력 필드 스타일 */
+@mixin input-base($border-color: $border-color, $focus-color: $primary-color) {
+  width: 100%;
+  padding: map.get($spacing, "sm");
+  font-size: map.get($font-sizes, "md");
+  border: 1px solid $border-color;
+  border-radius: border-radius("md");
+  outline: none;
+  transition: border 0.2s ease-in-out;
+
+  &:focus {
+    border-color: $focus-color;
+    box-shadow: 0 0 5px rgba($focus-color, 0.3);
+  }
+
+  &:disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+  }
+}
+
+/* ✅ select 요소 스타일 */
+@mixin select($icon-color: currentColor) {
+  appearance: none;
+  background: url("/icons/arrow-down.svg") no-repeat right 10px center;
+  background-size: 16px;
+  padding-right: 35px;
+  cursor: pointer;
+  color: $icon-color;
+
+  &::-ms-expand {
+    display: none; // ✅ IE 호환성
+  }
+}
+
+/* ✅ textarea 스타일 */
+@mixin textarea($min-height: 100px) {
+  min-height: $min-height;
+  resize: vertical;
+}

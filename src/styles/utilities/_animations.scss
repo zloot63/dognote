@@ -1,0 +1,131 @@
+// 📌 src/styles/utilities/animations.scss
+
+// ✅ 1. 공통 애니메이션 믹스인 (더 유연한 설정 가능)
+@mixin animate($name, $duration: 0.3s, $timing: ease-in-out, $delay: 0s, $iteration: 1, $fill-mode: both) {
+    animation: $name $duration $timing $delay $iteration $fill-mode;
+  }
+  
+  // ✅ 2. 공통 `@keyframes` 생성 믹스인 (반복 코드 최소화)
+  @mixin generate-keyframes($name, $from, $to) {
+    @keyframes #{$name} {
+      from {
+        @each $prop, $value in $from {
+          #{$prop}: $value;
+        }
+      }
+      to {
+        @each $prop, $value in $to {
+          #{$prop}: $value;
+        }
+      }
+    }
+  }
+  
+  // ✅ 3. 애니메이션 그룹 통합 (중복 제거된 Keyframes)
+  @include generate-keyframes(fadeIn, (opacity: 0), (opacity: 1));
+  @include generate-keyframes(fadeOut, (opacity: 1), (opacity: 0));
+  @include generate-keyframes(fadeInScale, (opacity: 0, transform: scale(0.95)), (opacity: 1, transform: scale(1)));
+  @include generate-keyframes(slideUp, (opacity: 0, transform: translateY(20px)), (opacity: 1, transform: translateY(0)));
+  @include generate-keyframes(slideDown, (opacity: 0, transform: translateY(-20px)), (opacity: 1, transform: translateY(0)));
+  @include generate-keyframes(slideLeft, (opacity: 0, transform: translateX(20px)), (opacity: 1, transform: translateX(0)));
+  @include generate-keyframes(slideRight, (opacity: 0, transform: translateX(-20px)), (opacity: 1, transform: translateX(0)));
+  @include generate-keyframes(hoverScale, (transform: scale(1)), (transform: scale(1.05)));
+  @include generate-keyframes(pressDown, (transform: scale(1)), (transform: scale(0.95)));
+  @include generate-keyframes(bounce, (transform: translateY(0)), (transform: translateY(-8px)));
+  @include generate-keyframes(wiggle, (transform: rotate(0deg)), (transform: rotate(5deg)));
+  @include generate-keyframes(spin, (transform: rotate(0deg)), (transform: rotate(360deg)));
+  @include generate-keyframes(pulse, (transform: scale(1), opacity: 1), (transform: scale(1.1), opacity: 0.7));
+  @include generate-keyframes(heartbeat, (transform: scale(1)), (transform: scale(1.2)));
+  @include generate-keyframes(modalFade, (opacity: 0, transform: translateY(-20px)), (opacity: 1, transform: translateY(0)));
+  @include generate-keyframes(modalSlideUp, (opacity: 0, transform: translateY(30px)), (opacity: 1, transform: translateY(0)));
+  @include generate-keyframes(toastIn, (transform: translateY(20px), opacity: 0), (transform: translateY(0), opacity: 1));
+  @include generate-keyframes(toastOut, (transform: translateY(0), opacity: 1), (transform: translateY(-20px), opacity: 0));
+  @include generate-keyframes(notifyIn, (transform: translateX(100%), opacity: 0), (transform: translateX(0), opacity: 1));
+  @include generate-keyframes(dropdownOpen, (transform: scaleY(0)), (transform: scaleY(1)));
+  @include generate-keyframes(menuExpand, (max-height: 0, opacity: 0), (max-height: 300px, opacity: 1));
+  @include generate-keyframes(inputFocus, (box-shadow: 0 0 0px rgba(0, 0, 0, 0)), (box-shadow: 0 0 8px rgba(0, 0, 0, 0.2)));
+  
+  // ✅ 4. 자동 애니메이션 클래스를 생성 (반복문 적용)
+  $animations: (
+    "fade-in": fadeIn,
+    "fade-out": fadeOut,
+    "fade-in-scale": fadeInScale,
+    "slide-up": slideUp,
+    "slide-down": slideDown,
+    "slide-left": slideLeft,
+    "slide-right": slideRight,
+    "hover-scale": hoverScale,
+    "press-down": pressDown,
+    "bounce": bounce,
+    "wiggle": wiggle,
+    "spin": spin,
+    "pulse": pulse,
+    "heartbeat": heartbeat,
+    "modal-fade": modalFade,
+    "modal-slide-up": modalSlideUp,
+    "toast-in": toastIn,
+    "toast-out": toastOut,
+    "notify-in": notifyIn,
+    "dropdown-open": dropdownOpen,
+    "menu-expand": menuExpand,
+    "input-focus": inputFocus
+  );
+  
+  @each $class, $animation in $animations {
+    .#{$class} {
+      @include animate($animation, 0.3s);
+    }
+  }
+  
+  // ✅ 5. 추가 유틸리티 클래스 (인터랙션 & 로딩)
+  .input-focus {
+    &:focus {
+      @include animate(inputFocus, 0.3s);
+    }
+  }
+  
+  .button-press {
+    &:active {
+      @include animate(pressDown, 0.1s);
+    }
+  }
+  
+  .hover-scale {
+    &:hover {
+      @include animate(hoverScale, 0.2s);
+    }
+  }
+  
+  .toast-in {
+    @include animate(toastIn, 0.4s);
+  }
+  
+  .toast-out {
+    @include animate(toastOut, 0.4s);
+  }
+  
+  .notify-in {
+    @include animate(notifyIn, 0.4s);
+  }
+  
+  .dropdown-open {
+    transform-origin: top;
+    @include animate(dropdownOpen, 0.3s);
+  }
+  
+  .menu-expand {
+    overflow: hidden;
+    @include animate(menuExpand, 0.4s);
+  }
+  
+  .skeleton-loading {
+    @keyframes skeletonLoading {
+      0% {
+        background-color: #e0e0e0;
+      }
+      100% {
+        background-color: #f5f5f5;
+      }
+    }
+    animation: skeletonLoading 1.2s infinite alternate;
+  }

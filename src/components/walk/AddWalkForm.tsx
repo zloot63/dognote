@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { saveWalkToFirestore } from "@/lib/firebase/walks";
 
-export default function AddWalkForm() {
+interface Props {
+    isOpen?: boolean;
+}
+
+export default function AddWalkForm(props:Props) {
     const [isWalking, setIsWalking] = useState(false);
     const [startTime, setStartTime] = useState<string | null>(null);
     const [route, setRoute] = useState<{ lat: number; lng: number }[]>([]);
