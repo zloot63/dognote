@@ -14,7 +14,7 @@ import {
 import { useFetchDogs } from "@/hooks/useDogs";
 import { Dog } from "@/types/dogs";
 import WalkDetailModal from "@/components/walk/WalkDetailModal"; // ✅ 모달 추가
-import Button from "../ui/inputs/Button";
+import Button from "../ui/inputs/Button"; // ✅ 새 Button 컴포넌트 적용
 
 export default function WalkButton() {
     const [walkId, setWalkId] = useState<string | null>(null);
@@ -99,14 +99,13 @@ export default function WalkButton() {
 
     return (
         <>
-            <button
+            <Button
                 onClick={walkId ? handleEndWalk : handleStartWalk}
-                className={`w-full px-6 py-3 text-white rounded-lg ${walkId ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-                    } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                variant={walkId ? "danger" : "primary"}
                 disabled={isLoading}
             >
                 {walkId ? "산책 종료" : "산책 시작"}
-            </button>
+            </Button>
 
             {/* ✅ WalkDetailModal 사용 (산책 종료 후 상세 입력) */}
             {isWalkDetailOpen && walkId && (

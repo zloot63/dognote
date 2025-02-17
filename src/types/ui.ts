@@ -8,4 +8,5 @@ export interface ButtonProps {
     size?: ButtonSize;
     disabled?: boolean;
     className?: string;
+    fullWidth?: boolean;
 }
