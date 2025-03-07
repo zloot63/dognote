@@ -1,0 +1,47 @@
+@use "sass:map";
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/abstracts/mixins" as *;
+
+.checkboxWrapper {
+  @include flex-center;
+  cursor: pointer;
+  user-select: none;
+  gap: map-get($spacing, "sm");
+
+  &:hover .customCheckbox {
+    border-color: map-get($colors, "primary");
+  }
+}
+
+.customCheckbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid map-get($colors, "border");
+  background: white;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  border-radius: 4px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 6px;
+    height: 10px;
+    border: solid map-get($colors, "primary");
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+}
+
+.checkbox:checked + .customCheckbox {
+  background: map-get($colors, "primary");
+  border-color: map-get($colors, "primary");
+
+  &::after {
+    opacity: 1;
+  }
+}

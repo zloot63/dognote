@@ -1,0 +1,50 @@
+@use "sass:map";
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/abstracts/mixins" as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: fit-content;
+
+  &.fullWidth {
+    width: 100%;
+  }
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-dark;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: $font-size-md;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  outline: none;
+  transition: border 0.2s ease-in-out;
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 4px rgba($primary-color, 0.3);
+  }
+
+  &:disabled {
+    background: $background-light;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &.error {
+    border-color: $error-color;
+  }
+}
+
+.errorMessage {
+  font-size: $font-size-xs;
+  color: $error-color;
+}

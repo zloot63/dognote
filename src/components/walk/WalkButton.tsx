@@ -103,6 +103,7 @@ export default function WalkButton() {
                 onClick={walkId ? handleEndWalk : handleStartWalk}
                 variant={walkId ? "danger" : "primary"}
                 disabled={isLoading}
+                fullWidth
             >
                 {walkId ? "산책 종료" : "산책 시작"}
             </Button>
