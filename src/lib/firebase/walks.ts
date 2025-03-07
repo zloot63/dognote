@@ -1,11 +1,10 @@
 import { db } from "@/lib/firebase";
-import { collection, query, orderBy, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore"; // ✅ 추가
+import { collection, query, orderBy, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, arrayUnion } from "firebase/firestore";
 import { getCurrentWalkFromDB } from "@/lib/localStorage";
 import { calculateDistance } from "@/utils/distance";
 import { getGPSFromStorage, removeGPSFromStorage } from "@/lib/localStorage";
 import { auth } from "@/lib/firebase";
 import { Walk, WalkFromFirestore } from "@/types/walks";
-
 
 /**
  * ✅ 현재 로그인한 사용자 ID 반환
@@ -16,7 +15,7 @@ const getUserId = (): string | null => auth.currentUser?.uid || null;
  * ✅ Firestore에 산책 기록 저장 (최초)
  */
 export const startWalkInFirestore = async (dogIds: string[]): Promise<string | null> => {
-    const userId = auth.currentUser?.uid;
+    const userId = getUserId();
     if (!userId) return null;
 
     try {
@@ -36,22 +35,31 @@ export const startWalkInFirestore = async (dogIds: string[]): Promise<string | n
 };
 
 /**
- * ✅ Firestore에 산책 기록 저장 (GPS 데이터 포함)
+ * ✅ Firestore에 GPS 데이터를 실시간 저장
  */
-export const saveWalkToFirestore = async (walk: Walk) => {
+export const saveGPSDataToFirestore = async (
+    walkId: string,
+    gpsData: { lat: number; lng: number; timestamp: string }
+) => {
     const userId = getUserId();
-    if (!userId) throw new Error("❌ 로그인한 사용자 정보가 없습니다.");
+    if (!userId) return;
 
-    await addDoc(collection(db, "users", userId, "walks"), walk);
+    try {
+        const walkRef = doc(db, "users", userId, "walks", walkId);
+        await updateDoc(walkRef, {
+            route: arrayUnion(gpsData),
+        });
+        console.log("✅ Firestore에 GPS 데이터 저장 완료:", gpsData);
+    } catch (error) {
+        console.error("❌ Firestore GPS 저장 오류:", error);
+    }
 };
-
-
 
 /**
  * ✅ Firestore에 산책 경로 업데이트
  */
 export const updateWalkInFirestore = async (walkId?: string) => {
-    const userId = auth.currentUser?.uid;
+    const userId = getUserId();
     if (!userId) return;
 
     const currentWalkId = walkId || (await getCurrentWalkFromDB());
@@ -74,7 +82,7 @@ export const updateWalkInFirestore = async (walkId?: string) => {
  * ✅ Firestore에 산책 종료 저장
  */
 export const endWalkInFirestore = async (walkId?: string) => {
-    const userId = auth.currentUser?.uid;
+    const userId = getUserId();
     if (!userId) return;
 
     const currentWalkId = walkId || (await getCurrentWalkFromDB());
@@ -94,7 +102,6 @@ export const endWalkInFirestore = async (walkId?: string) => {
         console.error("🚨 Firestore 산책 종료 저장 실패:", error);
     }
 };
-
 
 /**
  * ✅ Firestore에서 산책 기록 불러오기
@@ -146,9 +153,9 @@ export const getUserWalks = async (): Promise<Walk[]> => {
     }
 
     try {
-        const walksQuery = query( // ✅ query 사용
+        const walksQuery = query(
             collection(db, "users", userId, "walks"),
-            orderBy("startTime", "desc") // ✅ 최신순 정렬
+            orderBy("startTime", "desc")
         );
         const snapshot = await getDocs(walksQuery);
         return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Walk[];
@@ -188,7 +195,6 @@ export const getWalkById = async (walkId: string): Promise<Walk | null> => {
         return null;
     }
 };
-
 
 export const updateWalkDetails = async (walkId: string, data: Partial<Walk>) => {
     const userId = getUserId();

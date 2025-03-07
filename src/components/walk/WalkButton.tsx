@@ -36,18 +36,44 @@ export default function WalkButton() {
 
     const startTracking = () => {
         if (navigator.geolocation) {
+            let lastPosition: { lat: number; lng: number } | null = null;
+
             watchIdRef.current = navigator.geolocation.watchPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    saveGPSToStorage({ lat: latitude, lng: longitude, timestamp: new Date().toISOString() });
+
+                    // ✅ 최소 변화 거리 설정 (예: 10m 이상 이동 시 저장)
+                    if (
+                        lastPosition &&
+                        getDistance(lastPosition.lat, lastPosition.lng, latitude, longitude) < 10
+                    ) {
+                        return; // 너무 가까운 위치는 저장하지 않음
+                    }
+
+                    lastPosition = { lat: latitude, lng: longitude };
+
+                    const newGPSData = {
+                        lat: latitude,
+                        lng: longitude,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    // ✅ 1. LocalStorage에 저장
+                    saveGPSToStorage(newGPSData);
+
+                    // ✅ 2. Firestore에도 실시간 저장
+                    if (walkId) {
+                        saveGPSDataToFirestore(walkId, newGPSData);
+                    }
                 },
                 (error) => console.error("🚨 위치 추적 실패:", error),
-                { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 } // ✅ timeout 개선
             );
         } else {
             alert("❌ 위치 추적을 지원하지 않는 브라우저입니다.");
         }
     };
+
 
     const stopTracking = () => {
         if (watchIdRef.current !== null) {
@@ -103,7 +129,6 @@ export default function WalkButton() {
                 onClick={walkId ? handleEndWalk : handleStartWalk}
                 variant={walkId ? "danger" : "primary"}
                 disabled={isLoading}
-                fullWidth
             >
                 {walkId ? "산책 종료" : "산책 시작"}
             </Button>
