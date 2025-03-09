@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { startWalkInFirestore, endWalkInFirestore } from "@/lib/firebase/walks";
+import { startWalkInFirestore, endWalkInFirestore, saveGPSDataToFirestore } from "@/lib/firebase/walks";
 import {
     saveGPSToStorage,
     getGPSFromStorage,
@@ -13,15 +13,17 @@ import {
 } from "@/lib/localStorage";
 import { useFetchDogs } from "@/hooks/useDogs";
 import { Dog } from "@/types/dogs";
-import WalkDetailModal from "@/components/walk/WalkDetailModal"; // ✅ 모달 추가
-import Button from "../ui/inputs/Button"; // ✅ 새 Button 컴포넌트 적용
+import WalkDetailModal from "@/components/walk/WalkDetailModal";
+import Button from "../ui/inputs/Button";
+import { calculateDistance } from "@/utils/distance";
 
 export default function WalkButton() {
     const [walkId, setWalkId] = useState<string | null>(null);
     const { data: dogs, isLoading } = useFetchDogs();
     const watchIdRef = useRef<number | null>(null);
     const router = useRouter();
-    const [isWalkDetailOpen, setIsWalkDetailOpen] = useState(false); // ✅ 모달 상태 추가
+    const [isWalkDetailOpen, setIsWalkDetailOpen] = useState(false);
+    let lastPositionRef = useRef<{ lat: number; lng: number } | null>(null);
 
     useEffect(() => {
         console.log("🔄 LocalStorage에서 저장된 walkId 불러오는 중...");
@@ -34,46 +36,37 @@ export default function WalkButton() {
         }
     }, []);
 
-    const startTracking = () => {
+    const startTracking = (walkId: string) => {
         if (navigator.geolocation) {
-            let lastPosition: { lat: number; lng: number } | null = null;
-
             watchIdRef.current = navigator.geolocation.watchPosition(
-                (position) => {
+                async (position) => {
                     const { latitude, longitude } = position.coords;
+                    const timestamp = new Date().toISOString();
+                    const newGPSData = { lat: latitude, lng: longitude, timestamp };
 
-                    // ✅ 최소 변화 거리 설정 (예: 10m 이상 이동 시 저장)
+                    // ✅ 최소 이동 거리(10m) 이상일 때만 저장
                     if (
-                        lastPosition &&
-                        getDistance(lastPosition.lat, lastPosition.lng, latitude, longitude) < 10
+                        lastPositionRef.current &&
+                        calculateDistance([lastPositionRef.current], [newGPSData]) < 10
                     ) {
-                        return; // 너무 가까운 위치는 저장하지 않음
+                        return;
                     }
 
-                    lastPosition = { lat: latitude, lng: longitude };
+                    lastPositionRef.current = { lat: latitude, lng: longitude };
 
-                    const newGPSData = {
-                        lat: latitude,
-                        lng: longitude,
-                        timestamp: new Date().toISOString()
-                    };
-
-                    // ✅ 1. LocalStorage에 저장
+                    // ✅ 1. 로컬 스토리지에 저장
                     saveGPSToStorage(newGPSData);
 
-                    // ✅ 2. Firestore에도 실시간 저장
-                    if (walkId) {
-                        saveGPSDataToFirestore(walkId, newGPSData);
-                    }
+                    // ✅ 2. Firestore에 실시간 저장
+                    await saveGPSDataToFirestore(walkId, newGPSData);
                 },
                 (error) => console.error("🚨 위치 추적 실패:", error),
-                { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 } // ✅ timeout 개선
+                { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 } // 최적화된 설정
             );
         } else {
             alert("❌ 위치 추적을 지원하지 않는 브라우저입니다.");
         }
     };
-
 
     const stopTracking = () => {
         if (watchIdRef.current !== null) {
@@ -104,7 +97,7 @@ export default function WalkButton() {
         setWalkId(newWalkId);
         console.log("✅ walkId 저장 완료:", newWalkId);
 
-        startTracking();
+        startTracking(newWalkId);
     };
 
     const handleEndWalk = async () => {
@@ -117,8 +110,16 @@ export default function WalkButton() {
 
         stopTracking();
         setWalkId(null);
+
+        // 🔹 Firestore에 GPS 데이터 최종 저장
+        const allRoutes = getGPSFromStorage();
+        for (const gpsData of allRoutes) {
+            await saveGPSDataToFirestore(walkId, gpsData);
+        }
+
         await endWalkInFirestore(walkId);
         await removeCurrentWalkFromDB();
+        removeGPSFromStorage();
         console.log("✅ Firestore & LocalStorage에서 walkId 삭제 완료");
         setIsWalkDetailOpen(true);
     };
@@ -133,7 +134,6 @@ export default function WalkButton() {
                 {walkId ? "산책 종료" : "산책 시작"}
             </Button>
 
-            {/* ✅ WalkDetailModal 사용 (산책 종료 후 상세 입력) */}
             {isWalkDetailOpen && walkId && (
                 <WalkDetailModal
                     walkId={walkId}
