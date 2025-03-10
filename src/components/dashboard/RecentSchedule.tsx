@@ -1,8 +1,35 @@
-export default function RecentSchedule() {
-    return (
-        <section className="bg-white p-4 shadow-md rounded-lg mb-4">
-            <h2 className="text-xl font-bold">📅 최근 주요일정</h2>
-            <p className="text-gray-500">가까운 일정 1~2개 노출</p>
-        </section>
-    );
-}
+import React, { useEffect, useState } from "react";
+import { fetchRecentSchedules } from "@/lib/firebase/schedule";
+import { Schedule } from "@/types/schedule";
+
+const RecentSchedule = () => {
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+
+  useEffect(() => {
+    const loadSchedules = async () => {
+      const data = await fetchRecentSchedules();
+      setSchedules(data);
+    };
+
+    loadSchedules();
+  }, []);
+
+  return (
+    <div className="schedule-card">
+      <h3>📅 최근 주요일정</h3>
+      {schedules.length === 0 ? (
+        <p>가까운 일정이 없습니다.</p>
+      ) : (
+        <ul>
+          {schedules.slice(0, 2).map((schedule) => (
+            <li key={schedule.id}>
+              <strong>{schedule.type}</strong>: {schedule.date}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export default RecentSchedule;

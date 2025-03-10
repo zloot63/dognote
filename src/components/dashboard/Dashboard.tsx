@@ -26,7 +26,7 @@ export default function Dashboard() {
                 <>
                     <DogProfile dogs={dogs} />
                     <RecentSchedule />
-                    <WalkHistory /> {/* ✅ 산책 기록 표시 */}
+                    {/* <WalkHistory /> ✅ 산책 기록 표시 */}
                 </>
             ) : (
                 <div className="flex flex-col items-center justify-center min-h-screen">
