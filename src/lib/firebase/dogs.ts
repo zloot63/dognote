@@ -1,50 +1,44 @@
-import { db, collection, doc, getDocs, addDoc, deleteDoc } from "./firestore";
-import { auth } from "@/lib/firebase";
-import { Dog } from "@/types/dogs";
+// lib/firebase/dogs.ts
+import { db } from '@/lib/firebase/firebase';
+import { collection, doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
+import { Dog } from '@/types/dogs';
 
-/**
- * ✅ Firestore에서 강아지 정보 불러오기
- */
-export const fetchDogsFromFirestore = async (): Promise<Dog[]> => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return [];
+const dogsCollection = collection(db, 'dogs');
 
-    try {
-        const snapshot = await getDocs(collection(db, "users", userId, "dogs"));
-        return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Dog[];
-    } catch (error) {
-        console.error("🔥 강아지 정보 불러오기 실패:", error);
-        return [];
-    }
+// 강아지 등록
+export const createDog = async (dog: Omit<Dog, 'id' | 'createdAt' | 'updatedAt'>): Promise<string | null> => {
+  try {
+    const dogRef = await addDoc(collection(db, 'dogs'), {
+      ...dog,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    return dogRef.id;
+  } catch (error) {
+    console.error('🚨 강아지 등록 실패:', error);
+    return null;
+  }
 };
 
-/**
- * ✅ Firestore에 강아지 정보 저장
- */
-export const saveDogToFirestore = async (dog: Dog) => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
+// 강아지 정보 조회
+export const getDogById = async (dogId: string): Promise<Dog | null> => {
+  try {
+    const dogDoc = await getDoc(doc(db, 'dogs', dogId));
+    if (!dogDoc.exists()) return null;
 
-    try {
-        await addDoc(collection(db, "users", userId, "dogs"), {
-            ...dog,
-            createdAt: new Date().toISOString(),
-        });
-    } catch (error) {
-        console.error("🔥 강아지 정보 저장 실패:", error);
-    }
+    return { id: dogDoc.id, ...dogDoc.data() } as Dog;
+  } catch (error) {
+    console.error('🚨 강아지 조회 실패:', error);
+    return null;
+  }
 };
 
-/**
- * ✅ Firestore에서 특정 강아지 정보 삭제
- */
-export const deleteDogFromFirestore = async (dogId: string) => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
+// 강아지 정보 업데이트
+export const updateDog = async (dogId: string, data: Partial<Omit<Dog, 'id' | 'createdAt'>>): Promise<void> => {
+  await updateDoc(doc(db, 'dogs', dogId), { ...data, updatedAt: new Date() });
+};
 
-    try {
-        await deleteDoc(doc(db, "users", userId, "dogs", dogId));
-    } catch (error) {
-        console.error("🔥 강아지 정보 삭제 실패:", error);
-    }
+// 강아지 삭제 (구성원 여부 체크 로직은 추후 추가 예정)
+export const deleteDog = async (dogId: string): Promise<void> => {
+  await deleteDoc(doc(db, 'dogs', dogId));
 };
