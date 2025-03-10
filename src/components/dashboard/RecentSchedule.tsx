@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { fetchRecentSchedules } from "@/lib/firebase/schedule";
-import { Schedule } from "@/types/schedule";
+import { fetchRecentSchedules } from "@/lib/firebase/schedules";
+import { Schedule } from "@/types/schedules";
 
 const RecentSchedule = () => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
