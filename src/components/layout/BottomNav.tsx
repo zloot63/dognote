@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import WalkButton from "@/components/walk/WalkButton"; 
 

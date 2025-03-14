@@ -1,3 +1,5 @@
+"use client";
+
 import { Dog } from "@/types/dogs";
 
 interface DogProfileProps {

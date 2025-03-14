@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { fetchRecentSchedules } from "@/lib/firebase/schedules";
 import { Schedule } from "@/types/schedules";
