@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
-import { fetchDogsFromFirestore } from "@/lib/firebase/dogs";
+import { listAllDogs } from "@/lib/firebase/dogs";
 import { Menu, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { Dog } from "@/types/dogs";
@@ -24,9 +24,12 @@ export default function Header() {
       setUser(currentUser);
       if (currentUser) {
         try {
-          const dogs = await fetchDogsFromFirestore();
+          const dogs = await listAllDogs();
+  
           setDogList(dogs);
-          if (dogs.length > 0) setSelectedDog(dogs[0]); // ✅ 첫 번째 강아지를 기본 선택
+          if (dogs.length > 0) {
+            setSelectedDog(dogs[0]);
+          }
         } catch (error) {
           console.error("🔥 강아지 데이터 로드 실패:", error);
         }
@@ -35,9 +38,10 @@ export default function Header() {
         setSelectedDog(null);
       }
     });
-
+  
     return () => unsubscribe();
   }, []);
+  
 
   return (
     <>
@@ -58,7 +62,7 @@ export default function Header() {
               className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
             >
               <Image
-                src={selectedDog.photoURL || "/default-dog.png"}
+                src={selectedDog.profileImage || "/default-dog.png"}
                 alt={selectedDog.name}
                 width={30}
                 height={30}
