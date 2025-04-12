@@ -6,19 +6,33 @@ import { JWT } from "next-auth/jwt";
 import { Account, Profile, Session } from "next-auth";
 
 // ✅ 환경 변수 체크 (보안 키는 서버 전용, NEXT_PUBLIC_X 제거)
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID!;
-const NAVER_CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET!;
-const KAKAO_CLIENT_ID = process.env.KAKAO_CLIENT_ID!;
-const KAKAO_CLIENT_SECRET = process.env.KAKAO_CLIENT_SECRET!;
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
+const {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  NAVER_CLIENT_ID,
+  NAVER_CLIENT_SECRET,
+  KAKAO_CLIENT_ID,
+  KAKAO_CLIENT_SECRET,
+  NEXTAUTH_SECRET,
+} = process.env;
 
-if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !NEXTAUTH_SECRET) {
+if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !NAVER_CLIENT_ID || !NAVER_CLIENT_SECRET || !KAKAO_CLIENT_ID || !KAKAO_CLIENT_SECRET || !NEXTAUTH_SECRET) {
   throw new Error("🚨 환경 변수가 설정되지 않았습니다. .env 파일을 확인하세요!");
 }
 
-// ✅ NextAuth 설정
+// ✅ `session.user` 타입 확장 (NextAuth 모듈 확장)
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      accessToken: string;
+    };
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -37,7 +51,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, account, profile }: { token: JWT; account?: Account | null; profile?: Profile }) {
       if (account) {
-        token.accessToken = account.access_token;
+        token.accessToken = account.access_token || ""; // 🚨 undefined 방지
       }
       if (profile) {
         token.profile = profile;
@@ -45,13 +59,13 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
-      if (token.profile) {
-        session.user = {
-          ...session.user,
-          id: token.sub!,
-          profile: token.profile,
-        };
-      }
+      session.user = {
+        id: token.sub || "", // ✅ 타입 안정성 확보
+        name: session.user.name || null,
+        email: session.user.email || null,
+        image: session.user.image || null,
+        accessToken: token.accessToken as string, // ✅ 타입 안정성 추가
+      };
       return session;
     },
   },
