@@ -20,3 +20,10 @@ git clone https://github.com/zloot63/dognote.git
 cd dognote
 npm install
 npm run dev
+
+
+
+## 🤝 Contributing
+
+We welcome contributions from the community!  
+Please check out [CONTRIBUTING.md](./CONTRIBUTING.md) to get started.
