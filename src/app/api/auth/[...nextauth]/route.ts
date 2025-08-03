@@ -10,21 +10,36 @@ const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   NEXTAUTH_SECRET,
-  FIREBASE_PROJECT_ID,
-  FIREBASE_CLIENT_EMAIL,
-  FIREBASE_PRIVATE_KEY,
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,
+  NEXT_PUBLIC_FIREBASE_PRIVATE_KEY,
 } = process.env;
 
+// 필수 환경 변수 검증
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !NEXTAUTH_SECRET) {
-  throw new Error("🚨 필수 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인하세요!");
+  throw new Error("🚨 OAuth 관련 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인하세요!");
 }
+
+// Firebase Admin 환경 변수 검증 (현재 NEXT_PUBLIC_ 접두사 사용)
+if (!NEXT_PUBLIC_FIREBASE_PROJECT_ID || !NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL || !NEXT_PUBLIC_FIREBASE_PRIVATE_KEY) {
+  throw new Error("🚨 Firebase Admin 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인하세요!");
+}
+
+// 참고: 보안을 위해 허용된 서버 환경에서는 NEXT_PUBLIC_ 접두사를 사용하지 않는 것이 좋습니다.
 
 // Firebase Admin 설정
 const firebaseAdminConfig = {
-  projectId: FIREBASE_PROJECT_ID,
-  clientEmail: FIREBASE_CLIENT_EMAIL,
-  privateKey: FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  projectId: NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  clientEmail: NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,
+  privateKey: NEXT_PUBLIC_FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
 };
+
+// 디버깅용 로그
+console.log("Firebase Admin Config 검증:", {
+  projectIdExists: !!firebaseAdminConfig.projectId,
+  clientEmailExists: !!firebaseAdminConfig.clientEmail,
+  privateKeyExists: !!firebaseAdminConfig.privateKey,
+});
 
 // ✅ `session.user` 타입 확장 (NextAuth 모듈 확장)
 declare module "next-auth" {
@@ -40,9 +55,14 @@ declare module "next-auth" {
   }
 }
 
+// NextAuth.js 옵션 설정
 export const authOptions: NextAuthOptions = {
   adapter: FirestoreAdapter({
-    credential: cert(firebaseAdminConfig),
+    credential: cert({
+      projectId: firebaseAdminConfig.projectId,
+      clientEmail: firebaseAdminConfig.clientEmail,
+      privateKey: firebaseAdminConfig.privateKey,
+    }),
   }),
   providers: [
     GoogleProvider({
@@ -94,8 +114,11 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
+  debug: process.env.NODE_ENV === 'development',
 };
 
-// ✅ NextAuth 핸들러
-export const handler = NextAuth(authOptions);
+// NextAuth.js 핸들러 생성 및 내보내기
+const handler = NextAuth(authOptions);
+
+// API 라우트 핸들러 내보내기
 export { handler as GET, handler as POST };

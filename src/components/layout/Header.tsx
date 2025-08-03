@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation"; // 현재 사용하지 않음
 import { auth } from "@/lib/firebase";
 import { listAllDogs } from "@/lib/firebase/dogs";
 import { Menu, ChevronDown } from "lucide-react";
@@ -11,7 +11,7 @@ import { Dog } from "@/types/dogs";
 import SideMenu from "./SideMenu"; // ✅ 추가
 
 export default function Header() {
-  const router = useRouter();
+  // const router = useRouter(); // 현재 사용하지 않음
   const [user, setUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedDog, setSelectedDog] = useState<Dog | null>(null);

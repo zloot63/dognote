@@ -71,27 +71,60 @@ export const updateWalkInFirestore = async (walkId?: string) => {
 };
 
 /**
- * ✅ Firestore에 산책 종료 저장
+ * ✅ Firestore에 산책 종료 저장 (개선된 버전)
  */
-export const endWalkInFirestore = async (walkId?: string) => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
-
-    const currentWalkId = walkId || (await getCurrentWalkFromDB());
-    if (!currentWalkId) return;
+export const endWalkInFirestore = async (
+    walkId: string,
+    duration: number,
+    distance: number,
+    route: { lat: number; lng: number }[],
+    issues?: string[],
+    notes?: string,
+    rating?: number
+): Promise<Walk> => {
+    const userId = getUserId();
+    if (!userId) throw new Error("로그인한 사용자 정보가 없습니다.");
 
     try {
-        const allRoutes = getGPSFromStorage();
-        await updateDoc(doc(db, "users", userId, "walks", currentWalkId), {
-            endTime: new Date().toISOString(),
-            distance: calculateDistance(allRoutes),
-            route: allRoutes,
-        });
-
-        removeGPSFromStorage();
-        console.log("✅ Firestore 산책 종료 저장 완료:", currentWalkId);
+        const endTime = new Date().toISOString();
+        const walkDocRef = doc(db, "users", userId, "walks", walkId);
+        
+        const updateData = {
+            endTime,
+            duration,
+            distance,
+            route,
+            status: "completed" as const,
+            ...(issues && { issues }),
+            ...(notes && { notes }),
+            ...(rating && { rating })
+        };
+        
+        await updateDoc(walkDocRef, updateData);
+        
+        // 업데이트된 산책 데이터 반환
+        const walkDoc = await getDoc(walkDocRef);
+        if (!walkDoc.exists()) {
+            throw new Error("산책 데이터를 찾을 수 없습니다.");
+        }
+        
+        const walkData = walkDoc.data() as WalkFromFirestore;
+        return {
+            id: walkDoc.id,
+            userId,
+            dogIds: walkData.dogIds || [],
+            startTime: walkData.startTime || "",
+            endTime,
+            duration,
+            distance,
+            route,
+            status: "completed",
+            issues,
+            notes
+        };
     } catch (error) {
         console.error("🚨 Firestore 산책 종료 저장 실패:", error);
+        throw error;
     }
 };
 

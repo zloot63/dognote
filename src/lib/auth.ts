@@ -3,16 +3,29 @@ import GoogleProvider from "next-auth/providers/google";
 import { FirestoreAdapter } from "@auth/firebase-adapter";
 import { cert } from "firebase-admin/app";
 
-// Firebase Admin 설정
+// Firebase Admin 설정 (현재 NEXT_PUBLIC_ 접두사 사용)
 const firebaseAdminConfig = {
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  clientEmail: process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,
+  privateKey: process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY ? process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined,
 };
+
+// 디버깅용 로그
+console.log("Firebase Admin Config 검증 (auth.ts):", {
+  projectIdExists: !!firebaseAdminConfig.projectId,
+  clientEmailExists: !!firebaseAdminConfig.clientEmail,
+  privateKeyExists: !!firebaseAdminConfig.privateKey,
+});
+
+// 참고: 보안을 위해 허용된 서버 환경에서는 NEXT_PUBLIC_ 접두사를 사용하지 않는 것이 좋습니다.
 
 export const authOptions: NextAuthOptions = {
   adapter: FirestoreAdapter({
-    credential: cert(firebaseAdminConfig),
+    credential: cert({
+      projectId: firebaseAdminConfig.projectId || '',
+      clientEmail: firebaseAdminConfig.clientEmail || '',
+      privateKey: firebaseAdminConfig.privateKey || '',
+    }),
   }),
   providers: [
     GoogleProvider({

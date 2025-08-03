@@ -2,18 +2,44 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // 사용자 문서 - 본인만 읽기/쓰기 가능
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
+    // 강아지 문서 - 소유자만 읽기/쓰기 가능
+    match /dogs/{dogId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+
+    // 건강 기록 - 강아지 소유자만 접근 가능
+    match /dogs/{dogId}/healthRecords/{recordId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == get(/databases/$(database)/documents/dogs/$(dogId)).data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == get(/databases/$(database)/documents/dogs/$(dogId)).data.userId;
+    }
+
+    // 산책 기록 - 강아지 소유자만 접근 가능
+    match /dogs/{dogId}/walkRecords/{recordId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == get(/databases/$(database)/documents/dogs/$(dogId)).data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == get(/databases/$(database)/documents/dogs/$(dogId)).data.userId;
+    }
+
+    // 예방접종 기록 - 강아지 소유자만 접근 가능
+    match /dogs/{dogId}/vaccinations/{vaccinationId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == get(/databases/$(database)/documents/dogs/$(dogId)).data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == get(/databases/$(database)/documents/dogs/$(dogId)).data.userId;
+    }
+
+    // 개발 환경에서만 임시로 모든 접근 허용 (프로덕션에서는 제거)
     match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2025, 3, 15);
+      allow read, write: if request.auth != null;
     }
   }
 }
