@@ -9,13 +9,13 @@ import {
   saveCurrentWalkToDB,
   removeCurrentWalkFromDB,
 } from "@/lib/localStorage";
-import { useFetchDogs } from "@/hooks/useDogs";
+import { useDogs } from "@/hooks/useDogs";
 import { Dog } from "@/types/dogs";
 import WalkDetailModal from "@/components/walk/WalkDetailModal"; // ✅ 모달 추가
 
 export default function WalkButton() {
   const [walkId, setWalkId] = useState<string | null>(null);
-  const { data: dogs, isLoading } = useFetchDogs();
+  const { data: dogs, isLoading } = useDogs();
   const watchIdRef = useRef<number | null>(null);
   const router = useRouter();
   const [isWalkDetailOpen, setIsWalkDetailOpen] = useState(false); // ✅ 모달 상태 추가

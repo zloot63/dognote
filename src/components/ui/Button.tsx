@@ -1,30 +1,67 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'success' | 'warning';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   loading?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  fullWidth?: boolean;
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full';
+  shadow?: 'none' | 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', loading = false, disabled, children, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
+  ({ 
+    className, 
+    variant = 'primary', 
+    size = 'md', 
+    loading = false, 
+    disabled, 
+    leftIcon,
+    rightIcon,
+    fullWidth = false,
+    rounded = 'md',
+    shadow = 'sm',
+    children, 
+    ...props 
+  }, ref) => {
+    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95';
     
     const variants = {
-      primary: 'bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-primary',
-      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-visible:ring-secondary',
-      outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-accent',
-      ghost: 'hover:bg-accent hover:text-accent-foreground focus-visible:ring-accent',
-      destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive',
+      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500 shadow-blue-200',
+      secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:ring-gray-500 shadow-gray-200',
+      outline: 'border-2 border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus-visible:ring-gray-500',
+      ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus-visible:ring-gray-500',
+      destructive: 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 shadow-red-200',
+      success: 'bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-500 shadow-green-200',
+      warning: 'bg-yellow-500 text-white hover:bg-yellow-600 focus-visible:ring-yellow-500 shadow-yellow-200',
     };
 
     const sizes = {
-      sm: 'h-8 px-3 text-sm',
-      md: 'h-10 px-4 py-2',
-      lg: 'h-11 px-6 text-lg',
-      xl: 'h-12 px-8 text-xl',
+      xs: 'h-7 px-2 text-xs gap-1',
+      sm: 'h-8 px-3 text-sm gap-1.5',
+      md: 'h-10 px-4 py-2 text-sm gap-2',
+      lg: 'h-11 px-6 text-base gap-2',
+      xl: 'h-12 px-8 text-lg gap-2.5',
+    };
+
+    const roundedStyles = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-lg',
+      full: 'rounded-full',
+    };
+
+    const shadowStyles = {
+      none: '',
+      sm: 'shadow-sm hover:shadow-md',
+      md: 'shadow-md hover:shadow-lg',
+      lg: 'shadow-lg hover:shadow-xl',
     };
 
     return (
@@ -33,35 +70,32 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           baseStyles,
           variants[variant],
           sizes[size],
+          roundedStyles[rounded],
+          shadowStyles[shadow],
+          fullWidth && 'w-full',
           className
         )}
         ref={ref}
         disabled={disabled || loading}
         {...props}
       >
-        {loading && (
-          <svg
-            className="mr-2 h-4 w-4 animate-spin"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          leftIcon && <span className="flex-shrink-0">{leftIcon}</span>
         )}
-        {children}
+        
+        <span className={cn(
+          'flex-1 truncate',
+          (leftIcon || loading) && 'ml-0',
+          rightIcon && 'mr-0'
+        )}>
+          {children}
+        </span>
+        
+        {!loading && rightIcon && (
+          <span className="flex-shrink-0">{rightIcon}</span>
+        )}
       </button>
     );
   }
@@ -69,4 +103,77 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
+// 버튼 그룹 컴포넌트
+export interface ButtonGroupProps {
+  children: React.ReactNode;
+  className?: string;
+  orientation?: 'horizontal' | 'vertical';
+  spacing?: 'none' | 'sm' | 'md' | 'lg';
+}
+
+export const ButtonGroup: React.FC<ButtonGroupProps> = ({
+  children,
+  className,
+  orientation = 'horizontal',
+  spacing = 'sm'
+}) => {
+  const orientationStyles = {
+    horizontal: 'flex-row',
+    vertical: 'flex-col'
+  };
+
+  const spacingStyles = {
+    none: 'gap-0',
+    sm: 'gap-1',
+    md: 'gap-2',
+    lg: 'gap-3'
+  };
+
+  return (
+    <div className={cn(
+      'flex',
+      orientationStyles[orientation],
+      spacingStyles[spacing],
+      className
+    )}>
+      {children}
+    </div>
+  );
+};
+
+// 아이콘 버튼 컴포넌트
+export interface IconButtonProps extends Omit<ButtonProps, 'leftIcon' | 'rightIcon' | 'children'> {
+  icon: React.ReactNode;
+  'aria-label': string;
+}
+
+export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ icon, className, size = 'md', rounded = 'md', ...props }, ref) => {
+    const iconSizes = {
+      xs: 'h-4 w-4',
+      sm: 'h-4 w-4',
+      md: 'h-5 w-5',
+      lg: 'h-5 w-5',
+      xl: 'h-6 w-6'
+    };
+
+    return (
+      <Button
+        ref={ref}
+        size={size}
+        rounded={rounded}
+        className={cn('aspect-square p-0', className)}
+        {...props}
+      >
+        <span className={iconSizes[size]}>
+          {icon}
+        </span>
+      </Button>
+    );
+  }
+);
+
+IconButton.displayName = 'IconButton';
+
+export { Button };
 export default Button;

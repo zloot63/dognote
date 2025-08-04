@@ -93,9 +93,13 @@ export default function Dashboard() {
     ];
 
     return (
-        <Layout>
+        <Layout 
+            variant="dashboard" 
+            showFooter={true}
+            showWalkButton={true}
+        >
             {dogs.length > 0 ? (
-                <div className="space-y-6 p-4">
+                <div className="space-y-6">
                     {/* 상단 강아지 프로필 */}
                     <DogProfile dogs={dogs} />
                     
@@ -123,7 +127,7 @@ export default function Dashboard() {
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center min-h-screen">
+                <div className="flex flex-col items-center justify-center min-h-[60vh]">
                     <h2 className="text-xl font-bold mb-4">🐶 등록된 강아지가 없습니다.</h2>
                     <AddDogForm />
                 </div>

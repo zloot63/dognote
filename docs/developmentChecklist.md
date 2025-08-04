@@ -168,10 +168,13 @@
 
 | 상태 | ID | 작업 항목 | 우선순위 | 담당자 | 예상 시간 |
 |------|----|---------|---------|---------|---------| 
-| ⭕ | LAYOUT-01 | Header 컴포넌트 (반려견 스위처 포함) | Must | - | 4h |
-| ⭕ | LAYOUT-02 | Navigation/SideMenu | Must | - | 3h |
-| ⭕ | LAYOUT-03 | Footer 컴포넌트 | Should | - | 1h |
-| ⭕ | LAYOUT-04 | 모바일 반응형 레이아웃 | Must | - | 4h |
+| ✅ | LAYOUT-01 | Header 컴포넌트 (반려견 스위처 포함) | Must | - | 4h |
+| ✅ | LAYOUT-02 | Navigation/SideMenu 개선 | Must | - | 3h |
+| ✅ | LAYOUT-03 | Footer 컴포넌트 (풀/미니멀 변형) | Should | - | 1h |
+| ✅ | LAYOUT-04 | 모바일 반응형 레이아웃 | Must | - | 4h |
+| ✅ | LAYOUT-05 | BottomNav 개선 (플로팅 산책 버튼) | Must | - | 2h |
+| ✅ | LAYOUT-06 | Layout 컴포넌트 다중 변형 지원 | Must | - | 3h |
+| ✅ | LAYOUT-07 | 레이아웃 통합 테스트 페이지 구현 | Must | - | 2h |
 
 ### 도메인별 컴포넌트
 
