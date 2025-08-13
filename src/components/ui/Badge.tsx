@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info';
+  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info';
   size?: 'sm' | 'md' | 'lg';
   shape?: 'rounded' | 'pill' | 'square';
   dot?: boolean;
@@ -11,7 +11,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Badge: React.FC<BadgeProps> = ({
   className,
-  variant = 'default',
+  variant = 'primary',
   size = 'md',
   shape = 'rounded',
   dot = false,
@@ -21,7 +21,7 @@ const Badge: React.FC<BadgeProps> = ({
   const baseStyles = 'inline-flex items-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2';
   
   const variants = {
-    default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
+    primary: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
     secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
     destructive: 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
     outline: 'text-foreground border border-input hover:bg-accent hover:text-accent-foreground',

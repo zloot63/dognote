@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Eye, EyeOff } from 'lucide-react';
+import { variants, animations } from '@/lib/theme-utils';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -39,13 +40,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       setInternalValue(value || '');
     }, [value]);
 
-    const baseStyles = 'w-full font-medium transition-all duration-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50';
+    const baseStyles = `w-full font-medium ${animations.transition.normal} file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`;
     
-    const variants = {
-      default: 'border-2 border-gray-200 bg-white rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100',
-      filled: 'border-0 bg-gray-100 rounded-lg focus:bg-white focus:ring-4 focus:ring-blue-100',
-      underlined: 'border-0 border-b-2 border-gray-200 bg-transparent rounded-none focus:border-blue-500 focus:ring-0'
+    const inputVariants = {
+      default: variants.input.default,
+      filled: variants.input.filled,
+      underlined: variants.input.underlined
     };
+    
+    const errorVariant = error ? variants.input.error : inputVariants[variant];
 
     const sizes = {
       sm: 'h-8 px-3 py-1 text-sm',
@@ -89,9 +92,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             }}
             className={cn(
               baseStyles,
-              variants[variant],
+              errorVariant,
               sizes[inputSize],
-              errorStyles,
               leftIcon && 'pl-10',
               hasRightContent && 'pr-10',
               loading && 'cursor-wait',
@@ -206,9 +208,8 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
         <textarea
           className={cn(
             baseStyles,
-            variants[variant],
+            error ? variants.input.error : variants[variant],
             resizeStyles[resize],
-            errorStyles,
             className
           )}
           ref={ref}

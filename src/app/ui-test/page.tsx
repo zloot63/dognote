@@ -1,494 +1,520 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import TextArea from '@/components/ui/TextArea';
+import Checkbox from '@/components/ui/Checkbox';
+import Radio from '@/components/ui/Radio';
+import Select from '@/components/ui/Select';
+import Badge from '@/components/ui/Badge';
+import Avatar from '@/components/ui/Avatar';
+import Progress from '@/components/ui/Progress';
+import { Spinner, Loading, Skeleton } from '@/components/ui/Loading';
+import Modal from '@/components/ui/Modal';
+import Toast from '@/components/ui/Toast';
+import Tooltip from '@/components/ui/Tooltip';
+import Breadcrumb from '@/components/ui/Breadcrumb';
+import Container from '@/components/ui/Container';
+import Grid from '@/components/ui/Grid';
+import Divider from '@/components/ui/Divider';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import {
-  Button,
-  ButtonGroup,
-  IconButton,
-  Input,
-  TextArea,
-  Modal,
-  Spinner,
-  Loading,
-  Skeleton,
-  CardSkeleton,
-  ListSkeleton,
-  Toast,
-  useToast,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/components/ui';
-import { 
-  Search, 
-  Heart, 
-  Star, 
-  Download, 
-  Settings, 
-  User,
-  Mail,
+  Home,
+  Settings,
+  Search,
+  Edit,
+  CheckCircle,
+  Filter,
+  Eye,
+  Heart,
+  Download,
   Lock,
   Plus,
-  Edit,
-  Trash2,
-  Save
+  Trash2
 } from 'lucide-react';
 
-export default function UITestPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [textAreaValue, setTextAreaValue] = useState('');
-  const [passwordValue, setPasswordValue] = useState('');
-  const [loadingStates, setLoadingStates] = useState({
-    button1: false,
-    button2: false,
-    input: false
-  });
-  const { toasts, toast, removeToast } = useToast();
+// Toast 훅 모킹 (실제 구현이 없는 경우)
+const useToast = () => {
+  const [toasts, setToasts] = useState<any[]>([]);
+  
+  const addToast = (type: string, title: string, description?: string) => {
+    const id = Date.now().toString();
+    const newToast = { id, type, title, description };
+    setToasts(prev => [...prev, newToast]);
+    setTimeout(() => removeToast(id), 5000);
+  };
+  
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+  
+  return {
+    toasts,
+    removeToast,
+    toast: {
+      success: (title: string, description?: string) => addToast('success', title, description),
+      error: (title: string, description?: string) => addToast('error', title, description),
+      warning: (title: string, description?: string) => addToast('warning', title, description),
+      info: (title: string, description?: string) => addToast('info', title, description),
+      default: (title: string, description?: string) => addToast('default', title, description)
+    }
+  };
+};
 
-  const handleLoadingTest = (key: string) => {
-    setLoadingStates(prev => ({ ...prev, [key]: true }));
+export default function UITestPage() {
+  // 상태 관리
+  const [inputValue, setInputValue] = useState('');
+  const [textareaValue, setTextareaValue] = useState('');
+  const [isChecked, setIsChecked] = useState(false);
+  const [selectedRadio, setSelectedRadio] = useState('option1');
+  const [selectValue, setSelectValue] = useState('');
+  const [progressValue] = useState(65);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { toast, toasts, removeToast } = useToast();
+
+  const handleLoadingDemo = () => {
+    setIsLoading(true);
     setTimeout(() => {
-      setLoadingStates(prev => ({ ...prev, [key]: false }));
-      toast.success('성공!', `${key} 로딩이 완료되었습니다.`);
+      setIsLoading(false);
     }, 2000);
   };
 
+  // 브레드크럼 아이템
+  const breadcrumbItems = [
+    { label: '홈', href: '/', icon: <Home className="h-4 w-4" /> },
+    { label: 'UI 테스트', href: '/ui-test' }
+  ];
+
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-4xl space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">UI 컴포넌트 테스트</h1>
-          <p className="mt-2 text-muted-foreground">
-            DogNote 프로젝트의 기본 UI 컴포넌트들을 테스트합니다.
+    <div className="min-h-screen bg-neutral-50">
+      <Container size="xl" padding="lg">
+        {/* 헤더 */}
+        <div className="mb-8">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="text-4xl font-bold text-neutral-900 mt-4 mb-2">
+            UI 컴포넌트 테스트
+          </h1>
+          <p className="text-lg text-neutral-600">
+            DogNote 프로젝트의 모든 UI 컴포넌트를 테스트하고 확인할 수 있는 페이지입니다.
           </p>
         </div>
 
-        {/* Button 컴포넌트 테스트 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>🔘 Button 컴포넌트</CardTitle>
-            <CardDescription>개선된 버튼 스타일과 다양한 기능을 테스트합니다.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {/* 기본 변형 */}
-              <div>
-                <h4 className="font-medium mb-3">버튼 변형</h4>
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="primary">Primary</Button>
-                  <Button variant="secondary">Secondary</Button>
-                  <Button variant="outline">Outline</Button>
-                  <Button variant="ghost">Ghost</Button>
-                  <Button variant="destructive">Destructive</Button>
-                  <Button variant="success">Success</Button>
-                  <Button variant="warning">Warning</Button>
+        <div className="space-y-8">
+          {/* 기본 컴포넌트 섹션 */}
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-primary-600" />
+                기본 컴포넌트
+              </CardTitle>
+              <CardDescription>
+                가장 기본적인 UI 컴포넌트들을 테스트합니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* 버튼 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">버튼</h4>
+                  <div className="flex flex-wrap gap-3">
+                    <Button>기본 버튼</Button>
+                    <Button variant="outline">아웃라인</Button>
+                    <Button variant="ghost">고스트</Button>
+                    <Button variant="destructive">삭제</Button>
+                    <Button size="sm">작은 버튼</Button>
+                    <Button size="lg">큰 버튼</Button>
+                    <Button disabled>비활성화</Button>
+                    <Button loading={isLoading} onClick={handleLoadingDemo}>
+                      로딩 테스트
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
-              {/* 크기 */}
-              <div>
-                <h4 className="font-medium mb-3">버튼 크기</h4>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button size="xs">Extra Small</Button>
-                  <Button size="sm">Small</Button>
-                  <Button size="md">Medium</Button>
-                  <Button size="lg">Large</Button>
-                  <Button size="xl">Extra Large</Button>
-                </div>
-              </div>
-
-              {/* 아이콘 버튼 */}
-              <div>
-                <h4 className="font-medium mb-3">아이콘 버튼</h4>
-                <div className="flex flex-wrap gap-2">
-                  <Button leftIcon={<Heart className="h-4 w-4" />}>좋아요</Button>
-                  <Button rightIcon={<Download className="h-4 w-4" />} variant="outline">다운로드</Button>
-                  <Button 
-                    leftIcon={<Save className="h-4 w-4" />} 
-                    rightIcon={<Plus className="h-4 w-4" />}
-                    variant="success"
-                  >
-                    저장하고 추가
-                  </Button>
-                </div>
-              </div>
-
-              {/* 로딩 상태 */}
-              <div>
-                <h4 className="font-medium mb-3">로딩 상태</h4>
-                <div className="flex flex-wrap gap-2">
-                  <Button 
-                    loading={loadingStates.button1}
-                    onClick={() => handleLoadingTest('button1')}
-                  >
-                    로딩 테스트 1
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    loading={loadingStates.button2}
-                    onClick={() => handleLoadingTest('button2')}
-                  >
-                    로딩 테스트 2
-                  </Button>
-                </div>
-              </div>
-
-              {/* 아이콘 전용 버튼 */}
-              <div>
-                <h4 className="font-medium mb-3">아이콘 전용 버튼</h4>
-                <div className="flex flex-wrap gap-2">
-                  <IconButton icon={<Settings />} aria-label="설정" />
-                  <IconButton icon={<Edit />} aria-label="편집" variant="outline" />
-                  <IconButton icon={<Trash2 />} aria-label="삭제" variant="destructive" />
-                  <IconButton icon={<Star />} aria-label="즐겨찾기" variant="warning" size="lg" />
-                </div>
-              </div>
-
-              {/* 버튼 그룹 */}
-              <div>
-                <h4 className="font-medium mb-3">버튼 그룹</h4>
-                <div className="space-y-3">
-                  <ButtonGroup>
-                    <Button variant="outline">왼쪽</Button>
-                    <Button variant="outline">가운데</Button>
-                    <Button variant="outline">오른쪽</Button>
-                  </ButtonGroup>
-                  
-                  <ButtonGroup orientation="vertical" spacing="md">
-                    <Button variant="primary">위</Button>
-                    <Button variant="primary">가운데</Button>
-                    <Button variant="primary">아래</Button>
-                  </ButtonGroup>
-                </div>
-              </div>
-
-              {/* 특수 스타일 */}
-              <div>
-                <h4 className="font-medium mb-3">특수 스타일</h4>
-                <div className="space-y-2">
-                  <Button fullWidth>전체 너비 버튼</Button>
-                  <div className="flex gap-2">
-                    <Button rounded="none">각진 모서리</Button>
-                    <Button rounded="full">완전 둥근 모서리</Button>
-                    <Button shadow="lg">큰 그림자</Button>
+                {/* 아이콘 버튼 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">아이콘 버튼</h4>
+                  <div className="flex gap-3">
+                    <Button variant="outline" size="sm">
+                      <Heart className="h-4 w-4 mr-2" />
+                      좋아요
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      다운로드
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Edit className="h-4 w-4 mr-2" />
+                      편집
+                    </Button>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      삭제
+                    </Button>
                   </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Input 컴포넌트 테스트 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>📝 Input 컴포넌트</CardTitle>
-            <CardDescription>개선된 입력 필드와 다양한 기능을 테스트합니다.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {/* 기본 입력 */}
-              <div>
-                <h4 className="font-medium mb-3">기본 입력 필드</h4>
-                <div className="space-y-4">
-                  <Input
-                    label="기본 입력"
-                    placeholder="텍스트를 입력하세요"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    clearable
-                    onClear={() => setInputValue('')}
-                  />
-                  <Input
-                    label="필수 입력 *"
-                    placeholder="필수 입력 필드"
-                    required
-                    error={!inputValue ? "필수 입력 항목입니다" : ""}
-                  />
-                  <Input
-                    label="도움말 텍스트"
-                    placeholder="도움말 테스트"
-                    helperText="이것은 도움말 텍스트입니다. 입력 방법을 안내합니다."
-                  />
+          {/* 입력 컴포넌트 섹션 */}
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Edit className="h-5 w-5 text-primary-600" />
+                입력 컴포넌트
+              </CardTitle>
+              <CardDescription>
+                사용자 입력을 받는 다양한 컴포넌트들을 테스트합니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* 입력 필드 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">입력 필드</h4>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Input
+                      placeholder="기본 입력 필드"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                    />
+                    <Input
+                      type="password"
+                      placeholder="비밀번호"
+                      icon={<Lock className="h-4 w-4" />}
+                    />
+                    <Input
+                      placeholder="검색..."
+                      icon={<Search className="h-4 w-4" />}
+                      variant="search"
+                    />
+                    <Input
+                      placeholder="오류 상태"
+                      variant="error"
+                      error="필수 입력 항목입니다"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* 변형 스타일 */}
-              <div>
-                <h4 className="font-medium mb-3">입력 필드 변형</h4>
-                <div className="space-y-4">
-                  <Input
-                    label="기본 스타일"
-                    placeholder="기본 테두리 스타일"
-                    variant="default"
-                  />
-                  <Input
-                    label="채워진 스타일"
-                    placeholder="배경이 채워진 스타일"
-                    variant="filled"
-                  />
-                  <Input
-                    label="밑줄 스타일"
-                    placeholder="밑줄만 있는 스타일"
-                    variant="underlined"
-                  />
-                </div>
-              </div>
-
-              {/* 크기 */}
-              <div>
-                <h4 className="font-medium mb-3">입력 필드 크기</h4>
-                <div className="space-y-4">
-                  <Input label="작은 크기" placeholder="Small size" inputSize="sm" />
-                  <Input label="중간 크기" placeholder="Medium size" inputSize="md" />
-                  <Input label="큰 크기" placeholder="Large size" inputSize="lg" />
-                </div>
-              </div>
-
-              {/* 아이콘 */}
-              <div>
-                <h4 className="font-medium mb-3">아이콘이 있는 입력 필드</h4>
-                <div className="space-y-4">
-                  <Input
-                    label="검색"
-                    placeholder="검색어를 입력하세요"
-                    leftIcon={<Search className="h-4 w-4" />}
-                  />
-                  <Input
-                    label="이메일"
-                    type="email"
-                    placeholder="이메일을 입력하세요"
-                    leftIcon={<Mail className="h-4 w-4" />}
-                    rightIcon={<User className="h-4 w-4" />}
-                  />
-                </div>
-              </div>
-
-              {/* 패스워드 */}
-              <div>
-                <h4 className="font-medium mb-3">패스워드 입력</h4>
-                <Input
-                  label="패스워드"
-                  type="password"
-                  placeholder="패스워드를 입력하세요"
-                  value={passwordValue}
-                  onChange={(e) => setPasswordValue(e.target.value)}
-                  leftIcon={<Lock className="h-4 w-4" />}
-                  helperText="8자 이상, 영문/숫자/특수문자 포함"
-                />
-              </div>
-
-              {/* 로딩 상태 */}
-              <div>
-                <h4 className="font-medium mb-3">로딩 상태</h4>
-                <Input
-                  label="로딩 중"
-                  placeholder="로딩 중입니다..."
-                  loading={loadingStates.input}
-                  leftIcon={<Search className="h-4 w-4" />}
-                />
-                <Button 
-                  className="mt-2"
-                  size="sm"
-                  onClick={() => handleLoadingTest('input')}
-                >
-                  로딩 테스트
-                </Button>
-              </div>
-
-              {/* TextArea */}
-              <div>
-                <h4 className="font-medium mb-3">텍스트 영역</h4>
-                <div className="space-y-4">
+                {/* 텍스트 영역 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">텍스트 영역</h4>
                   <TextArea
-                    label="기본 텍스트 영역"
-                    placeholder="여러 줄의 텍스트를 입력하세요"
-                    value={textAreaValue}
-                    onChange={(e) => setTextAreaValue(e.target.value)}
-                    helperText="최대 500자까지 입력 가능합니다"
-                  />
-                  <TextArea
-                    label="크기 조절 비활성화"
-                    placeholder="크기 조절이 비활성화된 텍스트 영역"
-                    resize="none"
-                  />
-                  <TextArea
-                    label="에러 상태"
-                    placeholder="에러가 있는 텍스트 영역"
-                    error="내용이 너무 짧습니다. 최소 10자 이상 입력해주세요."
-                    required
+                    placeholder="여러 줄 텍스트를 입력하세요..."
+                    value={textareaValue}
+                    onChange={(e) => setTextareaValue(e.target.value)}
+                    rows={4}
                   />
                 </div>
-              </div>  
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* TextArea 컴포넌트 테스트 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>TextArea 컴포넌트</CardTitle>
-            <CardDescription>텍스트 영역 컴포넌트를 테스트합니다.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <TextArea
-                label="메모"
-                placeholder="여러 줄의 텍스트를 입력하세요..."
-                value={textAreaValue}
-                onChange={(e) => setTextAreaValue(e.target.value)}
-                helperText="최대 500자까지 입력 가능합니다"
-              />
-              <TextArea
-                label="고정 크기"
-                placeholder="크기 조절이 불가능한 텍스트 영역"
-                resize="none"
-              />
-            </div>
-          </CardContent>
-        </Card>
+                {/* 체크박스 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">체크박스</h4>
+                  <div className="space-y-3">
+                    <Checkbox
+                      checked={isChecked}
+                      onChange={setIsChecked}
+                      label="기본 체크박스"
+                    />
+                    <Checkbox
+                      checked={true}
+                      onChange={() => {}}
+                      label="선택된 체크박스"
+                    />
+                    <Checkbox
+                      checked={false}
+                      onChange={() => {}}
+                      disabled
+                      label="비활성화된 체크박스"
+                    />
+                  </div>
+                </div>
 
-        {/* Modal 컴포넌트 테스트 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Modal 컴포넌트</CardTitle>
-            <CardDescription>모달 다이얼로그를 테스트합니다.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => setIsModalOpen(true)}>
-              모달 열기
-            </Button>
-          </CardContent>
-        </Card>
+                {/* 라디오 버튼 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">라디오 버튼</h4>
+                  <div className="space-y-3">
+                    <Radio
+                      name="radio-group"
+                      value="option1"
+                      checked={selectedRadio === 'option1'}
+                      onChange={setSelectedRadio}
+                      label="옵션 1"
+                    />
+                    <Radio
+                      name="radio-group"
+                      value="option2"
+                      checked={selectedRadio === 'option2'}
+                      onChange={setSelectedRadio}
+                      label="옵션 2"
+                    />
+                    <Radio
+                      name="radio-group"
+                      value="option3"
+                      checked={selectedRadio === 'option3'}
+                      onChange={setSelectedRadio}
+                      label="옵션 3"
+                    />
+                  </div>
+                </div>
 
-        {/* Loading 컴포넌트 테스트 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Loading 컴포넌트</CardTitle>
-            <CardDescription>로딩 스피너와 스켈레톤을 테스트합니다.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div>
-                <h4 className="mb-2 font-medium">Spinner</h4>
-                <div className="flex items-center gap-4">
-                  <Spinner size="sm" />
-                  <Spinner size="md" />
-                  <Spinner size="lg" />
-                  <Spinner size="xl" />
+                {/* 셀렉트 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">셀렉트</h4>
+                  <Select
+                    value={selectValue}
+                    onChange={setSelectValue}
+                    placeholder="옵션을 선택하세요"
+                    options={[
+                      { value: 'option1', label: '옵션 1' },
+                      { value: 'option2', label: '옵션 2' },
+                      { value: 'option3', label: '옵션 3' }
+                    ]}
+                  />
                 </div>
               </div>
-              
-              <div>
-                <h4 className="mb-2 font-medium">Loading with Text</h4>
-                <Loading text="데이터를 불러오는 중..." />
-              </div>
-              
-              <div>
-                <h4 className="mb-2 font-medium">Skeleton</h4>
-                <div className="space-y-4">
-                  <Skeleton variant="text" lines={3} />
-                  <div className="flex items-center space-x-3">
-                    <Skeleton variant="circular" width={40} height={40} />
-                    <div className="flex-1">
-                      <Skeleton variant="text" />
-                      <Skeleton variant="text" width="60%" />
+            </CardContent>
+          </Card>
+
+          {/* 표시 컴포넌트 섹션 */}
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5 text-primary-600" />
+                표시 컴포넌트
+              </CardTitle>
+              <CardDescription>
+                정보를 표시하는 다양한 컴포넌트들을 테스트합니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* 배지 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">배지</h4>
+                  <div className="flex flex-wrap gap-3">
+                    <Badge>기본</Badge>
+                    <Badge variant="secondary">보조</Badge>
+                    <Badge variant="success">성공</Badge>
+                    <Badge variant="warning">경고</Badge>
+                    <Badge variant="destructive">오류</Badge>
+                    <Badge variant="outline">아웃라인</Badge>
+                  </div>
+                </div>
+
+                {/* 아바타 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">아바타</h4>
+                  <div className="flex items-center gap-4">
+                    <Avatar size="sm" />
+                    <Avatar size="md" />
+                    <Avatar size="lg" />
+                    <Avatar size="xl" />
+                    <Avatar 
+                      size="md" 
+                      src=""
+                      alt="강아지"
+                    />
+                  </div>
+                </div>
+
+                {/* 프로그레스 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">프로그레스</h4>
+                  <div className="space-y-4">
+                    <Progress value={progressValue} />
+                    <Progress value={25} variant="success" />
+                    <Progress value={75} variant="warning" />
+                    <Progress value={90} variant="destructive" />
+                  </div>
+                </div>
+
+                {/* 로딩 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">로딩</h4>
+                  <div className="flex items-center gap-6">
+                    <Spinner size="sm" />
+                    <Spinner size="md" />
+                    <Spinner size="lg" />
+                    <Loading text="데이터를 불러오는 중..." />
+                  </div>
+                </div>
+
+                {/* 스켈레톤 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">스켈레톤</h4>
+                  <div className="space-y-4">
+                    <Skeleton variant="text" lines={3} />
+                    <div className="flex items-center space-x-3">
+                      <Skeleton variant="circular" width={40} height={40} />
+                      <div className="flex-1">
+                        <Skeleton variant="text" />
+                        <Skeleton variant="text" width="60%" />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              
-              <div>
-                <h4 className="mb-2 font-medium">Card Skeleton</h4>
-                <CardSkeleton />
-              </div>
-              
-              <div>
-                <h4 className="mb-2 font-medium">List Skeleton</h4>
-                <ListSkeleton items={3} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Toast 컴포넌트 테스트 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Toast 컴포넌트</CardTitle>
-            <CardDescription>토스트 알림을 테스트합니다.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={() => toast.success('성공!', '작업이 성공적으로 완료되었습니다.')}>
-                Success Toast
-              </Button>
-              <Button onClick={() => toast.error('오류!', '문제가 발생했습니다.')}>
-                Error Toast
-              </Button>
-              <Button onClick={() => toast.warning('경고!', '주의가 필요합니다.')}>
-                Warning Toast
-              </Button>
-              <Button onClick={() => toast.info('정보', '새로운 정보가 있습니다.')}>
-                Info Toast
-              </Button>
-              <Button onClick={() => toast.default('기본', '기본 토스트 메시지입니다.')}>
-                Default Toast
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Card 컴포넌트 테스트 */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card variant="default">
-            <CardHeader>
-              <CardTitle>기본 카드</CardTitle>
-              <CardDescription>기본 스타일의 카드입니다.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>카드 내용이 여기에 표시됩니다.</p>
-            </CardContent>
-            <CardFooter>
-              <Button size="sm">액션</Button>
-            </CardFooter>
-          </Card>
-
-          <Card variant="outlined">
-            <CardHeader>
-              <CardTitle>아웃라인 카드</CardTitle>
-              <CardDescription>테두리가 강조된 카드입니다.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>아웃라인 스타일의 카드 내용입니다.</p>
             </CardContent>
           </Card>
 
+          {/* 피드백 컴포넌트 섹션 */}
           <Card variant="elevated">
             <CardHeader>
-              <CardTitle>엘리베이티드 카드</CardTitle>
-              <CardDescription>그림자가 있는 카드입니다.</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary-600" />
+                피드백 컴포넌트
+              </CardTitle>
+              <CardDescription>
+                사용자에게 피드백을 제공하는 컴포넌트들을 테스트합니다.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p>그림자 효과가 적용된 카드입니다.</p>
+              <div className="space-y-6">
+                {/* 모달 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">모달</h4>
+                  <Button onClick={() => setIsModalOpen(true)}>
+                    모달 열기
+                  </Button>
+                </div>
+
+                {/* 토스트 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">토스트 알림</h4>
+                  <div className="flex flex-wrap gap-3">
+                    <Button size="sm" onClick={() => toast.success('성공!', '작업이 성공적으로 완료되었습니다.')}>
+                      성공 토스트
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => toast.error('오류!', '문제가 발생했습니다.')}>
+                      오류 토스트
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => toast.warning('경고!', '주의가 필요합니다.')}>
+                      경고 토스트
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => toast.info('정보', '새로운 정보가 있습니다.')}>
+                      정보 토스트
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 톨팁 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">톨팁</h4>
+                  <div className="flex gap-3">
+                    <Tooltip content="이것은 톨팁 메시지입니다">
+                      <Button variant="outline">톨팁 테스트</Button>
+                    </Tooltip>
+                    <Tooltip content="위쪽에 표시되는 톨팁" position="top">
+                      <Button variant="outline">위쪽 톨팁</Button>
+                    </Tooltip>
+                    <Tooltip content="오른쪽에 표시되는 톨팁" position="right">
+                      <Button variant="outline">오른쪽 톨팁</Button>
+                    </Tooltip>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card variant="filled">
+          {/* 레이아웃 컴포넌트 섹션 */}
+          <Card variant="elevated">
             <CardHeader>
-              <CardTitle>채워진 카드</CardTitle>
-              <CardDescription>배경색이 있는 카드입니다.</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-primary-600" />
+                레이아웃 컴포넌트
+              </CardTitle>
+              <CardDescription>
+                레이아웃과 구조를 위한 컴포넌트들을 테스트합니다.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p>배경색이 적용된 카드입니다.</p>
+              <div className="space-y-6">
+                {/* 컨테이너 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">컨테이너</h4>
+                  <Container size="md" padding="sm" className="bg-neutral-100 border border-neutral-200">
+                    <p className="text-center text-neutral-700">중간 크기의 컨테이너</p>
+                  </Container>
+                </div>
+
+                {/* 그리드 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">그리드</h4>
+                  <Grid cols={3} gap="md">
+                    <div className="bg-primary-100 p-4 rounded-lg text-center">그리드 1</div>
+                    <div className="bg-primary-100 p-4 rounded-lg text-center">그리드 2</div>
+                    <div className="bg-primary-100 p-4 rounded-lg text-center">그리드 3</div>
+                  </Grid>
+                </div>
+
+                {/* 구분선 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">구분선</h4>
+                  <div className="space-y-4">
+                    <p>위 내용</p>
+                    <Divider />
+                    <p>아래 내용</p>
+                    <Divider variant="dashed" />
+                    <p>점선 구분선 아래 내용</p>
+                  </div>
+                </div>
+
+                {/* 카드 변형 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">카드 변형</h4>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Card variant="default">
+                      <CardHeader>
+                        <CardTitle>기본 카드</CardTitle>
+                        <CardDescription>기본 스타일의 카드입니다.</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p>카드 내용이 여기에 표시됩니다.</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card variant="elevated">
+                      <CardHeader>
+                        <CardTitle>엘리베이티드 카드</CardTitle>
+                        <CardDescription>그림자가 있는 카드입니다.</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p>그림자 효과가 적용된 카드입니다.</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card variant="interactive">
+                      <CardHeader>
+                        <CardTitle>인터랙티브 카드</CardTitle>
+                        <CardDescription>클릭 가능한 카드입니다.</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p>마우스 호버 효과가 있는 카드입니다.</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card variant="filled">
+                      <CardHeader>
+                        <CardTitle>채워진 카드</CardTitle>
+                        <CardDescription>배경색이 있는 카드입니다.</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p>배경색이 적용된 카드입니다.</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
-      </div>
+      </Container>
 
-      {/* Modal */}
+      {/* 모달 */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -510,14 +536,14 @@ export default function UITestPage() {
         </div>
       </Modal>
 
-      {/* Toast Container */}
+      {/* 토스트 컨테이너 */}
       {toasts.length > 0 && (
         <div className="fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:max-w-[420px]">
           {toasts.map((toastItem) => (
             <Toast
               key={toastItem.id}
               {...toastItem}
-              onClose={() => removeToast(toastItem.id!)}
+              onClose={() => removeToast(toastItem.id)}
             />
           ))}
         </div>

@@ -61,7 +61,7 @@ const Radio: React.FC<RadioProps> = ({
         'space-y-2',
         orientation === 'horizontal' && 'flex flex-wrap gap-4 space-y-0'
       )}>
-        {options.map((option) => (
+        {options?.map((option) => (
           <div key={option.value} className="flex items-start space-x-2">
             <div className="relative flex items-center">
               <input

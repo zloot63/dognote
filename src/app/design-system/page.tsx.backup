@@ -1,0 +1,1757 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import TextArea from '@/components/ui/TextArea';
+import Checkbox from '@/components/ui/Checkbox';
+import Radio from '@/components/ui/Radio';
+import Select from '@/components/ui/Select';
+import Badge from '@/components/ui/Badge';
+import Avatar from '@/components/ui/Avatar';
+import Progress from '@/components/ui/Progress';
+import { Spinner, Loading, Skeleton } from '@/components/ui/Loading';
+import Modal from '@/components/ui/Modal';
+import Tooltip from '@/components/ui/Tooltip';
+import { Card } from '@/components/ui/Card';
+import { theme } from '@/styles/theme';
+import {
+  Palette, Layers, Check, Edit, Eye, Settings, Paintbrush
+} from 'lucide-react';
+
+// 컴포넌트 카테고리 정의
+const componentCategories = [
+  {
+    id: 'foundations',
+    title: '기초 요소',
+    icon: <Palette className="h-5 w-5" />,
+    items: ['colors', 'typography', 'spacing', 'shadows']
+  },
+  {
+    id: 'theme',
+    title: '테마 유틸리티',
+    icon: <Paintbrush className="h-5 w-5" />,
+    items: ['theme-overview', 'theme-types', 'theme-functions', 'theme-tailwind', 'theme-components', 'theme-animations']
+  },
+  {
+    id: 'inputs',
+    title: '입력 컴포넌트',
+    icon: <Edit className="h-5 w-5" />,
+    items: ['button', 'input', 'textarea', 'checkbox', 'radio', 'select']
+  },
+  {
+    id: 'display',
+    title: '표시 컴포넌트',
+    icon: <Eye className="h-5 w-5" />,
+    items: ['badge', 'avatar', 'progress', 'loading', 'skeleton']
+  },
+  {
+    id: 'feedback',
+    title: '피드백',
+    icon: <Settings className="h-5 w-5" />,
+    items: ['modal', 'toast', 'tooltip']
+  },
+  {
+    id: 'layout',
+    title: '레이아웃',
+    icon: <Layers className="h-5 w-5" />,
+    items: ['card', 'container', 'grid', 'divider']
+  }
+];
+
+export default function DesignSystemPage() {
+  const [activeCategory, setActiveCategory] = useState('foundations');
+  const [activeComponent, setActiveComponent] = useState('colors');
+  const [copiedColor, setCopiedColor] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [isChecked, setIsChecked] = useState(false);
+  const [selectedRadio, setSelectedRadio] = useState('option1');
+  const [selectValue, setSelectValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const copyToClipboard = (text: string, colorKey: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedColor(colorKey);
+    setTimeout(() => setCopiedColor(null), 2000);
+  };
+
+  const renderColorPalette = () => (
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-xl font-semibold mb-4">Primary Colors</h3>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {Object.entries(theme.colors.primary).map(([key, value]) => (
+            <div key={key} className="space-y-2">
+              <div 
+                className="h-16 rounded-lg cursor-pointer transition-transform hover:scale-105"
+                style={{ backgroundColor: value }}
+                onClick={() => copyToClipboard(value, `primary-${key}`)}
+              />
+              <div className="text-sm">
+                <div className="font-medium">primary-{key}</div>
+                <div className="text-neutral-600">{value}</div>
+                {copiedColor === `primary-${key}` && (
+                  <div className="text-green-600 flex items-center gap-1">
+                    <Check className="h-3 w-3" />
+                    복사됨
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderButtons = () => (
+    <div className="space-y-8">
+      <div>
+        <h4 className="font-semibold mb-4">Button 변형</h4>
+        <div className="flex flex-wrap gap-3 mb-4">
+          <Button variant="primary">Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="destructive">Destructive</Button>
+        </div>
+        <div className="text-sm text-neutral-600">
+          <p>기본 Primary 버튼은 주요 액션에, Secondary는 보조 액션에 사용합니다.</p>
+        </div>
+      </div>
+      
+      <div>
+        <h4 className="font-semibold mb-4">Button 크기</h4>
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <Button size="sm">Small</Button>
+          <Button size="md">Medium</Button>
+          <Button size="lg">Large</Button>
+        </div>
+        <div className="text-sm text-neutral-600">
+          <p>다양한 크기의 버튼을 사용할 수 있습니다. 기본은 Medium입니다.</p>
+        </div>
+      </div>
+      
+      <div>
+        <h4 className="font-semibold mb-4">Button 상태</h4>
+        <div className="flex flex-wrap gap-3 mb-4">
+          <Button>Normal</Button>
+          <Button disabled>Disabled</Button>
+          <Button loading={isLoading} onClick={() => setIsLoading(!isLoading)}>
+            {isLoading ? 'Loading...' : 'Click to Load'}
+          </Button>
+        </div>
+        <div className="text-sm text-neutral-600">
+          <p>버튼의 다양한 상태를 표현할 수 있습니다.</p>
+        </div>
+      </div>
+      
+      <div>
+        <h4 className="font-semibold mb-4">사용법</h4>
+        <div className="bg-neutral-50 p-4 rounded-lg">
+          <pre className="text-sm text-neutral-700 overflow-x-auto">
+            <code>{`// 기본 버튼
+<Button onClick={handleClick}>
+  클릭하세요
+</Button>
+
+// 변형 버튼
+<Button variant="outline" size="lg">
+  아웃라인 버튼
+</Button>
+
+// 로딩 상태
+<Button loading={isLoading}>
+  {isLoading ? '처리 중...' : '전송'}
+</Button>`}</code>
+          </pre>
+        </div>
+      </div>
+      
+      <div>
+        <h4 className="font-semibold mb-4">Props</h4>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-neutral-200">
+                <th className="text-left py-2 font-medium">Prop</th>
+                <th className="text-left py-2 font-medium">Type</th>
+                <th className="text-left py-2 font-medium">Default</th>
+                <th className="text-left py-2 font-medium">Description</th>
+              </tr>
+            </thead>
+            <tbody className="text-neutral-600">
+              <tr className="border-b border-neutral-100">
+                <td className="py-2 font-mono">variant</td>
+                <td className="py-2">'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive'</td>
+                <td className="py-2">'primary'</td>
+                <td className="py-2">버튼 스타일 변형</td>
+              </tr>
+              <tr className="border-b border-neutral-100">
+                <td className="py-2 font-mono">size</td>
+                <td className="py-2">'sm' | 'md' | 'lg'</td>
+                <td className="py-2">'md'</td>
+                <td className="py-2">버튼 크기</td>
+              </tr>
+              <tr className="border-b border-neutral-100">
+                <td className="py-2 font-mono">loading</td>
+                <td className="py-2">boolean</td>
+                <td className="py-2">false</td>
+                <td className="py-2">로딩 상태 표시 여부</td>
+              </tr>
+              <tr className="border-b border-neutral-100">
+                <td className="py-2 font-mono">disabled</td>
+                <td className="py-2">boolean</td>
+                <td className="py-2">false</td>
+                <td className="py-2">버튼 비활성화 여부</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderInputs = () => (
+    <div className="space-y-8">
+      <div>
+        <h4 className="font-semibold mb-4">Input 변형</h4>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Input placeholder="기본 입력" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+          <Input type="password" placeholder="비밀번호" />
+          <Input placeholder="검색..." />
+          <Input placeholder="오류 상태" error="필수 입력 항목입니다" />
+        </div>
+      </div>
+      
+      <div>
+        <h4 className="font-semibold mb-4">사용법</h4>
+        <div className="bg-neutral-50 p-4 rounded-lg">
+          <pre className="text-sm text-neutral-700 overflow-x-auto">
+            <code>{`<Input 
+  placeholder="이메일을 입력하세요" 
+  value={email} 
+  onChange={(e) => setEmail(e.target.value)}
+  error={emailError}
+/>`}</code>
+          </pre>
+        </div>
+      </div>
+      
+      <div>
+        <h4 className="font-semibold mb-4">Props</h4>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-neutral-200">
+                <th className="text-left py-2 font-medium">Prop</th>
+                <th className="text-left py-2 font-medium">Type</th>
+                <th className="text-left py-2 font-medium">Default</th>
+                <th className="text-left py-2 font-medium">Description</th>
+              </tr>
+            </thead>
+            <tbody className="text-neutral-600">
+              <tr className="border-b border-neutral-100">
+                <td className="py-2 font-mono">placeholder</td>
+                <td className="py-2">string</td>
+                <td className="py-2">-</td>
+                <td className="py-2">입력 필드의 플레이스홀더 텍스트</td>
+              </tr>
+              <tr className="border-b border-neutral-100">
+                <td className="py-2 font-mono">error</td>
+                <td className="py-2">string</td>
+                <td className="py-2">-</td>
+                <td className="py-2">오류 메시지 텍스트</td>
+              </tr>
+              <tr className="border-b border-neutral-100">
+                <td className="py-2 font-mono">disabled</td>
+                <td className="py-2">boolean</td>
+                <td className="py-2">false</td>
+                <td className="py-2">입력 필드 비활성화 여부</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (activeComponent) {
+      case 'theme-darkmode':
+        return (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">다크모드와 반응형 테마</h3>
+              <p className="mb-4">테마 유틸리티를 활용하여 다크모드와 반응형 디자인을 구현하는 방법을 알아봅시다:</p>
+              
+              <h4 className="font-semibold mb-2">다크모드 구현</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-6">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// theme-utils.ts
+
+// 테마 모드 타입
+type ThemeMode = 'light' | 'dark' | 'system';
+
+// 현재 테마 모드 가져오기
+function getCurrentThemeMode(): ThemeMode {
+  if (typeof window === 'undefined') return 'light';
+  
+  const savedMode = localStorage.getItem('theme-mode') as ThemeMode | null;
+  if (savedMode) return savedMode;
+  
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return prefersDark ? 'dark' : 'light';
+}
+
+// 테마 모드 적용
+function applyThemeMode(mode: ThemeMode): void {
+  const isDark = 
+    mode === 'dark' || 
+    (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  document.documentElement.classList.toggle('dark', isDark);
+  localStorage.setItem('theme-mode', mode);
+}
+
+// 테마 모드 전환
+function toggleThemeMode(): ThemeMode {
+  const currentMode = getCurrentThemeMode();
+  const newMode = currentMode === 'dark' ? 'light' : 'dark';
+  
+  applyThemeMode(newMode);
+  return newMode;
+}
+
+// 다크모드에 따른 값 가져오기
+function getThemeModeValue<T>(lightValue: T, darkValue: T): T {
+  const isDark = document.documentElement.classList.contains('dark');
+  return isDark ? darkValue : lightValue;
+}`}</code>
+                </pre>
+              </div>
+              
+              <h4 className="font-semibold mb-2">Tailwind에서 다크모드 사용</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-6">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// tailwind.config.ts
+import { type Config } from 'tailwindcss';
+import { theme } from './src/styles/theme';
+
+const config: Config = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  darkMode: 'class', // 'class' 스트래티지 사용
+  theme: {
+    extend: {
+      colors: theme.colors,
+      spacing: theme.spacing,
+      fontSize: theme.fontSize,
+      borderRadius: theme.borderRadius,
+      boxShadow: theme.boxShadow,
+    },
+  },
+  plugins: [],
+};
+
+export default config;`}</code>
+                </pre>
+              </div>
+              
+              <h4 className="font-semibold mb-2">컴포넌트에서 다크모드 적용</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-6">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// 컴포넌트에서 다크모드 적용 예시
+import { tw, createColorClass } from '@/lib/theme-utils';
+
+function Card({ children, className = '', ...props }) {
+  // 다크모드 클래스 적용
+  const cardClasses = tw(
+    'rounded-lg p-4',
+    'bg-white border border-neutral-200 shadow-sm', // 라이트 모드 스타일
+    'dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-md', // 다크 모드 스타일
+    className
+  );
+  
+  return (
+    <div className={cardClasses} {...props}>
+      {children}
+    </div>
+  );
+}
+
+// 테마 유틸리티를 활용한 다크모드 클래스 생성
+function Button({ variant = 'primary', children, ...props }) {
+  // 변형별 다크모드 클래스 생성
+  const variantClasses = {
+    primary: tw(
+      createColorClass('bg', 'primary', 600),
+      createColorClass('text', 'white'),
+      'hover:bg-primary-700',
+      'dark:bg-primary-500 dark:hover:bg-primary-400'
+    ),
+    secondary: tw(
+      createColorClass('bg', 'neutral', 200),
+      createColorClass('text', 'neutral', 800),
+      'hover:bg-neutral-300',
+      'dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600'
+    )
+  };
+  
+  return (
+    <button 
+      className={tw('px-4 py-2 rounded-md', variantClasses[variant])} 
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}`}</code>
+                </pre>
+              </div>
+              
+              <h4 className="font-semibold mb-2">다크모드 토글 컴포넌트</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-6">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// ThemeToggle.tsx
+import { useState, useEffect } from 'react';
+import { getCurrentThemeMode, applyThemeMode, ThemeMode } from '@/lib/theme-utils';
+
+export function ThemeToggle() {
+  const [mode, setMode] = useState<ThemeMode>('light');
+  
+  useEffect(() => {
+    // 초기 모드 가져오기
+    const initialMode = getCurrentThemeMode();
+    setMode(initialMode);
+    applyThemeMode(initialMode);
+    
+    // 시스템 설정 변경 감지
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      if (mode === 'system') {
+        applyThemeMode('system');
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [mode]);
+  
+  const handleModeChange = (newMode: ThemeMode) => {
+    setMode(newMode);
+    applyThemeMode(newMode);
+  };
+  
+  return (
+    <div className="flex items-center space-x-2">
+      <button
+        onClick={() => handleModeChange('light')}
+        className={tw(
+          'p-2 rounded-md',
+          mode === 'light' ? 'bg-primary-100 text-primary-700' : 'text-neutral-600'
+        )}
+        aria-label="라이트 모드"
+      >
+        <span>☀️</span>
+      </button>
+      
+      <button
+        onClick={() => handleModeChange('dark')}
+        className={tw(
+          'p-2 rounded-md',
+          mode === 'dark' ? 'bg-primary-100 text-primary-700' : 'text-neutral-600'
+        )}
+        aria-label="다크 모드"
+      >
+        <span>🌙</span>
+      </button>
+      
+      <button
+        onClick={() => handleModeChange('system')}
+        className={tw(
+          'p-2 rounded-md',
+          mode === 'system' ? 'bg-primary-100 text-primary-700' : 'text-neutral-600'
+        )}
+        aria-label="시스템 모드"
+      >
+        <span>💻</span>
+      </button>
+    </div>
+  );
+}`}</code>
+                </pre>
+              </div>
+              
+              <h4 className="font-semibold mb-2">반응형 테마 구현</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-6">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// 반응형 값 타입
+type ResponsiveValue<T> = {
+  'base'?: T;
+  'sm'?: T;
+  'md'?: T;
+  'lg'?: T;
+  'xl'?: T;
+  '2xl'?: T;
+};
+
+// 반응형 값 해석
+function resolveResponsiveValue<T>(
+  value: T | ResponsiveValue<T>, 
+  breakpoint: keyof ResponsiveValue<T> = 'base'
+): T | undefined {
+  if (typeof value === 'object' && value !== null) {
+    // 현재 브레이크포인트에 대한 값이 있으면 사용
+    if (value[breakpoint] !== undefined) {
+      return value[breakpoint];
+    }
+    
+    // 브레이크포인트 순서대로 확인
+    const breakpoints: Array<keyof ResponsiveValue<T>> = ['base', 'sm', 'md', 'lg', 'xl', '2xl'];
+    const index = breakpoints.indexOf(breakpoint);
+    
+    // 현재 브레이크포인트보다 작은 값을 찾음
+    for (let i = index; i >= 0; i--) {
+      const bp = breakpoints[i];
+      if (value[bp] !== undefined) {
+        return value[bp];
+      }
+    }
+    
+    return undefined;
+  }
+  
+  // 반응형이 아닌 경우 그대로 반환
+  return value;
+}
+
+// 반응형 Tailwind 클래스 생성
+function createResponsiveClasses<T>(
+  prefix: string,
+  values: ResponsiveValue<T>
+): string {
+  const classes: string[] = [];
+  
+  // 기본값
+  if (values.base !== undefined) {
+    classes.push(`${prefix}-${values.base}`);
+  }
+  
+  // 반응형 값
+  if (values.sm !== undefined) classes.push(`sm:${prefix}-${values.sm}`);
+  if (values.md !== undefined) classes.push(`md:${prefix}-${values.md}`);
+  if (values.lg !== undefined) classes.push(`lg:${prefix}-${values.lg}`);
+  if (values.xl !== undefined) classes.push(`xl:${prefix}-${values.xl}`);
+  if (values['2xl'] !== undefined) classes.push(`2xl:${prefix}-${values['2xl']}`);
+  
+  return classes.join(' ');
+}}`}</code>
+                </pre>
+              </div>
+              
+              <h4 className="font-semibold mb-2">반응형 컴포넌트 예시</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-6">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// 반응형 컴포넌트 예시
+import { 
+  createResponsiveClasses, 
+  ResponsiveValue, 
+  resolveResponsiveValue 
+} from '@/lib/theme-utils';
+
+type ContainerProps = {
+  padding?: ResponsiveValue<number>;
+  maxWidth?: ResponsiveValue<string>;
+  children: React.ReactNode;
+};
+
+export function Container({ 
+  padding = { 'base': 4, 'md': 6, 'lg': 8 },
+  maxWidth = { 'base': 'full', 'md': '4xl', 'lg': '6xl' },
+  children 
+}: ContainerProps) {
+  // 반응형 클래스 생성
+  const paddingClasses = createResponsiveClasses('p', padding);
+  const maxWidthClasses = createResponsiveClasses('max-w', maxWidth);
+  
+  const className = [
+    'mx-auto w-full',
+    paddingClasses,
+    maxWidthClasses
+  ].join(' ');
+  
+  return (
+    <div className={className}>
+      {children}
+    </div>
+  );
+}
+
+// 사용 예시
+function Layout() {
+  return (
+    <Container
+      padding={{ 'base': 4, 'md': 6, 'lg': 8 }}
+      maxWidth={{ 'base': 'full', 'md': '4xl', 'lg': '6xl' }}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* 컴포넌트 내용 */}
+      </div>
+    </Container>
+  );
+}`}</code>
+                </pre>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h4 className="font-medium text-green-800 mb-2">다크모드 구현 필수 요소</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-green-700">
+                    <li>Tailwind 설정에 <code>darkMode: 'class'</code> 설정</li>
+                    <li>사용자 선호 저장 (localStorage)</li>
+                    <li>시스템 설정 감지 (prefers-color-scheme)</li>
+                    <li>dark: 접두어를 사용한 스타일 정의</li>
+                  </ul>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                  <h4 className="font-medium text-purple-800 mb-2">반응형 디자인 모범 사례</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-purple-700">
+                    <li>기본값과 반응형 값 모두 정의</li>
+                    <li>브레이크포인트별 값 자동 계산</li>
+                    <li>일관된 사용자 경험 보장</li>
+                    <li>props를 통한 간편한 커스터마이징</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-800 mb-2">접근성 고려사항</h4>
+                <p className="text-blue-700 mb-2">테마 유틸리티를 활용한 접근성 개선 방법:</p>
+                <ul className="list-disc pl-5 space-y-1 text-blue-700">
+                  <li>컨트래스트 비율 확인 함수 구현</li>
+                  <li>접근성 속성 자동 추가 (aria-* 속성)</li>
+                  <li>키보드 네비게이션 지원 (focus-visible)</li>
+                  <li>텍스트 크기 조정 기능 추가</li>
+                  <li>스크린 리더 호환성 향상</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'theme-components':
+        return (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">컴포넌트 변형 생성</h3>
+              <p className="mb-4">테마 유틸리티는 컴포넌트의 다양한 변형과 상태를 쉽게 생성하고 관리할 수 있는 함수를 제공합니다:</p>
+              
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-neutral-200">
+                      <th className="text-left py-2 font-medium">함수 이름</th>
+                      <th className="text-left py-2 font-medium">설명</th>
+                      <th className="text-left py-2 font-medium">사용 예시</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-neutral-600">
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createVariants</td>
+                      <td className="py-2">컴포넌트 변형 생성 함수</td>
+                      <td className="py-2 font-mono">createVariants(variantConfig)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createSizeVariants</td>
+                      <td className="py-2">컴포넌트 크기 변형 생성</td>
+                      <td className="py-2 font-mono">createSizeVariants(sizeConfig)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createStateVariants</td>
+                      <td className="py-2">컴포넌트 상태 변형 생성</td>
+                      <td className="py-2 font-mono">createStateVariants(stateConfig)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">composeVariants</td>
+                      <td className="py-2">여러 변형 구성 합치기</td>
+                      <td className="py-2 font-mono">composeVariants(variants, sizeVariants)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">getVariantProps</td>
+                      <td className="py-2">변형에 따른 props 가져오기</td>
+                      <td className="py-2 font-mono">getVariantProps(variants, 'primary')</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <h4 className="font-semibold mb-2">컴포넌트 변형 생성 예시</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-4">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// 컴포넌트 변형 생성 예시
+import { 
+  createVariants, 
+  createSizeVariants, 
+  composeVariants,
+  getVariantProps 
+} from '@/lib/theme-utils';
+
+// 버튼 변형 정의
+const buttonVariants = createVariants({
+  primary: {
+    className: 'bg-primary-600 text-white hover:bg-primary-700',
+    attributes: { role: 'button' }
+  },
+  secondary: {
+    className: 'bg-secondary-500 text-white hover:bg-secondary-600',
+    attributes: { role: 'button' }
+  },
+  outline: {
+    className: 'border border-primary-600 text-primary-600 hover:bg-primary-50',
+    attributes: { role: 'button' }
+  },
+  ghost: {
+    className: 'text-primary-600 hover:bg-primary-50',
+    attributes: { role: 'button' }
+  }
+});
+
+// 버튼 크기 변형 정의
+const buttonSizes = createSizeVariants({
+  sm: { className: 'px-3 py-1.5 text-sm' },
+  md: { className: 'px-4 py-2 text-base' },
+  lg: { className: 'px-6 py-3 text-lg' }
+});
+
+// 버튼 상태 변형 정의
+const buttonStates = createStateVariants({
+  disabled: { 
+    className: 'opacity-50 cursor-not-allowed pointer-events-none',
+    attributes: { 'aria-disabled': 'true' }
+  },
+  loading: {
+    className: 'opacity-80 cursor-wait',
+    attributes: { 'aria-busy': 'true' }
+  }
+});
+
+// 변형 합치기
+const allButtonVariants = composeVariants(buttonVariants, buttonSizes, buttonStates);
+
+// 특정 변형 사용
+const primaryButtonProps = getVariantProps(buttonVariants, 'primary');
+// { className: 'bg-primary-600 text-white hover:bg-primary-700', attributes: { role: 'button' } }
+
+// 여러 변형 결합
+const buttonProps = {
+  ...getVariantProps(buttonVariants, 'primary'),
+  ...getVariantProps(buttonSizes, 'md'),
+  ...(isDisabled ? getVariantProps(buttonStates, 'disabled') : {})
+};
+
+// 결합된 클래스
+const className = buttonProps.className; // 'bg-primary-600 text-white hover:bg-primary-700 px-4 py-2 text-base opacity-50 cursor-not-allowed pointer-events-none'
+
+// 결합된 속성
+const attributes = buttonProps.attributes; // { role: 'button', 'aria-disabled': 'true' }`}</code>
+                </pre>
+              </div>
+              
+              <h4 className="font-semibold mb-2">컴포넌트에서 변형 사용 예시</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-6">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// Button.tsx
+import { 
+  createVariants, 
+  createSizeVariants, 
+  createStateVariants,
+  composeVariants,
+  getVariantProps 
+} from '@/lib/theme-utils';
+
+type ButtonProps = {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  loading?: boolean;
+  children: React.ReactNode;
+  className?: string;
+  // 기타 속성...
+};
+
+// 변형 정의
+const buttonVariants = createVariants({
+  primary: {
+    className: 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm',
+    attributes: { role: 'button' }
+  },
+  secondary: {
+    className: 'bg-secondary-500 text-white hover:bg-secondary-600 shadow-sm',
+    attributes: { role: 'button' }
+  },
+  outline: {
+    className: 'border border-primary-600 text-primary-600 hover:bg-primary-50',
+    attributes: { role: 'button' }
+  },
+  ghost: {
+    className: 'text-primary-600 hover:bg-primary-50',
+    attributes: { role: 'button' }
+  }
+});
+
+const buttonSizes = createSizeVariants({
+  sm: { className: 'px-3 py-1.5 text-sm' },
+  md: { className: 'px-4 py-2 text-base' },
+  lg: { className: 'px-6 py-3 text-lg' }
+});
+
+const buttonStates = createStateVariants({
+  disabled: { 
+    className: 'opacity-50 cursor-not-allowed pointer-events-none',
+    attributes: { 'aria-disabled': 'true' }
+  },
+  loading: {
+    className: 'opacity-80 cursor-wait',
+    attributes: { 'aria-busy': 'true' }
+  }
+});
+
+export function Button({ 
+  variant = 'primary', 
+  size = 'md', 
+  disabled = false,
+  loading = false,
+  children,
+  className = '',
+  ...props 
+}: ButtonProps) {
+  // 기본 클래스
+  const baseClasses = 'rounded-md font-medium transition-all';
+  
+  // 변형 가져오기
+  const variantProps = getVariantProps(buttonVariants, variant);
+  const sizeProps = getVariantProps(buttonSizes, size);
+  
+  // 상태 처리
+  const stateProps = disabled 
+    ? getVariantProps(buttonStates, 'disabled')
+    : loading 
+      ? getVariantProps(buttonStates, 'loading')
+      : {};
+  
+  // 클래스 결합
+  const combinedClassName = [
+    baseClasses,
+    variantProps.className,
+    sizeProps.className,
+    stateProps.className,
+    className
+  ].filter(Boolean).join(' ');
+  
+  // 속성 결합
+  const combinedAttributes = {
+    ...variantProps.attributes,
+    ...sizeProps.attributes,
+    ...stateProps.attributes,
+    disabled: disabled || loading
+  };
+  
+  return (
+    <button 
+      className={combinedClassName} 
+      {...combinedAttributes}
+      {...props}
+    >
+      {loading && <span className="mr-2">⚪⚪⚪</span>}
+      {children}
+    </button>
+  );
+}`}</code>
+                </pre>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h4 className="font-medium text-green-800 mb-2">변형 시스템의 장점</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-green-700">
+                    <li>코드 재사용성 향상</li>
+                    <li>중앙 관리로 일관성 보장</li>
+                    <li>타입 안전성 및 자동완성</li>
+                    <li>접근성 속성 자동 추가</li>
+                  </ul>
+                </div>
+                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                  <h4 className="font-medium text-amber-800 mb-2">사용 패턴</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-amber-700">
+                    <li>변형을 모듈로 분리하여 정의</li>
+                    <li>필요한 변형만 합치기</li>
+                    <li>기본값 설정으로 사용성 향상</li>
+                    <li>상태에 따른 조건부 적용</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-800 mb-2">변형 시스템 확장</h4>
+                <p className="text-blue-700 mb-2">테마 유틸리티를 활용한 사용자 정의 변형 시스템 확장 예시:</p>
+                <pre className="text-sm text-blue-700 bg-blue-50 overflow-x-auto">
+                  <code>{`// 사용자 정의 변형 시스템 확장
+
+// 카드 컴포넌트를 위한 변형 정의
+const cardVariants = createVariants({
+  default: {
+    className: 'bg-white border border-neutral-200 shadow-sm',
+    attributes: { role: 'region' }
+  },
+  elevated: {
+    className: 'bg-white border border-neutral-100 shadow-md',
+    attributes: { role: 'region' }
+  },
+  flat: {
+    className: 'bg-neutral-50 border border-neutral-200',
+    attributes: { role: 'region' }
+  },
+  colorful: {
+    className: 'bg-gradient-to-br from-primary-50 to-secondary-50 border border-primary-100',
+    attributes: { role: 'region' }
+  }
+});
+
+// 카드 크기 변형
+const cardSizes = createSizeVariants({
+  sm: { className: 'p-3 text-sm' },
+  md: { className: 'p-5 text-base' },
+  lg: { className: 'p-7 text-lg' }
+});
+
+// 카드 상태 변형
+const cardStates = createStateVariants({
+  interactive: { 
+    className: 'cursor-pointer hover:shadow-md transition-shadow',
+    attributes: { tabIndex: '0' }
+  },
+  disabled: { 
+    className: 'opacity-60 pointer-events-none',
+    attributes: { 'aria-disabled': 'true' }
+  }
+});
+
+// 변형 합치기 및 사용
+function Card({ 
+  variant = 'default', 
+  size = 'md',
+  interactive = false,
+  disabled = false,
+  children,
+  ...props 
+}) {
+  const variantProps = getVariantProps(cardVariants, variant);
+  const sizeProps = getVariantProps(cardSizes, size);
+  
+  const stateProps = disabled 
+    ? getVariantProps(cardStates, 'disabled')
+    : interactive 
+      ? getVariantProps(cardStates, 'interactive')
+      : {};
+  
+  const className = [
+    'rounded-lg',
+    variantProps.className,
+    sizeProps.className,
+    stateProps.className
+  ].filter(Boolean).join(' ');
+  
+  return (
+    <div 
+      className={className}
+      {...variantProps.attributes}
+      {...sizeProps.attributes}
+      {...stateProps.attributes}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'theme-tailwind':
+        return (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">테마와 Tailwind CSS 통합</h3>
+              <p className="mb-4">테마 유틸리티는 Tailwind CSS와 원활하게 통합되어 클래스 기반 스타일링을 쉽게 할 수 있습니다:</p>
+              
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-neutral-200">
+                      <th className="text-left py-2 font-medium">함수 이름</th>
+                      <th className="text-left py-2 font-medium">설명</th>
+                      <th className="text-left py-2 font-medium">사용 예시</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-neutral-600">
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">tw</td>
+                      <td className="py-2">조건부 클래스 생성 유틸리티</td>
+                      <td className="py-2 font-mono">tw('text-primary-600 hover:bg-neutral-100')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">cx</td>
+                      <td className="py-2">클래스를 결합하는 유틸리티</td>
+                      <td className="py-2 font-mono">cx('btn', variant === 'primary' && 'btn-primary')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createColorClass</td>
+                      <td className="py-2">색상 관련 Tailwind 클래스 생성</td>
+                      <td className="py-2 font-mono">createColorClass('bg', 'primary', 600)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createSpacingClass</td>
+                      <td className="py-2">간격 관련 Tailwind 클래스 생성</td>
+                      <td className="py-2 font-mono">createSpacingClass('p', 4)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createFontSizeClass</td>
+                      <td className="py-2">폰트 크기 관련 Tailwind 클래스 생성</td>
+                      <td className="py-2 font-mono">createFontSizeClass('lg')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createRadiusClass</td>
+                      <td className="py-2">보더 반지름 관련 Tailwind 클래스 생성</td>
+                      <td className="py-2 font-mono">createRadiusClass('rounded', 'md')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createShadowClass</td>
+                      <td className="py-2">그림자 관련 Tailwind 클래스 생성</td>
+                      <td className="py-2 font-mono">createShadowClass('lg')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createResponsiveClasses</td>
+                      <td className="py-2">반응형 Tailwind 클래스 생성</td>
+                      <td className="py-2 font-mono">createResponsiveClasses('p', { base: 4, md: 6 })</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <h4 className="font-semibold mb-2">Tailwind 클래스 생성 함수 사용 예시</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-4">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// Tailwind 클래스 생성 함수 사용 예시
+import { 
+  tw, 
+  cx, 
+  createColorClass, 
+  createSpacingClass,
+  createResponsiveClasses 
+} from '@/lib/theme-utils';
+
+// 조건부 클래스 생성
+const buttonClasses = tw(
+  'px-4 py-2 rounded-md font-medium transition-all',
+  isDisabled && 'opacity-50 cursor-not-allowed',
+  !isDisabled && 'hover:shadow-md'
+);
+
+// 클래스 결합
+const cardClasses = cx(
+  'rounded-lg shadow-md',
+  variant === 'outlined' ? 'border border-neutral-200' : 'bg-white'
+);
+
+// 색상 클래스 생성
+const bgClass = createColorClass('bg', 'primary', 600);  // 'bg-primary-600'
+const textClass = createColorClass('text', 'error', 500); // 'text-error-500'
+
+// 간격 클래스 생성
+const paddingClass = createSpacingClass('p', 4);     // 'p-4'
+const marginClass = createSpacingClass('mt', 6);     // 'mt-6'
+const gapClass = createSpacingClass('gap', 2);       // 'gap-2'
+
+// 반응형 클래스 생성
+const responsivePadding = createResponsiveClasses('p', {
+  'base': 4,
+  'md': 6,
+  'lg': 8
+}); // 'p-4 md:p-6 lg:p-8'`}</code>
+                </pre>
+              </div>
+              
+              <h4 className="font-semibold mb-2">테마 설정과 Tailwind 통합 예시</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-6">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// tailwind.config.ts
+import { type Config } from 'tailwindcss';
+import { theme } from './src/styles/theme';
+
+const config: Config = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: theme.colors,
+      spacing: theme.spacing,
+      fontSize: theme.fontSize,
+      borderRadius: theme.borderRadius,
+      boxShadow: theme.boxShadow,
+      // 기타 테마 확장...
+    },
+  },
+  plugins: [],
+};
+
+export default config;`}</code>
+                </pre>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h4 className="font-medium text-green-800 mb-2">이점</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-green-700">
+                    <li>클래스 기반 스타일링 유지</li>
+                    <li>테마 시스템과 완벽한 통합</li>
+                    <li>조건부 클래스 생성 용이</li>
+                    <li>일관된 스타일 적용 보장</li>
+                  </ul>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                  <h4 className="font-medium text-purple-800 mb-2">사용 패턴</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-purple-700">
+                    <li>컴포넌트에서 기본 클래스 정의</li>
+                    <li>반복되는 패턴은 함수로 추출</li>
+                    <li>변형/크기별 클래스 그룹화</li>
+                    <li>상태별 클래스 조건부 적용</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-800 mb-2">모범 사례: 버튼 컴포넌트</h4>
+                <p className="text-blue-700 mb-2">테마 유틸리티와 Tailwind를 함께 사용한 버튼 컴포넌트 예시:</p>
+                <pre className="text-sm text-blue-700 bg-blue-50 overflow-x-auto">
+                  <code>{`// Button.tsx
+import { tw, cx, createColorClass } from '@/lib/theme-utils';
+
+type ButtonProps = {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  children: React.ReactNode;
+  // 기타 속성...
+};
+
+export function Button({ 
+  variant = 'primary', 
+  size = 'md', 
+  disabled = false,
+  children,
+  ...props 
+}: ButtonProps) {
+  // 기본 클래스
+  const baseClasses = 'rounded-md font-medium transition-all';
+  
+  // 크기별 클래스
+  const sizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg'
+  };
+  
+  // 변형별 클래스
+  const variantClasses = {
+    primary: cx(
+      createColorClass('bg', 'primary', 600),
+      createColorClass('text', 'white'),
+      'hover:bg-primary-700 shadow-sm'
+    ),
+    secondary: cx(
+      createColorClass('bg', 'secondary', 500),
+      createColorClass('text', 'white'),
+      'hover:bg-secondary-600 shadow-sm'
+    ),
+    outline: cx(
+      'border',
+      createColorClass('border', 'primary', 600),
+      createColorClass('text', 'primary', 600),
+      'hover:bg-primary-50'
+    ),
+    ghost: cx(
+      createColorClass('text', 'primary', 600),
+      'hover:bg-primary-50'
+    )
+  };
+  
+  // 상태 클래스
+  const stateClasses = {
+    disabled: 'opacity-50 cursor-not-allowed pointer-events-none'
+  };
+  
+  // 최종 클래스 결합
+  const classes = tw(
+    baseClasses,
+    sizeClasses[size],
+    variantClasses[variant],
+    disabled && stateClasses.disabled
+  );
+  
+  return (
+    <button className={classes} disabled={disabled} {...props}>
+      {children}
+    </button>
+  );
+}`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'theme-functions':
+        return (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">테마 유틸리티 함수</h3>
+              <p className="mb-4">테마 유틸리티는 디자인 시스템의 값을 쉽게 사용할 수 있는 다양한 함수를 제공합니다:</p>
+              
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-neutral-200">
+                      <th className="text-left py-2 font-medium">함수 이름</th>
+                      <th className="text-left py-2 font-medium">설명</th>
+                      <th className="text-left py-2 font-medium">사용 예시</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-neutral-600">
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">getColorValue</td>
+                      <td className="py-2">색상 스케일과 음영으로 색상 값 반환</td>
+                      <td className="py-2 font-mono">getColorValue('primary', 600)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">getSpacingValue</td>
+                      <td className="py-2">간격 키에 대한 픽셀 값 반환</td>
+                      <td className="py-2 font-mono">getSpacingValue(4)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">getFontSizeValue</td>
+                      <td className="py-2">폰트 크기 키에 대한 값 반환</td>
+                      <td className="py-2 font-mono">getFontSizeValue('lg')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">getRadiusValue</td>
+                      <td className="py-2">보더 반지름 키에 대한 값 반환</td>
+                      <td className="py-2 font-mono">getRadiusValue('md')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">getShadowValue</td>
+                      <td className="py-2">그림자 키에 대한 CSS 그림자 값 반환</td>
+                      <td className="py-2 font-mono">getShadowValue('lg')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">createCSSVariables</td>
+                      <td className="py-2">테마 값에서 CSS 변수 생성</td>
+                      <td className="py-2 font-mono">createCSSVariables(theme)</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">resolveResponsiveValue</td>
+                      <td className="py-2">반응형 값 해석</td>
+                      <td className="py-2 font-mono">resolveResponsiveValue(value, 'md')</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">resolveThemeValue</td>
+                      <td className="py-2">현재 테마 모드에 따라 값 해석</td>
+                      <td className="py-2 font-mono">resolveThemeValue(value, 'dark')</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <h4 className="font-semibold mb-2">테마 함수 사용 예시</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-4">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// 테마 함수 사용 예시
+import { 
+  getColorValue, 
+  getSpacingValue, 
+  getFontSizeValue, 
+  getRadiusValue,
+  getShadowValue 
+} from '@/lib/theme-utils';
+
+// 색상 값 가져오기
+const primaryColor = getColorValue('primary', 600); // #4f46e5
+const errorColor = getColorValue('error', 500);     // #ef4444
+
+// 간격 값 가져오기
+const spacing = getSpacingValue(4);  // 16px
+const gutter = getSpacingValue(6);   // 24px
+
+// 폰트 크기 값 가져오기
+const textSize = getFontSizeValue('lg');  // 1.125rem
+
+// 반지름 값 가져오기
+const radius = getRadiusValue('md');  // 0.375rem
+
+// 그림자 값 가져오기
+const shadow = getShadowValue('lg');  // 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)
+
+// 반응형 값 해석
+const responsivePadding = resolveResponsiveValue({
+  base: 4,
+  md: 6,
+  lg: 8
+}, 'md'); // 현재 화면 크기가 'md' 범위일 때 6 반환
+
+// 테마 모드에 따른 값 해석
+const bgColor = resolveThemeValue({
+  light: '#ffffff',
+  dark: '#121212'
+}, 'light'); // 현재 테마가 'light'일 때 '#ffffff' 반환`}</code>
+                </pre>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h4 className="font-medium text-green-800 mb-2">사용 이점</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-green-700">
+                    <li>타입 안전성 보장</li>
+                    <li>중앙 관리로 일관성 유지</li>
+                    <li>테마 변경 시 자동 반영</li>
+                    <li>반응형 값 쉽게 처리</li>
+                  </ul>
+                </div>
+                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                  <h4 className="font-medium text-amber-800 mb-2">주의사항</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-amber-700">
+                    <li>직접 색상코드 사용 금지</li>
+                    <li>Tailwind 클래스와 함께 사용 가능</li>
+                    <li>CSS-in-JS 소루션과 호환</li>
+                    <li>성능을 위해 메모이제이션 적용</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'theme-types':
+        return (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">테마 타입 정의</h3>
+              <p className="mb-4">테마 유틸리티는 강력한 타입스크립트 타입 시스템을 통해 타입 안전성을 보장합니다. 주요 타입 정의는 다음과 같습니다:</p>
+              
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-neutral-200">
+                      <th className="text-left py-2 font-medium">타입 이름</th>
+                      <th className="text-left py-2 font-medium">설명</th>
+                      <th className="text-left py-2 font-medium">예시</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-neutral-600">
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">ColorScale</td>
+                      <td className="py-2">테마 컴포넌트의 컴포넌트 색상 스케일</td>
+                      <td className="py-2 font-mono">'primary' | 'secondary' | 'neutral' | ...</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">ColorShade</td>
+                      <td className="py-2">컴포넌트 색상의 음영 값</td>
+                      <td className="py-2 font-mono">50 | 100 | 200 | ... | 900 | 950</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">SpacingKey</td>
+                      <td className="py-2">간격 시스템의 키 값</td>
+                      <td className="py-2 font-mono">0 | 0.5 | 1 | 1.5 | 2 | ... | 96 | 'px'</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">FontSizeKey</td>
+                      <td className="py-2">폰트 크기 시스템의 키 값</td>
+                      <td className="py-2 font-mono">'xs' | 'sm' | 'base' | 'lg' | 'xl' | ...</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">BorderRadiusKey</td>
+                      <td className="py-2">보더 반지름 시스템의 키 값</td>
+                      <td className="py-2 font-mono">'none' | 'sm' | 'md' | 'lg' | 'full'</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">ShadowKey</td>
+                      <td className="py-2">그림자 시스템의 키 값</td>
+                      <td className="py-2 font-mono">'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'none'</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">ComponentVariant</td>
+                      <td className="py-2">컴포넌트 변형 타입</td>
+                      <td className="py-2 font-mono">'primary' | 'secondary' | 'outline' | ...</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">ComponentSize</td>
+                      <td className="py-2">컴포넌트 크기 타입</td>
+                      <td className="py-2 font-mono">'xs' | 'sm' | 'md' | 'lg' | 'xl'</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">ResponsiveValue</td>
+                      <td className="py-2">반응형 값을 위한 제네릭 타입</td>
+                      <td className="py-2 font-mono">T | &#123; base?: T; sm?: T; md?: T; ... &#125;</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-2 font-mono">ThemeAwareValue</td>
+                      <td className="py-2">다크모드 지원 값을 위한 타입</td>
+                      <td className="py-2 font-mono">T | &#123; light: T; dark: T; &#125;</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <h4 className="font-semibold mb-2">타입 정의 사용 예시</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-4">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// 타입 정의 사용 예시
+import { ColorScale, ColorShade, ComponentVariant, ComponentSize } from '@/lib/theme-utils';
+
+// 타입 안전한 함수 매개변수
+function createButton(variant: ComponentVariant, size: ComponentSize) {
+  // 함수 구현...
+}
+
+// 타입 안전한 변수 선언
+const primaryColor: ColorScale = 'primary';
+const shade: ColorShade = 600;
+
+// 반응형 값 사용 예시
+const responsiveSpacing = {
+  base: 4,
+  sm: 6,
+  md: 8,
+  lg: 12
+};
+
+// 다크모드 지원 값 예시
+const themeAwareColor = {
+  light: '#ffffff',
+  dark: '#121212'
+};`}</code>
+                </pre>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-800 mb-2">타입 안전성의 장점</h4>
+                <ul className="list-disc pl-5 space-y-1 text-blue-700">
+                  <li>오타 방지 및 자동 완성 지원</li>
+                  <li>잘못된 값 사용 방지</li>
+                  <li>코드 유지보수성 향상</li>
+                  <li>디자인 시스템 일관성 보장</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'theme-overview':
+        return (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">테마 유틸리티 개요</h3>
+              <div className="p-4 bg-white rounded-lg border border-neutral-200 mb-6">
+                <p className="mb-4">DogNote 디자인 시스템은 <code>theme-utils.ts</code> 파일에 중앙화된 테마 유틸리티를 제공합니다. 이 유틸리티는 일관된 디자인 시스템을 유지하고 개발자 경험을 향상시키기 위해 설계되었습니다.</p>
+                
+                <h4 className="font-semibold mb-2">주요 특징</h4>
+                <ul className="list-disc pl-5 space-y-2 mb-4">
+                  <li>강력한 타입 시스템으로 타입 안전성 보장</li>
+                  <li>확장 가능한 아키텍처</li>
+                  <li>개발자 친화적 API</li>
+                  <li>성능 최적화</li>
+                  <li>Tailwind CSS와의 원활한 통합</li>
+                </ul>
+                
+                <h4 className="font-semibold mb-2">주요 카테고리</h4>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li><strong>타입 정의</strong>: 테마 시스템에서 사용되는 모든 타입 정의</li>
+                  <li><strong>핵심 유틸리티 함수</strong>: 색상, 간격, 타이포그래피 등의 테마 값을 조회하는 함수</li>
+                  <li><strong>CSS 변수 유틸리티</strong>: CSS 변수 생성 및 주입 함수</li>
+                  <li><strong>Tailwind CSS 클래스 생성기</strong>: 타입 안전한 Tailwind 클래스 생성</li>
+                  <li><strong>컴포넌트 변형 생성기</strong>: 컴포넌트 스타일 생성 유틸리티</li>
+                  <li><strong>애니메이션 유틸리티</strong>: 일관된 애니메이션 및 트랜지션</li>
+                </ul>
+              </div>
+              
+              <h4 className="font-semibold mb-2">사용 방법</h4>
+              <div className="bg-neutral-50 p-4 rounded-lg mb-4">
+                <pre className="text-sm text-neutral-700 overflow-x-auto">
+                  <code>{`// theme-utils.ts 임포트
+import { getColor, tw, createComponentClasses, animations, cn } from '@/lib/theme-utils';
+
+// 색상 가져오기
+const primaryColor = getColor('primary', 600); // '#4f46e5'
+
+// Tailwind 클래스 생성
+const bgClass = tw.bg.primary(500); // 'bg-primary-500'
+const textClass = tw.text.neutral(700); // 'text-neutral-700'
+
+// 조건부 클래스 결합
+const className = cn(
+  'p-4 rounded-lg',
+  isActive && 'bg-primary-100',
+  isDisabled && 'opacity-50 cursor-not-allowed'
+);
+
+// 컴포넌트 클래스 생성
+const buttonClasses = createComponentClasses('button', 'primary', 'md');
+
+// 애니메이션 적용
+const animatedClass = cn('rounded-lg', animations.transition.normal, animations.hover.scale);`}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'colors':
+        return renderColorPalette();
+      case 'typography':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h4 className="font-semibold mb-3">Headings</h4>
+              <div className="space-y-2">
+                <h1 className="text-4xl font-bold">Heading 1</h1>
+                <h2 className="text-3xl font-semibold">Heading 2</h2>
+                <h3 className="text-2xl font-semibold">Heading 3</h3>
+                <h4 className="text-xl font-medium">Heading 4</h4>
+              </div>
+            </div>
+          </div>
+        );
+      case 'spacing':
+        return (
+          <div className="space-y-4">
+            {[1, 2, 4, 6, 8, 12].map((size) => (
+              <div key={size} className="flex items-center gap-4">
+                <div className="w-16 text-sm font-mono">{size * 4}px</div>
+                <div className="bg-primary-200" style={{ width: `${size * 4}px`, height: '16px' }} />
+              </div>
+            ))}
+          </div>
+        );
+      case 'button':
+        return renderButtons();
+      case 'input':
+        return renderInputs();
+      case 'textarea':
+        return (
+          <div className="space-y-4">
+            <TextArea placeholder="기본 텍스트 영역" rows={4} />
+            <TextArea placeholder="오류 상태" error="내용을 입력해주세요" rows={3} />
+          </div>
+        );
+      case 'checkbox':
+        return (
+          <div className="space-y-3">
+            <Checkbox checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)} label="기본 체크박스" />
+            <Checkbox checked={true} onChange={() => {}} label="선택된 체크박스" />
+            <Checkbox checked={false} onChange={() => {}} disabled label="비활성화된 체크박스" />
+          </div>
+        );
+      case 'radio':
+        return (
+          <Radio
+            name="demo"
+            value={selectedRadio}
+            onChange={setSelectedRadio}
+            options={[
+              { value: 'option1', label: '옵션 1' },
+              { value: 'option2', label: '옵션 2' },
+              { value: 'option3', label: '옵션 3' }
+            ]}
+          />
+        );
+      case 'select':
+        return (
+          <Select
+            value={selectValue}
+            onChange={(value) => setSelectValue(Array.isArray(value) ? value[0] : value)}
+            placeholder="옵션을 선택하세요"
+            options={[
+              { value: 'option1', label: '옵션 1' },
+              { value: 'option2', label: '옵션 2' },
+              { value: 'option3', label: '옵션 3' }
+            ]}
+          />
+        );
+      case 'badge':
+        return (
+          <div className="flex flex-wrap gap-3">
+            <Badge>Default</Badge>
+            <Badge variant="secondary">Secondary</Badge>
+            <Badge variant="success">Success</Badge>
+            <Badge variant="warning">Warning</Badge>
+            <Badge variant="destructive">Error</Badge>
+            <Badge variant="outline">Outline</Badge>
+          </div>
+        );
+      case 'avatar':
+        return (
+          <div className="flex items-center gap-4">
+            <Avatar size="sm" />
+            <Avatar size="md" />
+            <Avatar size="lg" />
+            <Avatar size="xl" />
+          </div>
+        );
+      case 'progress':
+        return (
+          <div className="space-y-3">
+            <Progress value={25} />
+            <Progress value={50} variant="success" />
+            <Progress value={75} variant="warning" />
+            <Progress value={90} variant="destructive" />
+          </div>
+        );
+      case 'loading':
+        return (
+          <div className="flex items-center gap-6">
+            <Spinner size="sm" />
+            <Spinner size="md" />
+            <Spinner size="lg" />
+            <Loading text="데이터를 불러오는 중..." />
+          </div>
+        );
+      case 'skeleton':
+        return (
+          <div className="space-y-4">
+            <Skeleton variant="text" lines={3} />
+            <div className="flex items-center space-x-3">
+              <Skeleton variant="circular" width={40} height={40} />
+              <div className="flex-1">
+                <Skeleton variant="text" />
+                <Skeleton variant="text" width="60%" />
+              </div>
+            </div>
+          </div>
+        );
+      case 'modal':
+        return (
+          <div>
+            <Button onClick={() => setIsModalOpen(true)}>모달 열기</Button>
+            <Modal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              title="테스트 모달"
+              description="이것은 테스트용 모달입니다."
+            >
+              <div className="space-y-4">
+                <p>모달 내용이 여기에 표시됩니다.</p>
+                <div className="flex justify-end space-x-2">
+                  <Button variant="outline" onClick={() => setIsModalOpen(false)}>취소</Button>
+                  <Button onClick={() => setIsModalOpen(false)}>확인</Button>
+                </div>
+              </div>
+            </Modal>
+          </div>
+        );
+      case 'toast':
+        return (
+          <div className="flex flex-wrap gap-3">
+            <Button size="sm">성공 토스트</Button>
+            <Button size="sm" variant="destructive">오류 토스트</Button>
+            <Button size="sm" variant="outline">경고 토스트</Button>
+          </div>
+        );
+      case 'tooltip':
+        return (
+          <div className="flex gap-3">
+            <Tooltip content="이것은 툴팁 메시지입니다">
+              <Button variant="outline">툴팁 테스트</Button>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return <div>컴포넌트를 선택하세요</div>;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-neutral-50">
+      <div className="flex">
+        {/* 사이드바 */}
+        <div className="w-64 bg-white border-r border-neutral-200 min-h-screen">
+          <div className="p-6">
+            <h1 className="text-2xl font-bold text-neutral-900">Design System</h1>
+            <p className="text-sm text-neutral-600 mt-1">DogNote UI Components</p>
+          </div>
+          
+          <nav className="px-4">
+            {componentCategories.map((category) => (
+              <div key={category.id} className="mb-6">
+                <button
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                    activeCategory === category.id
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-neutral-700 hover:bg-neutral-100'
+                  }`}
+                >
+                  {category.icon}
+                  <span className="font-medium">{category.title}</span>
+                </button>
+                
+                {activeCategory === category.id && (
+                  <div className="ml-8 mt-2 space-y-1">
+                    {category.items.map((item) => (
+                      <button
+                        key={item}
+                        onClick={() => setActiveComponent(item)}
+                        className={`block w-full text-left px-3 py-1 rounded text-sm transition-colors ${
+                          activeComponent === item
+                            ? 'text-primary-600 bg-primary-50'
+                            : 'text-neutral-600 hover:text-neutral-900'
+                        }`}
+                      >
+                        {item.charAt(0).toUpperCase() + item.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </nav>
+        </div>
+
+        {/* 메인 콘텐츠 */}
+        <div className="flex-1">
+          <div className="p-8">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-neutral-900 capitalize">
+                {activeComponent}
+              </h2>
+              <p className="text-neutral-600 mt-2">
+                {activeComponent} 컴포넌트의 다양한 변형과 사용법을 확인하세요.
+              </p>
+            </div>
+
+            <Card className="p-6">
+              {renderContent()}
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

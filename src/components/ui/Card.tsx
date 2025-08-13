@@ -1,21 +1,23 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { theme } from '@/styles/theme';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'outlined' | 'elevated' | 'filled';
+  variant?: 'default' | 'outlined' | 'elevated' | 'filled' | 'interactive';
   padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   children: React.ReactNode;
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', padding = 'md', children, ...props }, ref) => {
-    const baseStyles = 'rounded-lg border bg-card text-card-foreground';
+    const baseStyles = 'rounded-xl bg-white text-neutral-900 transition-all duration-200';
     
     const variants = {
-      default: 'border-border shadow-sm',
-      outlined: 'border-2 border-border shadow-none',
-      elevated: 'border-border shadow-lg',
-      filled: 'border-none bg-muted shadow-sm',
+      default: 'border border-neutral-200 shadow-sm',
+      outlined: 'border-2 border-neutral-300 shadow-none',
+      elevated: 'border border-neutral-200 shadow-lg',
+      filled: 'border-none bg-neutral-50 shadow-sm',
+      interactive: 'border border-neutral-200 shadow-sm hover:shadow-lg hover:border-primary-300 cursor-pointer',
     };
 
     const paddings = {

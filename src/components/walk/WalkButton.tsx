@@ -20,9 +20,9 @@ export default function WalkButton() {
   const router = useRouter();
   const [isWalkDetailOpen, setIsWalkDetailOpen] = useState(false); // ✅ 모달 상태 추가
 
-  // ✅ LocalStorage에서 기존 walkId 복원
+  // ✅ LocalStorage 에서 기존 walkId 복원
   useEffect(() => {
-    console.log("🔄 LocalStorage에서 저장된 walkId 불러오는 중...");
+    console.log("🔄 LocalStorage 에서 저장된 walkId 불러오는 중...");
     const savedWalkId = getCurrentWalkFromDB();
     if (savedWalkId && savedWalkId !== walkId) {
       setWalkId(savedWalkId);
@@ -72,7 +72,7 @@ export default function WalkButton() {
     try {
       const newWalkId = await startWalkInFirestore(dogIds);
       if (!newWalkId) {
-        throw new Error("❌ Firestore에서 walkId 생성 실패");
+        throw new Error("❌ Firestore 에서 walkId 생성 실패");
       }
 
       await saveCurrentWalkToDB(newWalkId);
@@ -97,7 +97,7 @@ export default function WalkButton() {
       await endWalkInFirestore(walkId);
       await removeCurrentWalkFromDB();
       setWalkId(null);
-      console.log("✅ Firestore & LocalStorage에서 walkId 삭제 완료");
+      console.log("✅ Firestore & LocalStorage 에서 walkId 삭제 완료");
       setIsWalkDetailOpen(true);
     } catch (error) {
       console.error("🚨 산책 종료 오류:", error);

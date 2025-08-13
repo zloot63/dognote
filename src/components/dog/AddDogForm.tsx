@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAddDog } from "@/hooks/useDogs";
+import { useCreateDog } from "@/hooks/useDogs";
 import { Dog } from "@/types/dogs";
 
 export default function AddDogForm() {
-  const { mutate, isLoading } = useAddDog();
+  const { mutate } = useCreateDog();
   const [dog, setDog] = useState<Omit<Dog, "id">>({
     name: "",
     breed: "",
