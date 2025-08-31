@@ -54,6 +54,7 @@ export const authOptions: NextAuthOptions = {
       // OAuth provider 정보 저장
       if (account) {
         token.provider = account.provider;
+        token.accessToken = account.access_token;
       }
       
       return token;
@@ -66,6 +67,7 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name as string;
         session.user.image = token.picture as string;
         session.user.provider = token.provider as string;
+        session.user.accessToken = token.accessToken as string;
       }
       
       return session;

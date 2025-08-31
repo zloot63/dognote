@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import admin from 'firebase-admin';
 
 // Firebase Admin SDK 초기화 (이미 초기화된 경우 재사용)
