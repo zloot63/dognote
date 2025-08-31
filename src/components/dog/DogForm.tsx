@@ -226,9 +226,6 @@ const DogForm: React.FC<DogFormProps> = ({
                     const birth = new Date(date);
                     const now = new Date();
                     if (birth > now) return '미래 날짜는 선택할 수 없습니다';
-                    if (birth < new Date(now.getFullYear() - 25, 0, 1)) {
-                      return '25년 이전 날짜는 선택할 수 없습니다';
-                    }
                     return true;
                   }
                 }}
