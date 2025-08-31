@@ -3,7 +3,8 @@ import { useSession } from 'next-auth/react';
 import { DogService } from '@/services/dogService';
 import { Dog, DogFormData } from '@/types/dog';
 import { useDogStore } from '@/store/dogStore';
-import { useToast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui';
+import * as React from 'react';
 
 // React Query 키 상수
 const QUERY_KEYS = {
@@ -19,29 +20,37 @@ export const useDogs = () => {
   const { setDogs, setLoading, setError } = useDogStore();
   const { toast } = useToast();
   
-  return useQuery({
+  const query = useQuery({
     queryKey: QUERY_KEYS.dogs(session?.user?.id || ''),
     queryFn: async () => {
       if (!session?.user?.id) {
         throw new Error('사용자 인증이 필요합니다.');
       }
+      setLoading(true);
       return await DogService.getDogsByUserId(session.user.id);
     },
     enabled: !!session?.user?.id,
-    onSuccess: (data: Dog[]) => {
-      setDogs(data);
+  });
+
+  React.useEffect(() => {
+    if (query.data) {
+      setDogs(query.data);
       setLoading(false);
       setError(null);
-    },
-    onError: (error: Error) => {
-      setError(error.message);
+    }
+    
+    if (query.error) {
+      setError((query.error as Error).message);
       setLoading(false);
-      toast.error('오류', error.message);
-    },
-    onLoading: () => {
+      toast.error('오류', (query.error as Error).message);
+    }
+    
+    if (query.isFetching) {
       setLoading(true);
     }
-  });
+  }, [query.data, query.error, query.isFetching, setDogs, setLoading, setError, toast]);
+  
+  return query;
 };
 
 /**
@@ -50,17 +59,23 @@ export const useDogs = () => {
 export const useDog = (dogId: string) => {
   const { setSelectedDog } = useDogStore();
   
-  return useQuery({
+  const query = useQuery({
     queryKey: QUERY_KEYS.dog(dogId),
     queryFn: async () => {
       if (!dogId) return null;
       return await DogService.getDogById(dogId);
     },
     enabled: !!dogId,
-    onSuccess: (data) => {
-      setSelectedDog(data);
-    }
+    select: (data) => data
   });
+
+  React.useEffect(() => {
+    if (query.data) {
+      setSelectedDog(query.data);
+    }
+  }, [query.data, setSelectedDog]);
+  
+  return query;
 };
 
 /**
@@ -72,24 +87,30 @@ export const useCreateDog = () => {
   const { addDog } = useDogStore();
   const { toast } = useToast();
   
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (dogData: DogFormData) => {
       if (!session?.user?.id) {
         throw new Error('사용자 인증이 필요합니다.');
       }
       return await DogService.createDog(session.user.id, dogData);
     },
-    onSuccess: (newDog) => {
-      addDog(newDog);
+  });
+
+  React.useEffect(() => {
+    if (mutation.isSuccess) {
+      addDog(mutation.data);
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.dogs(session?.user?.id || '')
       });
-      toast.success('성공', `${newDog.name}이(가) 성공적으로 등록되었습니다! 🐶`);
-    },
-    onError: (error: Error) => {
-      toast.error('등록 실패', error.message);
+      toast.success('성공', `${mutation.data.name}이(가) 성공적으로 등록되었습니다! 🐶`);
     }
-  });
+    
+    if (mutation.isError) {
+      toast.error('등록 실패', (mutation.error as Error).message);
+    }
+  }, [mutation.isSuccess, mutation.data, mutation.isError, mutation.error, addDog, queryClient, session, toast]);
+  
+  return mutation;
 };
 
 /**
@@ -101,24 +122,30 @@ export const useUpdateDog = () => {
   const { updateDog } = useDogStore();
   const { toast } = useToast();
   
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async ({ dogId, dogData }: { dogId: string; dogData: Partial<DogFormData> }) => {
       return await DogService.updateDog(dogId, dogData);
     },
-    onSuccess: (updatedDog) => {
-      updateDog(updatedDog.id, updatedDog);
+  });
+
+  React.useEffect(() => {
+    if (mutation.isSuccess) {
+      updateDog(mutation.data.id, mutation.data);
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.dogs(session?.user?.id || '')
       });
       queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.dog(updatedDog.id)
+        queryKey: QUERY_KEYS.dog(mutation.data.id)
       });
-      toast.success('수정 완료', `${updatedDog.name}의 정보가 수정되었습니다.`);
-    },
-    onError: (error: Error) => {
-      toast.error('수정 실패', error.message);
+      toast.success('수정 완료', `${mutation.data.name}의 정보가 수정되었습니다.`);
     }
-  });
+    
+    if (mutation.isError) {
+      toast.error('수정 실패', (mutation.error as Error).message);
+    }
+  }, [mutation.isSuccess, mutation.data, mutation.isError, mutation.error, updateDog, queryClient, session, toast]);
+  
+  return mutation;
 };
 
 /**
@@ -130,22 +157,28 @@ export const useDeleteDog = () => {
   const { removeDog } = useDogStore();
   const { toast } = useToast();
   
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (dogId: string) => {
       await DogService.deleteDog(dogId);
       return dogId;
     },
-    onSuccess: (dogId) => {
-      removeDog(dogId);
+  });
+
+  React.useEffect(() => {
+    if (mutation.isSuccess) {
+      removeDog(mutation.data);
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.dogs(session?.user?.id || '')
       });
       toast.success('삭제 완료', '강아지 정보가 삭제되었습니다.');
-    },
-    onError: (error: Error) => {
-      toast.error('삭제 실패', error.message);
     }
-  });
+    
+    if (mutation.isError) {
+      toast.error('삭제 실패', (mutation.error as Error).message);
+    }
+  }, [mutation.isSuccess, mutation.data, mutation.isError, mutation.error, removeDog, queryClient, session, toast]);
+  
+  return mutation;
 };
 
 /**
@@ -155,15 +188,20 @@ export const useSearchDogs = () => {
   const { data: session } = useSession();
   const { toast } = useToast();
   
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (searchQuery: string) => {
       if (!session?.user?.id) {
         throw new Error('사용자 인증이 필요합니다.');
       }
       return await DogService.searchDogs(session.user.id, searchQuery);
     },
-    onError: (error: Error) => {
-      toast.error('검색 실패', error.message);
-    }
   });
+
+  React.useEffect(() => {
+    if (mutation.isError) {
+      toast.error('검색 실패', (mutation.error as Error).message);
+    }
+  }, [mutation.isError, mutation.error, toast]);
+  
+  return mutation;
 };

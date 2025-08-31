@@ -37,9 +37,17 @@ service cloud.firestore {
         request.auth.uid == get(/databases/$(database)/documents/dogs/$(dogId)).data.userId;
     }
 
-    // 개발 환경에서만 임시로 모든 접근 허용 (프로덕션에서는 제거)
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    // 산책 기록 - 새로운 스키마 지원 (userId 기반)
+    match /walks/{walkId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // 공유 접근 관리 (향후 확장)
+    match /shared/{shareId} {
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.ownerId || 
+         request.auth.uid in resource.data.allowedUsers);
     }
   }
 }

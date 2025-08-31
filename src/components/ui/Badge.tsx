@@ -1,149 +1,128 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info';
-  size?: 'sm' | 'md' | 'lg';
-  shape?: 'rounded' | 'pill' | 'square';
-  dot?: boolean;
-  children: React.ReactNode;
-}
+import { cn } from "@/lib/utils"
 
-const Badge: React.FC<BadgeProps> = ({
-  className,
-  variant = 'primary',
-  size = 'md',
-  shape = 'rounded',
-  dot = false,
-  children,
-  ...props
-}) => {
-  const baseStyles = 'inline-flex items-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2';
-  
-  const variants = {
-    primary: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
-    secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
-    destructive: 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
-    outline: 'text-foreground border border-input hover:bg-accent hover:text-accent-foreground',
-    success: 'border-transparent bg-green-500 text-white hover:bg-green-600',
-    warning: 'border-transparent bg-yellow-500 text-white hover:bg-yellow-600',
-    info: 'border-transparent bg-blue-500 text-white hover:bg-blue-600',
-  };
+const badgeVariants = cva(
+  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
+        outline: "text-foreground",
+        success:
+          "border-transparent bg-green-500 text-white shadow hover:bg-green-500/80",
+        warning:
+          "border-transparent bg-yellow-500 text-white shadow hover:bg-yellow-500/80",
+        info:
+          "border-transparent bg-blue-500 text-white shadow hover:bg-blue-500/80",
+      },
+      size: {
+        sm: "px-2 py-0.5 text-xs",
+        md: "px-2.5 py-0.5 text-xs",
+        lg: "px-3 py-1 text-sm",
+      },
+      shape: {
+        default: "rounded-md",
+        rounded: "rounded-full",
+        square: "rounded-none",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+      shape: "default",
+    },
+  }
+)
 
-  const sizes = {
-    sm: 'px-1.5 py-0.5 text-xs',
-    md: 'px-2.5 py-0.5 text-sm',
-    lg: 'px-3 py-1 text-base',
-  };
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
 
-  const shapes = {
-    rounded: 'rounded-md',
-    pill: 'rounded-full',
-    square: 'rounded-none',
-  };
+const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
+  ({ className, variant, size, shape, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(badgeVariants({ variant, size, shape }), className)}
+        {...props}
+      />
+    )
+  }
+)
+Badge.displayName = "Badge"
 
-  const dotSizes = {
-    sm: 'h-1.5 w-1.5',
-    md: 'h-2 w-2',
-    lg: 'h-2.5 w-2.5',
-  };
-
-  return (
-    <div
-      className={cn(
-        baseStyles,
-        variants[variant],
-        sizes[size],
-        shapes[shape],
-        className
-      )}
-      {...props}
-    >
-      {dot && (
-        <div
-          className={cn(
-            'mr-1 rounded-full bg-current',
-            dotSizes[size]
-          )}
-        />
-      )}
-      {children}
-    </div>
-  );
-};
-
-// 숫자 배지 컴포넌트
-export interface NumberBadgeProps {
+// NumberBadge component for displaying numbers
+export interface NumberBadgeProps extends BadgeProps {
   count: number;
   max?: number;
   showZero?: boolean;
-  variant?: BadgeProps['variant'];
-  size?: BadgeProps['size'];
-  className?: string;
 }
 
-const NumberBadge: React.FC<NumberBadgeProps> = ({
-  count,
-  max = 99,
-  showZero = false,
-  variant = 'destructive',
-  size = 'sm',
-  className,
-}) => {
-  if (count === 0 && !showZero) {
-    return null;
+const NumberBadge = React.forwardRef<HTMLDivElement, NumberBadgeProps>(
+  ({ count, max = 99, showZero = false, className, variant = "destructive", size = "sm", shape = "rounded", ...props }, ref) => {
+    if (count === 0 && !showZero) {
+      return null;
+    }
+
+    const displayCount = max && count > max ? `${max}+` : count.toString();
+
+    return (
+      <Badge
+        ref={ref}
+        variant={variant}
+        size={size}
+        shape={shape}
+        className={cn("min-w-[1.25rem] justify-center", className)}
+        {...props}
+      >
+        {displayCount}
+      </Badge>
+    );
   }
+);
+NumberBadge.displayName = "NumberBadge";
 
-  const displayCount = count > max ? `${max}+` : count.toString();
-
-  return (
-    <Badge
-      variant={variant}
-      size={size}
-      shape="pill"
-      className={cn('min-w-5 justify-center', className)}
-    >
-      {displayCount}
-    </Badge>
-  );
-};
-
-// 상태 배지 컴포넌트
-export interface StatusBadgeProps {
-  status: 'online' | 'offline' | 'busy' | 'away' | 'idle';
-  showText?: boolean;
-  size?: BadgeProps['size'];
-  className?: string;
+// StatusBadge component for displaying status
+export interface StatusBadgeProps extends BadgeProps {
+  status: 'active' | 'inactive' | 'pending' | 'success' | 'error' | 'warning';
+  showDot?: boolean;
 }
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({
-  status,
-  showText = true,
-  size = 'md',
-  className,
-}) => {
-  const statusConfig = {
-    online: { variant: 'success' as const, text: '온라인', dot: true },
-    offline: { variant: 'secondary' as const, text: '오프라인', dot: true },
-    busy: { variant: 'destructive' as const, text: '바쁨', dot: true },
-    away: { variant: 'warning' as const, text: '자리비움', dot: true },
-    idle: { variant: 'info' as const, text: '대기중', dot: true },
-  };
+const StatusBadge = React.forwardRef<HTMLDivElement, StatusBadgeProps>(
+  ({ status, showDot = true, className, ...props }, ref) => {
+    const statusConfig = {
+      active: { variant: 'success' as const, label: '활성' },
+      inactive: { variant: 'secondary' as const, label: '비활성' },
+      pending: { variant: 'warning' as const, label: '대기' },
+      success: { variant: 'success' as const, label: '성공' },
+      error: { variant: 'destructive' as const, label: '오류' },
+      warning: { variant: 'warning' as const, label: '경고' },
+    };
 
-  const config = statusConfig[status];
+    const config = statusConfig[status];
 
-  return (
-    <Badge
-      variant={config.variant}
-      size={size}
-      shape="pill"
-      dot={config.dot}
-      className={className}
-    >
-      {showText && config.text}
-    </Badge>
-  );
-};
+    return (
+      <Badge
+        ref={ref}
+        variant={config.variant}
+        className={cn("gap-1", className)}
+        {...props}
+      >
+        {showDot && (
+          <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        )}
+        {config.label}
+      </Badge>
+    );
+  }
+);
+StatusBadge.displayName = "StatusBadge";
 
-export { NumberBadge, StatusBadge };
-export default Badge;
+export { Badge, NumberBadge, StatusBadge, badgeVariants }

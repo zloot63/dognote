@@ -11,8 +11,7 @@ import {
   Modal,
   Button,
   Container,
-  Loading,
-  Toast
+  Loading
 } from '@/components/ui';
 
 type ViewMode = 'list' | 'form' | 'detail';
@@ -146,9 +145,8 @@ const DogsPage: React.FC = () => {
 
       {/* 폼 모달 */}
       <Modal
-        isOpen={isFormModalOpen}
+        open={isFormModalOpen}
         onClose={handleFormCancel}
-        size="xl"
         title={selectedDog ? '강아지 정보 수정' : '새 강아지 등록'}
       >
         <DogForm
@@ -159,8 +157,6 @@ const DogsPage: React.FC = () => {
         />
       </Modal>
 
-      {/* Toast 컨테이너 */}
-      <Toast />
     </>
   );
 };

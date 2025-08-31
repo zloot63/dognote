@@ -1,239 +1,253 @@
-import React from 'react';
+import * as React from 'react';
+import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from '@/lib/utils';
 
-export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
-  cols?: 1 | 2 | 3 | 4 | 5 | 6 | 12 | 'auto' | 'fit';
-  gap?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+const gridVariants = cva(
+  "grid",
+  {
+    variants: {
+      cols: {
+        1: "grid-cols-1",
+        2: "grid-cols-2",
+        3: "grid-cols-3",
+        4: "grid-cols-4",
+        5: "grid-cols-5",
+        6: "grid-cols-6",
+        12: "grid-cols-12",
+        auto: "grid-cols-auto",
+        fit: "grid-cols-fit",
+      },
+      gap: {
+        none: "gap-0",
+        sm: "gap-2",
+        md: "gap-4",
+        lg: "gap-6",
+        xl: "gap-8",
+      },
+    },
+    defaultVariants: {
+      cols: "auto",
+      gap: "md",
+    },
+  }
+);
+
+export interface GridProps 
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof gridVariants> {
   responsive?: {
-    sm?: GridProps['cols'];
-    md?: GridProps['cols'];
-    lg?: GridProps['cols'];
-    xl?: GridProps['cols'];
+    sm?: VariantProps<typeof gridVariants>['cols'];
+    md?: VariantProps<typeof gridVariants>['cols'];
+    lg?: VariantProps<typeof gridVariants>['cols'];
+    xl?: VariantProps<typeof gridVariants>['cols'];
   };
   children: React.ReactNode;
 }
 
-const Grid: React.FC<GridProps> = ({
-  className,
-  cols = 'auto',
-  gap = 'md',
-  responsive,
-  children,
-  ...props
-}) => {
-  const colsStyles = {
-    1: 'grid-cols-1',
-    2: 'grid-cols-2',
-    3: 'grid-cols-3',
-    4: 'grid-cols-4',
-    5: 'grid-cols-5',
-    6: 'grid-cols-6',
-    12: 'grid-cols-12',
-    auto: 'grid-cols-auto',
-    fit: 'grid-cols-fit',
-  };
+const Grid = React.forwardRef<HTMLDivElement, GridProps>(
+  ({ className, cols, gap, responsive, children, ...props }, ref) => {
+    const responsiveClasses = responsive ? [
+      responsive.sm && `sm:grid-cols-${responsive.sm === 'auto' ? 'auto' : responsive.sm === 'fit' ? 'fit' : responsive.sm}`,
+      responsive.md && `md:grid-cols-${responsive.md === 'auto' ? 'auto' : responsive.md === 'fit' ? 'fit' : responsive.md}`,
+      responsive.lg && `lg:grid-cols-${responsive.lg === 'auto' ? 'auto' : responsive.lg === 'fit' ? 'fit' : responsive.lg}`,
+      responsive.xl && `xl:grid-cols-${responsive.xl === 'auto' ? 'auto' : responsive.xl === 'fit' ? 'fit' : responsive.xl}`,
+    ].filter(Boolean).join(' ') : '';
 
-  const gapStyles = {
-    none: 'gap-0',
-    sm: 'gap-2',
-    md: 'gap-4',
-    lg: 'gap-6',
-    xl: 'gap-8',
-  };
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          gridVariants({ cols, gap }),
+          responsiveClasses,
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+Grid.displayName = "Grid";
 
-  const responsiveStyles = responsive ? {
-    sm: responsive.sm ? `sm:${colsStyles[responsive.sm]}` : '',
-    md: responsive.md ? `md:${colsStyles[responsive.md]}` : '',
-    lg: responsive.lg ? `lg:${colsStyles[responsive.lg]}` : '',
-    xl: responsive.xl ? `xl:${colsStyles[responsive.xl]}` : '',
-  } : {};
+// Grid Item variants
+const gridItemVariants = cva(
+  "",
+  {
+    variants: {
+      span: {
+        1: "col-span-1",
+        2: "col-span-2",
+        3: "col-span-3",
+        4: "col-span-4",
+        5: "col-span-5",
+        6: "col-span-6",
+        12: "col-span-12",
+        full: "col-span-full",
+      },
+      start: {
+        1: "col-start-1",
+        2: "col-start-2",
+        3: "col-start-3",
+        4: "col-start-4",
+        5: "col-start-5",
+        6: "col-start-6",
+        7: "col-start-7",
+        8: "col-start-8",
+        9: "col-start-9",
+        10: "col-start-10",
+        11: "col-start-11",
+        12: "col-start-12",
+      },
+      end: {
+        1: "col-end-1",
+        2: "col-end-2",
+        3: "col-end-3",
+        4: "col-end-4",
+        5: "col-end-5",
+        6: "col-end-6",
+        7: "col-end-7",
+        8: "col-end-8",
+        9: "col-end-9",
+        10: "col-end-10",
+        11: "col-end-11",
+        12: "col-end-12",
+        13: "col-end-13",
+      },
+    },
+  }
+);
 
-  return (
-    <div
-      className={cn(
-        'grid',
-        colsStyles[cols],
-        gapStyles[gap],
-        Object.values(responsiveStyles).join(' '),
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
-
-// Grid Item 컴포넌트
-export interface GridItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  span?: 1 | 2 | 3 | 4 | 5 | 6 | 12 | 'full';
-  start?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  end?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+export interface GridItemProps 
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof gridItemVariants> {
   responsive?: {
-    sm?: { span?: GridItemProps['span']; start?: GridItemProps['start']; end?: GridItemProps['end'] };
-    md?: { span?: GridItemProps['span']; start?: GridItemProps['start']; end?: GridItemProps['end'] };
-    lg?: { span?: GridItemProps['span']; start?: GridItemProps['start']; end?: GridItemProps['end'] };
-    xl?: { span?: GridItemProps['span']; start?: GridItemProps['start']; end?: GridItemProps['end'] };
+    sm?: { 
+      span?: VariantProps<typeof gridItemVariants>['span']; 
+      start?: VariantProps<typeof gridItemVariants>['start']; 
+      end?: VariantProps<typeof gridItemVariants>['end']; 
+    };
+    md?: { 
+      span?: VariantProps<typeof gridItemVariants>['span']; 
+      start?: VariantProps<typeof gridItemVariants>['start']; 
+      end?: VariantProps<typeof gridItemVariants>['end']; 
+    };
+    lg?: { 
+      span?: VariantProps<typeof gridItemVariants>['span']; 
+      start?: VariantProps<typeof gridItemVariants>['start']; 
+      end?: VariantProps<typeof gridItemVariants>['end']; 
+    };
+    xl?: { 
+      span?: VariantProps<typeof gridItemVariants>['span']; 
+      start?: VariantProps<typeof gridItemVariants>['start']; 
+      end?: VariantProps<typeof gridItemVariants>['end']; 
+    };
   };
   children: React.ReactNode;
 }
 
-const GridItem: React.FC<GridItemProps> = ({
-  className,
-  span,
-  start,
-  end,
-  responsive,
-  children,
-  ...props
-}) => {
-  const spanStyles = {
-    1: 'col-span-1',
-    2: 'col-span-2',
-    3: 'col-span-3',
-    4: 'col-span-4',
-    5: 'col-span-5',
-    6: 'col-span-6',
-    12: 'col-span-12',
-    full: 'col-span-full',
-  };
+const GridItem = React.forwardRef<HTMLDivElement, GridItemProps>(
+  ({ className, span, start, end, responsive, children, ...props }, ref) => {
+    const responsiveClasses = responsive ? [
+      responsive.sm?.span && `sm:col-span-${responsive.sm.span === 'full' ? 'full' : responsive.sm.span}`,
+      responsive.sm?.start && `sm:col-start-${responsive.sm.start}`,
+      responsive.sm?.end && `sm:col-end-${responsive.sm.end}`,
+      responsive.md?.span && `md:col-span-${responsive.md.span === 'full' ? 'full' : responsive.md.span}`,
+      responsive.md?.start && `md:col-start-${responsive.md.start}`,
+      responsive.md?.end && `md:col-end-${responsive.md.end}`,
+      responsive.lg?.span && `lg:col-span-${responsive.lg.span === 'full' ? 'full' : responsive.lg.span}`,
+      responsive.lg?.start && `lg:col-start-${responsive.lg.start}`,
+      responsive.lg?.end && `lg:col-end-${responsive.lg.end}`,
+      responsive.xl?.span && `xl:col-span-${responsive.xl.span === 'full' ? 'full' : responsive.xl.span}`,
+      responsive.xl?.start && `xl:col-start-${responsive.xl.start}`,
+      responsive.xl?.end && `xl:col-end-${responsive.xl.end}`,
+    ].filter(Boolean).join(' ') : '';
 
-  const startStyles = {
-    1: 'col-start-1',
-    2: 'col-start-2',
-    3: 'col-start-3',
-    4: 'col-start-4',
-    5: 'col-start-5',
-    6: 'col-start-6',
-    7: 'col-start-7',
-    8: 'col-start-8',
-    9: 'col-start-9',
-    10: 'col-start-10',
-    11: 'col-start-11',
-    12: 'col-start-12',
-  };
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          gridItemVariants({ span, start, end }),
+          responsiveClasses,
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+GridItem.displayName = "GridItem";
 
-  const endStyles = {
-    1: 'col-end-1',
-    2: 'col-end-2',
-    3: 'col-end-3',
-    4: 'col-end-4',
-    5: 'col-end-5',
-    6: 'col-end-6',
-    7: 'col-end-7',
-    8: 'col-end-8',
-    9: 'col-end-9',
-    10: 'col-end-10',
-    11: 'col-end-11',
-    12: 'col-end-12',
-    13: 'col-end-13',
-  };
+// Flex variants
+const flexVariants = cva(
+  "flex",
+  {
+    variants: {
+      direction: {
+        row: "flex-row",
+        col: "flex-col",
+        "row-reverse": "flex-row-reverse",
+        "col-reverse": "flex-col-reverse",
+      },
+      wrap: {
+        wrap: "flex-wrap",
+        nowrap: "flex-nowrap",
+        "wrap-reverse": "flex-wrap-reverse",
+      },
+      justify: {
+        start: "justify-start",
+        end: "justify-end",
+        center: "justify-center",
+        between: "justify-between",
+        around: "justify-around",
+        evenly: "justify-evenly",
+      },
+      align: {
+        start: "items-start",
+        end: "items-end",
+        center: "items-center",
+        baseline: "items-baseline",
+        stretch: "items-stretch",
+      },
+      gap: {
+        none: "gap-0",
+        sm: "gap-2",
+        md: "gap-4",
+        lg: "gap-6",
+        xl: "gap-8",
+      },
+    },
+    defaultVariants: {
+      direction: "row",
+      wrap: "nowrap",
+      justify: "start",
+      align: "start",
+      gap: "none",
+    },
+  }
+);
 
-  const getResponsiveClasses = () => {
-    if (!responsive) return '';
-    
-    const classes: string[] = [];
-    
-    Object.entries(responsive).forEach(([breakpoint, styles]) => {
-      if (styles.span) classes.push(`${breakpoint}:${spanStyles[styles.span]}`);
-      if (styles.start) classes.push(`${breakpoint}:${startStyles[styles.start]}`);
-      if (styles.end) classes.push(`${breakpoint}:${endStyles[styles.end]}`);
-    });
-    
-    return classes.join(' ');
-  };
-
-  return (
-    <div
-      className={cn(
-        span && spanStyles[span],
-        start && startStyles[start],
-        end && endStyles[end],
-        getResponsiveClasses(),
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
-
-// Flex 컴포넌트 (그리드 대안)
-export interface FlexProps extends React.HTMLAttributes<HTMLDivElement> {
-  direction?: 'row' | 'col' | 'row-reverse' | 'col-reverse';
-  wrap?: 'wrap' | 'nowrap' | 'wrap-reverse';
-  justify?: 'start' | 'end' | 'center' | 'between' | 'around' | 'evenly';
-  align?: 'start' | 'end' | 'center' | 'baseline' | 'stretch';
-  gap?: GridProps['gap'];
+export interface FlexProps 
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof flexVariants> {
   children: React.ReactNode;
 }
 
-const Flex: React.FC<FlexProps> = ({
-  className,
-  direction = 'row',
-  wrap = 'nowrap',
-  justify = 'start',
-  align = 'start',
-  gap = 'none',
-  children,
-  ...props
-}) => {
-  const directionStyles = {
-    row: 'flex-row',
-    col: 'flex-col',
-    'row-reverse': 'flex-row-reverse',
-    'col-reverse': 'flex-col-reverse',
-  };
+const Flex = React.forwardRef<HTMLDivElement, FlexProps>(
+  ({ className, direction, wrap, justify, align, gap, children, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(flexVariants({ direction, wrap, justify, align, gap }), className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+Flex.displayName = "Flex";
 
-  const wrapStyles = {
-    wrap: 'flex-wrap',
-    nowrap: 'flex-nowrap',
-    'wrap-reverse': 'flex-wrap-reverse',
-  };
-
-  const justifyStyles = {
-    start: 'justify-start',
-    end: 'justify-end',
-    center: 'justify-center',
-    between: 'justify-between',
-    around: 'justify-around',
-    evenly: 'justify-evenly',
-  };
-
-  const alignStyles = {
-    start: 'items-start',
-    end: 'items-end',
-    center: 'items-center',
-    baseline: 'items-baseline',
-    stretch: 'items-stretch',
-  };
-
-  const gapStyles = {
-    none: 'gap-0',
-    sm: 'gap-2',
-    md: 'gap-4',
-    lg: 'gap-6',
-    xl: 'gap-8',
-  };
-
-  return (
-    <div
-      className={cn(
-        'flex',
-        directionStyles[direction],
-        wrapStyles[wrap],
-        justifyStyles[justify],
-        alignStyles[align],
-        gapStyles[gap],
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
-
-export { GridItem, Flex };
-export default Grid;
+export { Grid, GridItem, Flex, gridVariants, gridItemVariants, flexVariants };

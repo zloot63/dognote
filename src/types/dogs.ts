@@ -3,6 +3,7 @@ export interface Dog {
   id: string;
   name: string;
   breed?: string;
+  age?: number; // ✅ 나이 속성 추가
   birthDate?: string;
   gender?: "male" | "female";
   weight?: number;

@@ -1,7 +1,134 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
+import * as React from "react"
+import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from "@radix-ui/react-icons"
+import { cva, type VariantProps } from "class-variance-authority"
 
-export interface PaginationProps {
+import { cn } from "@/lib/utils"
+import { Button, ButtonProps } from "@/components/ui/Button"
+
+const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
+  <nav
+    role="navigation"
+    aria-label="pagination"
+    className={cn("mx-auto flex w-full justify-center", className)}
+    {...props}
+  />
+)
+Pagination.displayName = "Pagination"
+
+const PaginationContent = React.forwardRef<
+  HTMLUListElement,
+  React.ComponentProps<"ul">
+>(({ className, ...props }, ref) => (
+  <ul
+    ref={ref}
+    className={cn("flex flex-row items-center gap-1", className)}
+    {...props}
+  />
+))
+PaginationContent.displayName = "PaginationContent"
+
+const PaginationItem = React.forwardRef<
+  HTMLLIElement,
+  React.ComponentProps<"li">
+>(({ className, ...props }, ref) => (
+  <li ref={ref} className={cn("", className)} {...props} />
+))
+PaginationItem.displayName = "PaginationItem"
+
+type PaginationLinkProps = {
+  isActive?: boolean
+} & Pick<ButtonProps, "size"> &
+  React.ComponentProps<"a">
+
+const PaginationLink = ({
+  className,
+  isActive,
+  size = "icon",
+  ...props
+}: PaginationLinkProps) => (
+  <a
+    aria-current={isActive ? "page" : undefined}
+    className={cn(
+      "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      isActive
+        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+        : "hover:bg-accent hover:text-accent-foreground",
+      size === "default" && "h-9 px-4 py-2",
+      size === "sm" && "h-8 px-3 text-xs",
+      size === "lg" && "h-10 px-8",
+      size === "icon" && "h-9 w-9",
+      className
+    )}
+    {...props}
+  />
+)
+PaginationLink.displayName = "PaginationLink"
+
+const PaginationPrevious = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink
+    aria-label="Go to previous page"
+    size="default"
+    className={cn("gap-1 pl-2.5", className)}
+    {...props}
+  >
+    <ChevronLeftIcon className="h-4 w-4" />
+    <span>Previous</span>
+  </PaginationLink>
+)
+PaginationPrevious.displayName = "PaginationPrevious"
+
+const PaginationNext = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink
+    aria-label="Go to next page"
+    size="default"
+    className={cn("gap-1 pr-2.5", className)}
+    {...props}
+  >
+    <span>Next</span>
+    <ChevronRightIcon className="h-4 w-4" />
+  </PaginationLink>
+)
+PaginationNext.displayName = "PaginationNext"
+
+const PaginationEllipsis = ({
+  className,
+  ...props
+}: React.ComponentProps<"span">) => (
+  <span
+    aria-hidden
+    className={cn("flex h-9 w-9 items-center justify-center", className)}
+    {...props}
+  >
+    <DotsHorizontalIcon className="h-4 w-4" />
+    <span className="sr-only">More pages</span>
+  </span>
+)
+PaginationEllipsis.displayName = "PaginationEllipsis"
+
+// Enhanced Pagination Component with all features
+const paginationVariants = cva(
+  "",
+  {
+    variants: {
+      size: {
+        sm: "text-xs",
+        md: "text-sm",
+        lg: "text-base",
+      },
+    },
+    defaultVariants: {
+      size: "md",
+    },
+  }
+);
+
+export interface EnhancedPaginationProps extends VariantProps<typeof paginationVariants> {
   currentPage: number;
   totalPages: number;
   totalItems?: number;
@@ -11,209 +138,148 @@ export interface PaginationProps {
   showPageNumbers?: boolean;
   showInfo?: boolean;
   maxPageNumbers?: number;
-  size?: 'sm' | 'md' | 'lg';
   className?: string;
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
-  currentPage,
-  totalPages,
-  totalItems,
-  itemsPerPage,
-  showFirstLast = true,
-  showPrevNext = true,
-  showPageNumbers = true,
-  showInfo = true,
-  maxPageNumbers = 7,
-  size = 'md',
-  className,
-  onPageChange,
-}) => {
-  // 페이지 번호 계산
-  const getPageNumbers = (): (number | string)[] => {
-    if (totalPages <= maxPageNumbers) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    const half = Math.floor(maxPageNumbers / 2);
-    let start = Math.max(1, currentPage - half);
-    const end = Math.min(totalPages, start + maxPageNumbers - 1);
-
-    if (end - start + 1 < maxPageNumbers) {
-      start = Math.max(1, end - maxPageNumbers + 1);
-    }
-
-    const pages: (number | string)[] = [];
-
-    if (start > 1) {
-      pages.push(1);
-      if (start > 2) {
-        pages.push('...');
+const EnhancedPagination = React.forwardRef<HTMLElement, EnhancedPaginationProps>(
+  ({
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    showFirstLast = true,
+    showPrevNext = true,
+    showPageNumbers = true,
+    showInfo = true,
+    maxPageNumbers = 7,
+    size = "md",
+    className,
+    onPageChange,
+    ...props
+  }, ref) => {
+    // 페이지 번호 계산
+    const getPageNumbers = (): (number | string)[] => {
+      if (totalPages <= maxPageNumbers) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
       }
-    }
 
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
+      const half = Math.floor(maxPageNumbers / 2);
+      let start = Math.max(1, currentPage - half);
+      const end = Math.min(totalPages, start + maxPageNumbers - 1);
 
-    if (end < totalPages) {
-      if (end < totalPages - 1) {
-        pages.push('...');
+      if (end - start + 1 < maxPageNumbers) {
+        start = Math.max(1, end - maxPageNumbers + 1);
       }
-      pages.push(totalPages);
-    }
 
-    return pages;
-  };
+      const pages: (number | string)[] = [];
 
-  const sizeStyles = {
-    sm: 'h-8 min-w-8 text-xs',
-    md: 'h-9 min-w-9 text-sm',
-    lg: 'h-10 min-w-10 text-base',
-  };
+      if (start > 1) {
+        pages.push(1);
+        if (start > 2) {
+          pages.push('...');
+        }
+      }
 
-  const pageNumbers = getPageNumbers();
-  const canGoPrev = currentPage > 1;
-  const canGoNext = currentPage < totalPages;
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
 
-  // 정보 텍스트 생성
-  const getInfoText = (): string => {
-    if (!totalItems || !itemsPerPage) {
-      return `${currentPage} / ${totalPages} 페이지`;
-    }
+      if (end < totalPages) {
+        if (end < totalPages - 1) {
+          pages.push('...');
+        }
+        pages.push(totalPages);
+      }
 
-    const startItem = (currentPage - 1) * itemsPerPage + 1;
-    const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+      return pages;
+    };
 
-    return `${startItem}-${endItem} / ${totalItems}개 항목`;
-  };
+    const pageNumbers = getPageNumbers();
 
-  return (
-    <div className={cn('flex flex-col items-center space-y-4', className)}>
-      {/* 페이지 네비게이션 */}
-      <nav className="flex items-center space-x-1" aria-label="Pagination">
-        {/* 첫 페이지 */}
-        {showFirstLast && (
-          <button
-            type="button"
-            onClick={() => onPageChange(1)}
-            disabled={!canGoPrev}
-            className={cn(
-              'inline-flex items-center justify-center rounded-md border border-input bg-background px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
-              sizeStyles[size]
-            )}
-            aria-label="첫 페이지로 이동"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-          </button>
+    const handlePageChange = (page: number) => {
+      if (page >= 1 && page <= totalPages && page !== currentPage) {
+        onPageChange(page);
+      }
+    };
+
+    return (
+      <div className={cn("space-y-4", className)} {...props}>
+        {showInfo && totalItems && itemsPerPage && (
+          <div className="text-sm text-muted-foreground text-center">
+            {`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)} of ${totalItems} items`}
+          </div>
         )}
-
-        {/* 이전 페이지 */}
-        {showPrevNext && (
-          <button
-            type="button"
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={!canGoPrev}
-            className={cn(
-              'inline-flex items-center justify-center rounded-md border border-input bg-background px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
-              sizeStyles[size]
+        
+        <Pagination ref={ref} className={paginationVariants({ size })}>
+          <PaginationContent>
+            {/* First Page */}
+            {showFirstLast && currentPage > 1 && (
+              <PaginationItem>
+                <PaginationLink
+                  onClick={() => handlePageChange(1)}
+                  className="cursor-pointer"
+                >
+                  First
+                </PaginationLink>
+              </PaginationItem>
             )}
-            aria-label="이전 페이지로 이동"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        )}
 
-        {/* 페이지 번호들 */}
-        {showPageNumbers && pageNumbers.map((page, index) => {
-          if (page === '...') {
-            return (
-              <span
-                key={`ellipsis-${index}`}
-                className={cn(
-                  'inline-flex items-center justify-center px-2 text-muted-foreground',
-                  sizeStyles[size]
+            {/* Previous Page */}
+            {showPrevNext && currentPage > 1 && (
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
+            )}
+
+            {/* Page Numbers */}
+            {showPageNumbers && pageNumbers.map((page, index) => (
+              <PaginationItem key={index}>
+                {page === '...' ? (
+                  <PaginationEllipsis />
+                ) : (
+                  <PaginationLink
+                    onClick={() => handlePageChange(page as number)}
+                    isActive={page === currentPage}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
                 )}
-              >
-                ...
-              </span>
-            );
-          }
+              </PaginationItem>
+            ))}
 
-          const pageNumber = page as number;
-          const isActive = pageNumber === currentPage;
-
-          return (
-            <button
-              key={pageNumber}
-              type="button"
-              onClick={() => onPageChange(pageNumber)}
-              className={cn(
-                'inline-flex items-center justify-center rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                sizeStyles[size],
-                isActive
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-input bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-              )}
-              aria-label={`${pageNumber}페이지로 이동`}
-              aria-current={isActive ? 'page' : undefined}
-            >
-              {pageNumber}
-            </button>
-          );
-        })}
-
-        {/* 다음 페이지 */}
-        {showPrevNext && (
-          <button
-            type="button"
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={!canGoNext}
-            className={cn(
-              'inline-flex items-center justify-center rounded-md border border-input bg-background px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
-              sizeStyles[size]
+            {/* Next Page */}
+            {showPrevNext && currentPage < totalPages && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
             )}
-            aria-label="다음 페이지로 이동"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        )}
 
-        {/* 마지막 페이지 */}
-        {showFirstLast && (
-          <button
-            type="button"
-            onClick={() => onPageChange(totalPages)}
-            disabled={!canGoNext}
-            className={cn(
-              'inline-flex items-center justify-center rounded-md border border-input bg-background px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
-              sizeStyles[size]
+            {/* Last Page */}
+            {showFirstLast && currentPage < totalPages && (
+              <PaginationItem>
+                <PaginationLink
+                  onClick={() => handlePageChange(totalPages)}
+                  className="cursor-pointer"
+                >
+                  Last
+                </PaginationLink>
+              </PaginationItem>
             )}
-            aria-label="마지막 페이지로 이동"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-            </svg>
-          </button>
-        )}
-      </nav>
-
-      {/* 페이지 정보 */}
-      {showInfo && (
-        <div className="text-sm text-muted-foreground">
-          {getInfoText()}
-        </div>
-      )}
-    </div>
-  );
-};
+          </PaginationContent>
+        </Pagination>
+      </div>
+    );
+  }
+);
+EnhancedPagination.displayName = "EnhancedPagination";
 
 // 간단한 페이지네이션 컴포넌트
 export interface SimplePaginationProps {
@@ -223,24 +289,33 @@ export interface SimplePaginationProps {
   className?: string;
 }
 
-const SimplePagination: React.FC<SimplePaginationProps> = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-  className,
-}) => {
-  return (
-    <Pagination
-      currentPage={currentPage}
-      totalPages={totalPages}
-      onPageChange={onPageChange}
-      showFirstLast={false}
-      showInfo={false}
-      maxPageNumbers={5}
-      className={className}
-    />
-  );
-};
+const SimplePagination = React.forwardRef<HTMLElement, SimplePaginationProps>(
+  ({ currentPage, totalPages, onPageChange, className, ...props }, ref) => {
+    return (
+      <EnhancedPagination
+        ref={ref}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        showFirstLast={false}
+        showInfo={false}
+        maxPageNumbers={5}
+        className={className}
+        {...props}
+      />
+    );
+  }
+);
+SimplePagination.displayName = "SimplePagination";
 
-export { SimplePagination };
-export default Pagination;
+export {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  EnhancedPagination,
+  SimplePagination,
+}

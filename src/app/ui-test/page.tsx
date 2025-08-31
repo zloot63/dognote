@@ -1,24 +1,34 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import TextArea from '@/components/ui/TextArea';
-import Checkbox from '@/components/ui/Checkbox';
-import Radio from '@/components/ui/Radio';
-import Select from '@/components/ui/Select';
-import Badge from '@/components/ui/Badge';
-import Avatar from '@/components/ui/Avatar';
-import Progress from '@/components/ui/Progress';
-import { Spinner, Loading, Skeleton } from '@/components/ui/Loading';
-import Modal from '@/components/ui/Modal';
-import Toast from '@/components/ui/Toast';
-import Tooltip from '@/components/ui/Tooltip';
-import Breadcrumb from '@/components/ui/Breadcrumb';
-import Container from '@/components/ui/Container';
-import Grid from '@/components/ui/Grid';
-import Divider from '@/components/ui/Divider';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
+import {
+  Button,
+  Input,
+  Textarea,
+  Checkbox,
+  Radio,
+  Select,
+  Badge,
+  Avatar,
+  Progress,
+  Spinner,
+  Loading,
+  EnhancedSkeleton,
+  Modal,
+  useToast,
+  Tooltip,
+  Breadcrumb,
+  Container,
+  Grid,
+  Divider,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  DatePicker,
+  DateRangePicker
+} from '@/components/ui';
 import {
   Home,
   Settings,
@@ -30,37 +40,11 @@ import {
   Heart,
   Download,
   Lock,
-  Plus,
-  Trash2
+  Trash2,
+  Calendar
 } from 'lucide-react';
 
-// Toast 훅 모킹 (실제 구현이 없는 경우)
-const useToast = () => {
-  const [toasts, setToasts] = useState<any[]>([]);
-  
-  const addToast = (type: string, title: string, description?: string) => {
-    const id = Date.now().toString();
-    const newToast = { id, type, title, description };
-    setToasts(prev => [...prev, newToast]);
-    setTimeout(() => removeToast(id), 5000);
-  };
-  
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
-  
-  return {
-    toasts,
-    removeToast,
-    toast: {
-      success: (title: string, description?: string) => addToast('success', title, description),
-      error: (title: string, description?: string) => addToast('error', title, description),
-      warning: (title: string, description?: string) => addToast('warning', title, description),
-      info: (title: string, description?: string) => addToast('info', title, description),
-      default: (title: string, description?: string) => addToast('default', title, description)
-    }
-  };
-};
+// 실제 useToast 훅 사용
 
 export default function UITestPage() {
   // 상태 관리
@@ -70,10 +54,12 @@ export default function UITestPage() {
   const [selectedRadio, setSelectedRadio] = useState('option1');
   const [selectValue, setSelectValue] = useState('');
   const [progressValue] = useState(65);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [dateRange, setDateRange] = useState<{from?: Date, to?: Date}>({});
   
-  const { toast, toasts, removeToast } = useToast();
+  const { toast } = useToast();
 
   const handleLoadingDemo = () => {
     setIsLoading(true);
@@ -202,7 +188,7 @@ export default function UITestPage() {
                 {/* 텍스트 영역 */}
                 <div>
                   <h4 className="font-semibold text-neutral-800 mb-3">텍스트 영역</h4>
-                  <TextArea
+                  <Textarea
                     placeholder="여러 줄 텍스트를 입력하세요..."
                     value={textareaValue}
                     onChange={(e) => setTextareaValue(e.target.value)}
@@ -275,6 +261,25 @@ export default function UITestPage() {
                     ]}
                   />
                 </div>
+
+                {/* 날짜 선택 */}
+                <div>
+                  <h4 className="font-semibold text-neutral-800 mb-3">날짜 선택</h4>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <DatePicker
+                      label="날짜 선택"
+                      value={selectedDate || undefined}
+                      onChange={(date) => setSelectedDate(date)}
+                      placeholder="날짜를 선택하세요"
+                    />
+                    <DateRangePicker
+                      label="기간 선택"
+                      value={dateRange}
+                      onChange={(range) => setDateRange(range || {})}
+                      placeholder="기간을 선택하세요"
+                    />
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -315,7 +320,7 @@ export default function UITestPage() {
                     <Avatar size="xl" />
                     <Avatar 
                       size="md" 
-                      src=""
+                      src="https://placedog.net/100/100"
                       alt="강아지"
                     />
                   </div>
@@ -347,12 +352,12 @@ export default function UITestPage() {
                 <div>
                   <h4 className="font-semibold text-neutral-800 mb-3">스켈레톤</h4>
                   <div className="space-y-4">
-                    <Skeleton variant="text" lines={3} />
+                    <EnhancedSkeleton variant="text" lines={3} />
                     <div className="flex items-center space-x-3">
-                      <Skeleton variant="circular" width={40} height={40} />
+                      <EnhancedSkeleton variant="circular" width={40} height={40} />
                       <div className="flex-1">
-                        <Skeleton variant="text" />
-                        <Skeleton variant="text" width="60%" />
+                        <EnhancedSkeleton variant="text" />
+                        <EnhancedSkeleton variant="text" width="60%" />
                       </div>
                     </div>
                   </div>
@@ -377,7 +382,7 @@ export default function UITestPage() {
                 {/* 모달 */}
                 <div>
                   <h4 className="font-semibold text-neutral-800 mb-3">모달</h4>
-                  <Button onClick={() => setIsModalOpen(true)}>
+                  <Button onClick={() => setModalOpen(true)}>
                     모달 열기
                   </Button>
                 </div>
@@ -401,18 +406,18 @@ export default function UITestPage() {
                   </div>
                 </div>
 
-                {/* 톨팁 */}
+                {/* 툴팁 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">톨팁</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">툴팁</h4>
                   <div className="flex gap-3">
-                    <Tooltip content="이것은 톨팁 메시지입니다">
-                      <Button variant="outline">톨팁 테스트</Button>
+                    <Tooltip content="이것은 툴팁 메시지입니다">
+                      <Button variant="outline">툴팁 테스트</Button>
                     </Tooltip>
-                    <Tooltip content="위쪽에 표시되는 톨팁" position="top">
-                      <Button variant="outline">위쪽 톨팁</Button>
+                    <Tooltip content="위쪽에 표시되는 툴팁" position="top">
+                      <Button variant="outline">위쪽 툴팁</Button>
                     </Tooltip>
-                    <Tooltip content="오른쪽에 표시되는 톨팁" position="right">
-                      <Button variant="outline">오른쪽 톨팁</Button>
+                    <Tooltip content="오른쪽에 표시되는 툴팁" position="right">
+                      <Button variant="outline">오른쪽 툴팁</Button>
                     </Tooltip>
                   </div>
                 </div>
@@ -516,38 +521,29 @@ export default function UITestPage() {
 
       {/* 모달 */}
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        open={modalOpen}
+        onClose={(reason) => {
+          console.log('Modal closed due to:', reason);
+          setModalOpen(false);
+        }}
         title="테스트 모달"
         description="이것은 테스트용 모달입니다."
-        size="md"
+        maxWidth="md"
       >
         <div className="space-y-4">
           <p>모달 내용이 여기에 표시됩니다.</p>
           <Input placeholder="모달 내 입력 필드" />
           <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+            <Button variant="outline" onClick={() => setModalOpen(false)}>
               취소
             </Button>
-            <Button onClick={() => setIsModalOpen(false)}>
+            <Button onClick={() => setModalOpen(false)}>
               확인
             </Button>
           </div>
         </div>
       </Modal>
 
-      {/* 토스트 컨테이너 */}
-      {toasts.length > 0 && (
-        <div className="fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:max-w-[420px]">
-          {toasts.map((toastItem) => (
-            <Toast
-              key={toastItem.id}
-              {...toastItem}
-              onClose={() => removeToast(toastItem.id)}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

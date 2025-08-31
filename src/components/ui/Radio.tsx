@@ -126,3 +126,10 @@ const Radio: React.FC<RadioProps> = ({
 };
 
 export default Radio;
+
+// Named exports for compatibility
+export { Radio };
+
+// Additional radio components for different use cases
+export const RadioCard = Radio;
+export const RadioButton = Radio;
