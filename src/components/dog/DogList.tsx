@@ -58,7 +58,7 @@ const DogList: React.FC<DogListProps> = ({
   ];
 
   const sizeOptions = [
-    { value: '', label: '모든 크기' },
+    { value: 'all', label: '모든 크기' },
     ...Object.entries(SIZE_LABELS).map(([value, label]) => ({
       value,
       label: label.split(' ')[0] // "소형견 (10kg 미만)" -> "소형견"
@@ -66,13 +66,13 @@ const DogList: React.FC<DogListProps> = ({
   ];
 
   const genderOptions = [
-    { value: '', label: '모든 성별' },
+    { value: 'all', label: '모든 성별' },
     { value: 'male', label: '수컷' },
     { value: 'female', label: '암컷' }
   ];
 
   const breedOptions = [
-    { value: '', label: '모든 견종' },
+    { value: 'all', label: '모든 견종' },
     ...DOG_BREEDS.map(breed => ({ value: breed, label: breed }))
   ];
 
@@ -168,22 +168,22 @@ const DogList: React.FC<DogListProps> = ({
           <CustomSelect
             placeholder="크기"
             options={sizeOptions}
-            value={filterBy.size || ''}
-            onChange={(value) => setFilter({ size: value as "small" | "medium" | "large" | "giant" | undefined || undefined })}
+            value={filterBy.size || 'all'}
+            onChange={(value) => setFilter({ size: value === 'all' ? undefined : value as "small" | "medium" | "large" | "giant" | undefined })}
           />
           
           <CustomSelect
             placeholder="성별"
             options={genderOptions}
-            value={filterBy.gender || ''}
-            onChange={(value) => setFilter({ gender: value as "male" | "female" | undefined || undefined })}
+            value={filterBy.gender || 'all'}
+            onChange={(value) => setFilter({ gender: value === 'all' ? undefined : value as "male" | "female" | undefined })}
           />
           
           <CustomSelect
             placeholder="견종"
             options={breedOptions}
-            value={filterBy.breed || ''}
-            onChange={(value) => setFilter({ breed: value || undefined })}
+            value={filterBy.breed || 'all'}
+            onChange={(value) => setFilter({ breed: value === 'all' ? undefined : value || undefined })}
             searchable
           />
           

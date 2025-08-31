@@ -56,7 +56,7 @@ export default function UITestPage() {
   const [textareaValue, setTextareaValue] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [selectedRadio, setSelectedRadio] = useState('option1');
-  const [selectValue, setSelectValue] = useState('');
+  const [selectValue, setSelectValue] = useState<string | undefined>(undefined);
   const [progressValue] = useState(65);
   const [modalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
