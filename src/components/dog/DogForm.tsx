@@ -13,8 +13,13 @@ import {
 import {
   Button,
   Input,
+  Label,
   TextArea,
   Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
   Radio,
   Checkbox,
   DatePicker,
@@ -29,7 +34,7 @@ import {
 } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
-interface DogFormProps {
+export interface DogFormProps {
   dog?: Dog; // 수정 모드일 때 기존 데이터
   onSubmit: (data: DogFormData) => Promise<void>;
   onCancel: () => void;
@@ -151,12 +156,17 @@ const DogForm: React.FC<DogFormProps> = ({
                   }
                 }}
                 render={({ field }) => (
-                  <Input
-                    label="이름 *"
-                    placeholder="강아지 이름을 입력하세요"
-                    error={errors.name?.message}
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="dogName">이름 *</Label>
+                    <Input
+                      id="dogName"
+                      placeholder="강아지 이름을 입력하세요"
+                      {...field}
+                    />
+                    {errors.name?.message && (
+                      <p className="text-sm text-red-500">{errors.name.message}</p>
+                    )}
+                  </div>
                 )}
               />
 
@@ -165,15 +175,25 @@ const DogForm: React.FC<DogFormProps> = ({
                 control={control}
                 rules={{ required: '견종을 선택해주세요' }}
                 render={({ field }) => (
-                  <Select
-                    label="견종 *"
-                    placeholder="견종을 선택하세요"
-                    options={DOG_BREEDS.map(breed => ({ value: breed, label: breed }))}
-                    value={field.value}
-                    onChange={field.onChange}
-                    error={errors.breed?.message}
-                    searchable
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="dogBreed">견종 *</Label>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger id="dogBreed">
+                        <SelectValue placeholder="견종을 선택하세요" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DOG_BREEDS.map(breed => (
+                          <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.breed?.message && (
+                      <p className="text-sm text-red-500">{errors.breed.message}</p>
+                    )}
+                  </div>
                 )}
               />
 
@@ -213,12 +233,16 @@ const DogForm: React.FC<DogFormProps> = ({
                   }
                 }}
                 render={({ field }) => (
-                  <DatePicker
-                    label="생년월일 *"
-                    value={field.value ? new Date(Date.parse(field.value)) : new Date()}
-                    onChange={field.onChange}
-                    error={errors.birthDate?.message}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="dogBirthDate">생년월일 *</Label>
+                    <DatePicker
+                      value={field.value ? new Date(Date.parse(field.value)) : new Date()}
+                      onChange={field.onChange}
+                    />
+                    {errors.birthDate?.message && (
+                      <p className="text-sm text-red-500">{errors.birthDate.message}</p>
+                    )}
+                  </div>
                 )}
               />
 
@@ -231,15 +255,20 @@ const DogForm: React.FC<DogFormProps> = ({
                   max: { value: 100, message: '체중은 100kg 이하여야 합니다' }
                 }}
                 render={({ field }) => (
-                  <Input
-                    label="체중 (kg) *"
-                    type="number"
-                    step="0.1"
-                    placeholder="0.0"
-                    error={errors.weight?.message}
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="dogWeight">체중 (kg) *</Label>
+                    <Input
+                      id="dogWeight"
+                      type="number"
+                      step="0.1"
+                      placeholder="0.0"
+                      {...field}
+                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    />
+                    {errors.weight?.message && (
+                      <p className="text-sm text-red-500">{errors.weight.message}</p>
+                    )}
+                  </div>
                 )}
               />
 
@@ -251,12 +280,17 @@ const DogForm: React.FC<DogFormProps> = ({
                   maxLength: { value: 20, message: '색상은 20글자 이하여야 합니다' }
                 }}
                 render={({ field }) => (
-                  <Input
-                    label="색상 *"
-                    placeholder="예: 갈색, 흰색, 검은색"
-                    error={errors.color?.message}
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="dogColor">색상 *</Label>
+                    <Input
+                      id="dogColor"
+                      placeholder="예: 갈색, 흰색, 검은색"
+                      {...field}
+                    />
+                    {errors.color?.message && (
+                      <p className="text-sm text-red-500">{errors.color.message}</p>
+                    )}
+                  </div>
                 )}
               />
 
@@ -264,15 +298,22 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="size"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    label="크기"
-                    options={Object.entries(SIZE_LABELS).map(([value, label]) => ({
-                      value,
-                      label
-                    }))}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="dogSize">크기</Label>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger id="dogSize">
+                        <SelectValue placeholder="크기를 선택하세요" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(SIZE_LABELS).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 )}
               />
 
@@ -280,15 +321,22 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="activityLevel"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    label="활동 수준"
-                    options={Object.entries(ACTIVITY_LEVEL_LABELS).map(([value, label]) => ({
-                      value,
-                      label
-                    }))}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="dogActivityLevel">활동 수준</Label>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger id="dogActivityLevel">
+                        <SelectValue placeholder="활동 수준을 선택하세요" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(ACTIVITY_LEVEL_LABELS).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 )}
               />
 
@@ -297,12 +345,15 @@ const DogForm: React.FC<DogFormProps> = ({
                   name="description"
                   control={control}
                   render={({ field }) => (
-                    <TextArea
-                      label="설명"
-                      placeholder="강아지에 대한 추가 정보를 입력하세요"
-                      rows={3}
-                      {...field}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="dogDescription">설명</Label>
+                      <TextArea
+                        id="dogDescription"
+                        placeholder="강아지에 대한 추가 정보를 입력하세요"
+                        rows={3}
+                        {...field}
+                      />
+                    </div>
                   )}
                 />
               </GridItem>
@@ -321,11 +372,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="isNeutered"
                 control={control}
                 render={({ field }) => (
-                  <Checkbox
-                    label="중성화 수술 완료"
-                    checked={field.value}
-                    onChange={field.onChange}
-                  />
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isNeutered"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                    <Label htmlFor="isNeutered">중성화 수술 완료</Label>
+                  </div>
                 )}
               />
 
@@ -333,11 +387,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="microchipId"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="마이크로칩 번호"
-                    placeholder="마이크로칩 번호를 입력하세요"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="microchipId">마이크로칩 번호</Label>
+                    <Input
+                      id="microchipId"
+                      placeholder="마이크로칩 번호를 입력하세요"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
 
@@ -345,24 +402,32 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="registrationNumber"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="등록번호"
-                    placeholder="동물등록번호를 입력하세요"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="registrationNumber">등록번호</Label>
+                    <Input
+                      id="registrationNumber"
+                      placeholder="동물등록번호를 입력하세요"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
 
               <GridItem span="full">
-                <Divider label="성격" />
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg">성격</h3>
+                  <Divider />
+                </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
                   {TEMPERAMENT_OPTIONS.map((temperament) => (
-                    <Checkbox
-                      key={temperament}
-                      label={temperament}
-                      checked={selectedTemperaments.includes(temperament)}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTemperamentChange(temperament, e.target.checked)}
-                    />
+                    <div key={temperament} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`temperament-${temperament}`}
+                        checked={selectedTemperaments.includes(temperament)}
+                        onCheckedChange={(checked) => handleTemperamentChange(temperament, checked as boolean)}
+                      />
+                      <Label htmlFor={`temperament-${temperament}`}>{temperament}</Label>
+                    </div>
                   ))}
                 </div>
               </GridItem>
@@ -381,11 +446,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="emergencyContact.name"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="이름"
-                    placeholder="응급 연락처 이름"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="emergencyContactName">이름</Label>
+                    <Input
+                      id="emergencyContactName"
+                      placeholder="응급 연락처 이름"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
 
@@ -393,11 +461,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="emergencyContact.phone"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="전화번호"
-                    placeholder="010-0000-0000"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="emergencyContactPhone">전화번호</Label>
+                    <Input
+                      id="emergencyContactPhone"
+                      placeholder="010-0000-0000"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
 
@@ -405,11 +476,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="emergencyContact.relationship"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="관계"
-                    placeholder="예: 가족, 친구, 이웃"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="emergencyContactRelationship">관계</Label>
+                    <Input
+                      id="emergencyContactRelationship"
+                      placeholder="예: 가족, 친구, 이웃"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
             </Grid>
@@ -427,11 +501,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="veterinarian.name"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="수의사 이름"
-                    placeholder="담당 수의사 이름"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="veterinarianName">수의사 이름</Label>
+                    <Input
+                      id="veterinarianName"
+                      placeholder="담당 수의사 이름"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
 
@@ -439,11 +516,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="veterinarian.clinic"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="병원명"
-                    placeholder="동물병원 이름"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="veterinarianClinic">병원명</Label>
+                    <Input
+                      id="veterinarianClinic"
+                      placeholder="동물병원 이름"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
 
@@ -451,11 +531,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="veterinarian.phone"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="병원 전화번호"
-                    placeholder="02-0000-0000"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="veterinarianPhone">병원 전화번호</Label>
+                    <Input
+                      id="veterinarianPhone"
+                      placeholder="02-0000-0000"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
 
@@ -463,11 +546,14 @@ const DogForm: React.FC<DogFormProps> = ({
                 name="veterinarian.address"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    label="병원 주소"
-                    placeholder="동물병원 주소"
-                    {...field}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="veterinarianAddress">병원 주소</Label>
+                    <Input
+                      id="veterinarianAddress"
+                      placeholder="동물병원 주소"
+                      {...field}
+                    />
+                  </div>
                 )}
               />
             </Grid>

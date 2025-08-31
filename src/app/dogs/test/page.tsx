@@ -224,7 +224,7 @@ const DogTestPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex gap-4">
                   <Button
-                    variant={formMode === 'create' ? 'primary' : 'outline'}
+                    variant={formMode === 'create' ? 'default' : 'outline'}
                     onClick={() => {
                       setFormMode('create');
                       setSelectedDog(null);
@@ -233,7 +233,7 @@ const DogTestPage: React.FC = () => {
                     등록 모드
                   </Button>
                   <Button
-                    variant={formMode === 'edit' ? 'primary' : 'outline'}
+                    variant={formMode === 'edit' ? 'default' : 'outline'}
                     onClick={() => {
                       setFormMode('edit');
                       setSelectedDog(mockDogs[0]);

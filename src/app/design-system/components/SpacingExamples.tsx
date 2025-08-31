@@ -3,19 +3,23 @@
 import React from 'react';
 import {Card} from '@/components/ui/Card';
 import {spacing} from '@/styles/theme';
-import {useCopyToClipboard} from "@uidotdev/usehooks";
-import {Check, Copy} from 'lucide-react';
+import { useState } from 'react';
 
 /**
  * 스페이싱 예제 컴포넌트
  * 간격 시스템과 사용 예시를 보여줍니다.
  */
 export function SpacingExamples() {
-    const [copiedText, setCopiedText] = useCopyToClipboard();
+    const [copiedText, setCopiedText] = useState<string>("");
 
-    const handleCopy = (text: string) => {
-        setCopiedText(text);
-        setTimeout(() => setCopiedText(''), 2000);
+    const handleCopy = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopiedText(text);
+            setTimeout(() => setCopiedText(''), 2000);
+        } catch (error) {
+            console.error('Failed to copy:', error);
+        }
     };
 
     // 스페이싱 값을 카테고리별로 그룹화
@@ -43,7 +47,7 @@ export function SpacingExamples() {
             <section className="space-y-4">
                 <h3 className="text-xl font-semibold">스페이싱 시스템</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card variant="outlined" className="p-6">
+                    <Card className="p-6 border-2 border-neutral-300">
                         <h4 className="font-medium text-lg mb-3">4px 그리드 시스템</h4>
                         <p className="mb-4">
                             DogNote의 스페이싱 시스템은 4px 그리드를 기반으로 합니다. 이는 일관된 UI를 구축하고
@@ -64,7 +68,7 @@ export function SpacingExamples() {
                             ))}
                         </div>
                     </Card>
-                    <Card variant="outlined" className="p-6">
+                    <Card className="p-6 border-2 border-neutral-300">
                         <h4 className="font-medium text-lg mb-3">스페이싱 사용 원칙</h4>
                         <ul className="list-disc pl-5 space-y-2 text-neutral-700 dark:text-neutral-300">
                             <li>작은 요소 간 간격에는 작은 값(1-4) 사용</li>
@@ -80,7 +84,7 @@ export function SpacingExamples() {
             {/* 스페이싱 값 테이블 */}
             <section className="space-y-4">
                 <h3 className="text-xl font-semibold">스페이싱 값</h3>
-                <Card variant="outlined" className="overflow-hidden">
+                <Card className="overflow-hidden border-2 border-neutral-300">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
@@ -151,7 +155,7 @@ export function SpacingExamples() {
             <section className="space-y-4">
                 <h3 className="text-xl font-semibold">스페이싱 사용 예시</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card variant="outlined" className="p-6 space-y-6">
+                    <Card className="p-6 space-y-6 border-2 border-neutral-300">
                         <h4 className="font-semibold text-lg">패딩 예시</h4>
                         <div className="space-y-4">
                             <div>
@@ -184,7 +188,7 @@ export function SpacingExamples() {
                         </div>
                     </Card>
 
-                    <Card variant="outlined" className="p-6 space-y-6">
+                    <Card className="p-6 space-y-6 border-2 border-neutral-300">
                         <h4 className="font-semibold text-lg">마진과 갭 예시</h4>
                         <div className="space-y-4">
                             <div>
@@ -228,7 +232,7 @@ export function SpacingExamples() {
             {/* 반응형 스페이싱 */}
             <section className="space-y-4">
                 <h3 className="text-xl font-semibold">반응형 스페이싱</h3>
-                <Card variant="outlined" className="p-6">
+                <Card className="p-6 border-2 border-neutral-300">
                     <h4 className="font-medium text-lg mb-4">화면 크기에 따른 스페이싱 조정</h4>
 
                     <div className="mb-6">
@@ -261,7 +265,7 @@ export function SpacingExamples() {
 
 interface CopyButtonProps {
     text: string;
-    copiedText: string | null;
+    copiedText: string;
     onCopy: (text: string) => void;
 }
 
@@ -274,9 +278,9 @@ function CopyButton({text, copiedText, onCopy}: CopyButtonProps) {
             onClick={() => onCopy(text)}>
             <span className="font-mono">{text}</span>
             {isCopied ? (
-                <Check className="h-3 w-3 ml-1.5 text-green-500"/>
+                <span className="ml-1.5 text-green-500">✓</span>
             ) : (
-                <Copy className="h-3 w-3 ml-1.5 text-neutral-500"/>
+                <span className="ml-1.5 text-neutral-500">📋</span>
             )}
         </button>
     );

@@ -21,6 +21,8 @@ export {
   SelectScrollUpButton, 
   SelectScrollDownButton 
 } from './Select';
+export { default as CustomSelect } from './CustomSelect';
+export type { CustomSelectProps, SelectOption } from './CustomSelect';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';
 

@@ -3,7 +3,7 @@
  */
 
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
-import { firebaseApp } from './firestore';
+import { firebaseApp } from '../firebase';
 
 const auth = getAuth(firebaseApp);
 

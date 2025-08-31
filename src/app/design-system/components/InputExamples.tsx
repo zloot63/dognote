@@ -53,7 +53,7 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                 <Label htmlFor="filled-input">채워진 스타일</Label>
                 <Input
                   id="filled-input"
-                  variant="filled"
+                  className="bg-neutral-100 border-0 focus:bg-white focus:ring-4 focus:ring-primary-100"
                   placeholder="채워진 입력 필드"
                   value={inputValues.filled}
                   onChange={(e) => handleChange('filled', e.target.value)}
@@ -64,7 +64,7 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                 <Label htmlFor="underlined-input">밑줄 스타일</Label>
                 <Input
                   id="underlined-input"
-                  variant="underlined"
+                  className="border-0 border-b-2 border-neutral-200 bg-transparent rounded-none focus:border-primary-500 focus:ring-0"
                   placeholder="밑줄 입력 필드"
                   value={inputValues.underlined}
                   onChange={(e) => handleChange('underlined', e.target.value)}
@@ -75,7 +75,7 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                 <Label htmlFor="error-input">오류 상태</Label>
                 <Input
                   id="error-input"
-                  variant="error"
+                  className="border-2 border-error-300 focus:border-error-500 focus:ring-4 focus:ring-error-100"
                   placeholder="오류 입력 필드"
                   value={inputValues.error}
                   onChange={(e) => handleChange('error', e.target.value)}
@@ -136,9 +136,9 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
           <div>
             <h4 className="font-medium mb-3">크기 (Sizes)</h4>
             <div className="space-y-4">
-              <Input size="sm" placeholder="작은 크기 (Small)" />
-              <Input size="md" placeholder="중간 크기 (Medium)" />
-              <Input size="lg" placeholder="큰 크기 (Large)" />
+              <Input className="h-8 text-xs px-2 py-1" placeholder="작은 크기 (Small)" />
+              <Input placeholder="중간 크기 (Medium)" />
+              <Input className="h-12 text-lg px-4 py-3" placeholder="큰 크기 (Large)" />
             </div>
           </div>
         </div>
@@ -176,20 +176,20 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
 <Label htmlFor="email">이메일</Label>
 <Input id="email" placeholder="이메일 입력..." />
 
-// 변형 지정
-<Input variant="default" placeholder="기본 스타일" />
-<Input variant="filled" placeholder="채워진 스타일" />
-<Input variant="underlined" placeholder="밑줄 스타일" />
-<Input variant="error" placeholder="오류 상태" />
+// 변형 지정 (className 사용)
+<Input placeholder="기본 스타일" />
+<Input className="bg-neutral-100 border-0 focus:bg-white" placeholder="채워진 스타일" />
+<Input className="border-0 border-b-2 border-neutral-200 rounded-none" placeholder="밑줄 스타일" />
+<Input className="border-2 border-error-300 focus:border-error-500" placeholder="오류 상태" />
 
 // 상태 지정
 <Input disabled placeholder="비활성화 상태" />
 <Input readOnly value="읽기 전용 상태" />
 
-// 크기 지정
-<Input size="sm" placeholder="작은 크기" />
-<Input size="md" placeholder="중간 크기" />
-<Input size="lg" placeholder="큰 크기" />
+// 크기 지정 (className 사용)
+<Input className="h-8 text-xs px-2 py-1" placeholder="작은 크기" />
+<Input placeholder="중간 크기" />
+<Input className="h-12 text-lg px-4 py-3" placeholder="큰 크기" />
 
 // 아이콘 입력 필드
 <div className="relative">

@@ -41,7 +41,8 @@ export function ColorPalette({ className = '' }: ColorPaletteProps) {
               <h4 className="font-medium capitalize">{scale}</h4>
               <div className="grid grid-cols-11 gap-2">
                 {shades.map((shade) => {
-                  const colorValue = theme.colors[scale]?.[shade];
+                  const colorScale = theme.colors[scale];
+                  const colorValue = colorScale?.[shade as keyof typeof colorScale];
                   if (!colorValue) return null;
                   
                   const colorKey = `${scale}-${shade}`;

@@ -7,7 +7,7 @@ import DogCard from './DogCard';
 import {
   Button,
   Input,
-  Select,
+  CustomSelect,
   Grid,
   Container,
   Loading,
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
-interface DogListProps {
+export interface DogListProps {
   onAddNew?: () => void;
   onEdit?: (dog: Dog) => void;
   onDelete?: (dog: Dog) => void;
@@ -130,14 +130,14 @@ const DogList: React.FC<DogListProps> = ({
           
           <div className="flex gap-2">
             <Button
-              variant={viewMode === 'grid' ? 'primary' : 'outline'}
+              variant={viewMode === 'grid' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setViewMode('grid')}
             >
               그리드
             </Button>
             <Button
-              variant={viewMode === 'list' ? 'primary' : 'outline'}
+              variant={viewMode === 'list' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setViewMode('list')}
             >
@@ -148,14 +148,14 @@ const DogList: React.FC<DogListProps> = ({
 
         {/* 필터 및 정렬 */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
-          <Select
+          <CustomSelect
             placeholder="정렬"
             options={sortOptions}
             value={sortBy}
             onChange={(value) => setSortBy(value as 'name' | 'age' | 'breed' | 'createdAt')}
           />
           
-          <Select
+          <CustomSelect
             placeholder="순서"
             options={[
               { value: 'asc', label: '오름차순' },
@@ -165,21 +165,21 @@ const DogList: React.FC<DogListProps> = ({
             onChange={(value) => setSortOrder(value as 'asc' | 'desc')}
           />
           
-          <Select
+          <CustomSelect
             placeholder="크기"
             options={sizeOptions}
             value={filterBy.size || ''}
-            onChange={(value) => setFilter({ size: value || undefined })}
+            onChange={(value) => setFilter({ size: value as "small" | "medium" | "large" | "giant" | undefined || undefined })}
           />
           
-          <Select
+          <CustomSelect
             placeholder="성별"
             options={genderOptions}
             value={filterBy.gender || ''}
-            onChange={(value) => setFilter({ gender: value || undefined })}
+            onChange={(value) => setFilter({ gender: value as "male" | "female" | undefined || undefined })}
           />
           
-          <Select
+          <CustomSelect
             placeholder="견종"
             options={breedOptions}
             value={filterBy.breed || ''}

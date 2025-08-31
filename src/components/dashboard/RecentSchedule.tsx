@@ -1,20 +1,35 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchRecentSchedules } from "@/lib/firebase/schedules";
+import { listSchedulesByUser } from "@/lib/firebase/schedules";
 import { Schedule } from "@/types/schedules";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 const RecentSchedule = () => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const loadSchedules = async () => {
-      const data = await fetchRecentSchedules();
-      setSchedules(data);
+      if (!user?.uid) return;
+      const data = await listSchedulesByUser(user.uid);
+      // 최근 일정 순으로 정렬
+      const sortedData = data.sort((a, b) => 
+        a.scheduledAt.toDate().getTime() - b.scheduledAt.toDate().getTime()
+      );
+      setSchedules(sortedData);
     };
 
     loadSchedules();
-  }, []);
+  }, [user]);
 
   return (
     <div className="schedule-card">
@@ -25,7 +40,7 @@ const RecentSchedule = () => {
         <ul>
           {schedules.slice(0, 2).map((schedule) => (
             <li key={schedule.id}>
-              <strong>{schedule.type}</strong>: {schedule.date}
+              <strong>{schedule.type}</strong>: {schedule.scheduledAt.toDate().toLocaleDateString('ko-KR')}
             </li>
           ))}
         </ul>

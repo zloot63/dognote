@@ -11,16 +11,15 @@ interface ButtonExamplesProps {
  * 다양한 변형과 상태를 보여줌
  */
 export function ButtonExamples({className = ''}: ButtonExamplesProps) {
-  // 버튼 변형 목록
-  const variants: ComponentVariant[] = [
-    'primary',
+  // 버튼 변형 목록 (실제 지원되는 variant만)
+  const variants = [
+    'default',
     'secondary',
     'outline',
     'ghost',
     'destructive',
-    'success',
-    'warning'
-  ];
+    'link'
+  ] as const;
 
   return (
     <div className={`space-y-8 ${className}`}>
@@ -48,11 +47,10 @@ export function ButtonExamples({className = ''}: ButtonExamplesProps) {
           <div>
             <h4 className="font-medium mb-3">크기 (Sizes)</h4>
             <div className="flex flex-wrap items-center gap-4">
-              <Button size="xs">Extra Small</Button>
               <Button size="sm">Small</Button>
-              <Button size="md">Medium</Button>
+              <Button size="default">Default</Button>
               <Button size="lg">Large</Button>
-              <Button size="xl">Extra Large</Button>
+              <Button size="icon">⚙</Button>
             </div>
           </div>
 
@@ -150,18 +148,18 @@ export function ButtonExamples({className = ''}: ButtonExamplesProps) {
 <Button>기본 버튼</Button>
 
 // 변형 지정
-<Button variant="primary">Primary</Button>
+<Button variant="default">Default</Button>
 <Button variant="secondary">Secondary</Button>
 <Button variant="outline">Outline</Button>
 <Button variant="ghost">Ghost</Button>
 <Button variant="destructive">Destructive</Button>
+<Button variant="link">Link</Button>
 
 // 크기 지정
-<Button size="xs">Extra Small</Button>
 <Button size="sm">Small</Button>
-<Button size="md">Medium</Button>
+<Button size="default">Default</Button>
 <Button size="lg">Large</Button>
-<Button size="xl">Extra Large</Button>
+<Button size="icon">Icon</Button>
 
 // 상태 지정
 <Button disabled>비활성화</Button>

@@ -67,9 +67,9 @@ describe('Modal Component', () => {
     expect(dialog).toHaveClass('h-full');
   });
 
-  it('applies maxWidth correctly', () => {
+  it('applies size correctly', () => {
     render(
-      <Modal open={true} onClose={vi.fn()} maxWidth="sm">
+      <Modal open={true} onClose={vi.fn()} size="sm">
         <div>Small modal</div>
       </Modal>
     );

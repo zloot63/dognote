@@ -10,6 +10,8 @@ export interface Walk {
     status: "active" | "completed";
     issues?: string[];
     notes?: string;
+    mood?: string;
+    condition?: string;
 }
 
 

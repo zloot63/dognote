@@ -1,5 +1,5 @@
 import React from 'react';
-import themeUtils, { theme } from '@/lib/theme-utils';
+import themeUtils from '@/lib/theme-utils';
 
 interface ThemeUtilitiesProps {
   className?: string;

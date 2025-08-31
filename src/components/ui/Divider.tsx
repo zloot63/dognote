@@ -149,7 +149,7 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
         <Separator
           ref={ref as any}
           className={className}
-          orientation={orientation}
+          orientation={orientation || undefined}
           variant={variant}
           thickness={thickness}
           spacing={spacing}
@@ -185,7 +185,7 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
       md: 'my-4',
       lg: 'my-6', 
       xl: 'my-8',
-    }[spacing];
+    }[spacing || 'md'];
 
     return (
       <div
@@ -201,7 +201,7 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
           {labelPosition !== 'left' && (
             <Separator
               className="flex-1"
-              orientation={orientation}
+              orientation={orientation || 'horizontal'}
               variant={variant}
               thickness={thickness}
               spacing="none"
@@ -213,7 +213,7 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
           {labelPosition !== 'right' && (
             <Separator
               className="flex-1"
-              orientation={orientation}
+              orientation={orientation || 'horizontal'}
               variant={variant}
               thickness={thickness}
               spacing="none"

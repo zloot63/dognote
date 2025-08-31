@@ -10,11 +10,16 @@ import {
   Button,
   Badge,
   Avatar,
-  Tooltip
+  AvatarImage,
+  AvatarFallback,
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent
 } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
-interface DogCardProps {
+export interface DogCardProps {
   dog: Dog;
   variant?: 'default' | 'compact' | 'detailed';
   onEdit?: (dog: Dog) => void;
@@ -46,12 +51,10 @@ const DogCard: React.FC<DogCardProps> = ({
       >
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
-            <Avatar
-              src={dog.profileImage}
-              alt={dog.name}
-              size="lg"
-              fallback={dog.name.charAt(0)}
-            />
+            <Avatar className="w-12 h-12">
+              <AvatarImage src={dog.profileImage} alt={dog.name} />
+              <AvatarFallback>{dog.name.charAt(0)}</AvatarFallback>
+            </Avatar>
             
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-lg truncate">{dog.name}</h3>
@@ -96,12 +99,10 @@ const DogCard: React.FC<DogCardProps> = ({
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              <Avatar
-                src={dog.profileImage}
-                alt={dog.name}
-                size="xl"
-                fallback={dog.name.charAt(0)}
-              />
+              <Avatar className="w-16 h-16">
+                <AvatarImage src={dog.profileImage} alt={dog.name} />
+                <AvatarFallback>{dog.name.charAt(0)}</AvatarFallback>
+              </Avatar>
               <div>
                 <h2 className="text-2xl font-bold">{dog.name}</h2>
                 <p className="text-lg text-muted-foreground">{dog.breed}</p>
@@ -279,23 +280,27 @@ const DogCard: React.FC<DogCardProps> = ({
       <CardContent className="p-6">
         <div className="text-center">
           <div className="relative mb-4">
-            <Avatar
-              src={dog.profileImage}
-              alt={dog.name}
-              size="xl"
-              fallback={dog.name.charAt(0)}
-              className="mx-auto"
-            />
+            <Avatar className="w-20 h-20 mx-auto">
+              <AvatarImage src={dog.profileImage} alt={dog.name} />
+              <AvatarFallback>{dog.name.charAt(0)}</AvatarFallback>
+            </Avatar>
             {dog.isNeutered && (
-              <Tooltip content="중성화 완료">
-                <Badge 
-                  variant="success" 
-                  size="sm"
-                  className="absolute -top-1 -right-1"
-                >
-                  ✓
-                </Badge>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge 
+                      variant="success" 
+                      size="sm"
+                      className="absolute -top-1 -right-1"
+                    >
+                      ✓
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>중성화 완료</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
 

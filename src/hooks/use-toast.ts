@@ -140,18 +140,7 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = Omit<ToasterToast, "id"> & {
-  success: (title: string, description?: string) => {
-    id: string
-    dismiss: () => void
-    update: (props: ToasterToast) => void
-  }
-  error: (title: string, description?: string) => {
-    id: string
-    dismiss: () => void
-    update: (props: ToasterToast) => void
-  }
-}
+type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
   const id = genId()
@@ -182,6 +171,14 @@ function toast({ ...props }: Toast) {
   }
 }
 
+// toast 함수에 success와 error 메서드를 추가하기 위한 타입 확장
+type ToastFunction = typeof toast & {
+  success: (title: string, description?: string) => ReturnType<typeof toast>
+  error: (title: string, description?: string) => ReturnType<typeof toast>
+  warning: (title: string, description?: string) => ReturnType<typeof toast>
+  info: (title: string, description?: string) => ReturnType<typeof toast>
+}
+
 toast.success = (title: string, description?: string) => {
   return toast({
     title,
@@ -199,6 +196,27 @@ toast.error = (title: string, description?: string) => {
   });
 };
 
+toast.warning = (title: string, description?: string) => {
+  return toast({
+    title,
+    description,
+    variant: "default",
+    className: "bg-yellow-500 text-white"
+  });
+};
+
+toast.info = (title: string, description?: string) => {
+  return toast({
+    title,
+    description,
+    variant: "default",
+    className: "bg-blue-500 text-white"
+  });
+};
+
+// toast 함수를 ToastFunction 타입으로 캐스팅
+const enhancedToast = toast as ToastFunction;
+
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
 
@@ -214,9 +232,9 @@ function useToast() {
 
   return {
     ...state,
-    toast,
+    toast: enhancedToast,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   }
 }
 
-export { useToast, toast }
+export { useToast, enhancedToast as toast }

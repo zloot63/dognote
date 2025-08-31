@@ -20,7 +20,7 @@ export default function WalkHistory() {
                         <li key={walk.id} className="p-2 border rounded-lg">
                             <p className="font-medium">📍 산책 시작: {new Date(walk.startTime).toLocaleString()}</p>
                             <p>🕒 종료: {walk.endTime ? new Date(walk.endTime).toLocaleString() : "진행 중"}</p>
-                            <p>📏 거리: {walk.distance.toFixed(2)} km</p>
+                            <p>📏 거리: {walk.distance ? walk.distance.toFixed(2) : '0.00'} km</p>
                         </li>
                     ))}
                 </ul>

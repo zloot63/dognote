@@ -176,7 +176,9 @@ const WalkTracker: React.FC<WalkTrackerProps> = ({
       watchIdRef.current = watchId;
       
       // 콜백 호출
-      onWalkStart?.(walkId);
+      if (walkId) {
+        onWalkStart?.(walkId);
+      }
       
       console.log('산책 시작:', { walkId, startTime, selectedDogIds });
       

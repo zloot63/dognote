@@ -208,7 +208,7 @@ export const getWalkById = async (walkId: string): Promise<Walk | null> => {
             userId,
             dogIds: walkData.dogIds ?? [],
             startTime: walkData.startTime ?? "",
-            endTime: walkData.endTime ?? null,
+            endTime: walkData.endTime ?? undefined,
             duration: walkData.duration ?? 0,
             distance: walkData.distance ?? 0,
             route: walkData.route ?? [],

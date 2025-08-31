@@ -3,19 +3,23 @@
 import React from 'react';
 import { Card } from '@/components/ui/Card';
 import { boxShadow } from '@/styles/theme';
-import { useCopyToClipboard } from "@uidotdev/usehooks";
-import { Check, Copy } from 'lucide-react';
+import { useState } from 'react';
 
 /**
  * 그림자 예제 컴포넌트
  * 그림자 시스템과 사용 예시를 보여줍니다.
  */
 export function ShadowExamples() {
-  const [copiedText, setCopiedText] = useCopyToClipboard();
+  const [copiedText, setCopiedText] = useState<string>("");
 
-  const handleCopy = (text: string) => {
-    setCopiedText(text);
-    setTimeout(() => setCopiedText(""), 2000);
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedText(text);
+      setTimeout(() => setCopiedText(""), 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
   };
 
   return (
@@ -24,7 +28,7 @@ export function ShadowExamples() {
       <section className="space-y-4">
         <h3 className="text-xl font-semibold">그림자 시스템</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card variant="outlined" className="p-6">
+          <Card className="p-6 border-2 border-neutral-300">
             <h4 className="font-medium text-lg mb-3">그림자의 목적</h4>
             <p className="mb-4">
               그림자는 UI 에서 깊이와 계층을 표현하는 중요한 요소입니다.
@@ -40,7 +44,7 @@ export function ShadowExamples() {
               </ul>
             </div>
           </Card>
-          <Card variant="outlined" className="p-6">
+          <Card className="p-6 border-2 border-neutral-300">
             <h4 className="font-medium text-lg mb-3">그림자 구성 요소</h4>
             <p className="mb-4">
               DogNote의 그림자 시스템은 다음 요소로 구성됩니다:
@@ -86,7 +90,7 @@ export function ShadowExamples() {
       <section className="space-y-4">
         <h3 className="text-xl font-semibold">그림자 사용 예시</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card variant="outlined" className="p-6 space-y-6">
+          <Card className="p-6 space-y-6 border-2 border-neutral-300">
             <h4 className="font-semibold text-lg">컴포넌트별 권장 그림자</h4>
             <div className="space-y-6">
               <div>
@@ -116,7 +120,7 @@ export function ShadowExamples() {
             </div>
           </Card>
 
-          <Card variant="outlined" className="p-6 space-y-6">
+          <Card className="p-6 space-y-6 border-2 border-neutral-300">
             <h4 className="font-semibold text-lg">상호작용 그림자</h4>
             <div className="space-y-6">
               <div>
@@ -151,7 +155,7 @@ export function ShadowExamples() {
       {/* 다크 모드 그림자 */}
       <section className="space-y-4">
         <h3 className="text-xl font-semibold">다크 모드 그림자</h3>
-        <Card variant="outlined" className="p-6">
+        <Card className="p-6 border-2 border-neutral-300">
           <h4 className="font-medium text-lg mb-4">다크 모드에서의 그림자 처리</h4>
           
           <p className="mb-4">
@@ -192,14 +196,15 @@ export function ShadowExamples() {
 interface ShadowCardProps {
   name: string;
   value: string;
-  copiedText: string | null;
+  copiedText: string;
   onCopy: (text: string) => void;
 }
 
 function ShadowCard({ name, value, copiedText, onCopy }: ShadowCardProps) {
   const shadowClass = `shadow-${name}`;
   const isCopied = copiedText === shadowClass;
-  console.log('미사용중:', value)
+  // value 파라미터 사용 (미사용 경고 제거)
+  console.log('Shadow value:', value);
   
   return (
     <div className="flex flex-col">
@@ -212,9 +217,9 @@ function ShadowCard({ name, value, copiedText, onCopy }: ShadowCardProps) {
         <code className="text-xs text-neutral-600 dark:text-neutral-400 font-mono">{shadowClass}</code>
           <button className="p-1.5 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors" onClick={() => onCopy(shadowClass)}>
             {isCopied ? (
-              <Check className="h-4 w-4 text-green-500" />
+              <span className="text-green-500">✓</span>
             ) : (
-              <Copy className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+              <span className="text-neutral-500 dark:text-neutral-400">📋</span>
             )}
           </button>
       </div>

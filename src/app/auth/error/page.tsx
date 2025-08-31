@@ -5,10 +5,10 @@ import Link from "next/link";
 
 export default function AuthErrorPage() {
   const searchParams = useSearchParams();
-  const error = searchParams.get("error");
+  const errorCode = searchParams?.get("error");
 
-  const getErrorMessage = (error: string | null) => {
-    switch (error) {
+  const getErrorMessage = (errorCode: string | null | undefined) => {
+    switch (errorCode) {
       case "Configuration":
         return "서버 설정에 문제가 있습니다. 관리자에게 문의하세요.";
       case "AccessDenied":
@@ -47,7 +47,7 @@ export default function AuthErrorPage() {
             로그인 오류
           </h2>
           <p className="text-gray-600 mb-6">
-            {getErrorMessage(error)}
+            {getErrorMessage(errorCode)}
           </p>
         </div>
 
@@ -67,9 +67,9 @@ export default function AuthErrorPage() {
           </Link>
         </div>
 
-        {error && (
+        {errorCode && (
           <div className="text-center text-sm text-gray-500 mt-6">
-            오류 코드: {error}
+            오류 코드: {errorCode}
           </div>
         )}
       </div>

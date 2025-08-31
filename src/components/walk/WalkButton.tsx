@@ -10,7 +10,7 @@ import {
   removeCurrentWalkFromDB,
 } from "@/lib/localStorage";
 import { useDogs } from "@/hooks/useDogs";
-import { Dog } from "@/types/dogs";
+import { Dog } from "@/types/dog";
 import WalkDetailModal from "@/components/walk/WalkDetailModal"; // ✅ 모달 추가
 
 export default function WalkButton() {
@@ -94,7 +94,12 @@ export default function WalkButton() {
     }
 
     try {
-      await endWalkInFirestore(walkId);
+      // 기본값으로 산책 종료 처리
+      const duration = 0; // 실제 duration은 GPS 추적에서 계산되어야 함
+      const distance = 0; // 실제 distance는 GPS 추적에서 계산되어야 함
+      const route: { lat: number; lng: number }[] = []; // 빈 경로 배열
+      
+      await endWalkInFirestore(walkId, duration, distance, route);
       await removeCurrentWalkFromDB();
       setWalkId(null);
       console.log("✅ Firestore & LocalStorage 에서 walkId 삭제 완료");

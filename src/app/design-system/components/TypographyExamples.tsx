@@ -4,19 +4,22 @@ import React, {useState} from 'react';
 import {Card} from '@/components/ui/Card';
 import {cn} from '@/lib/utils';
 import {typography} from '@/styles/theme';
-import {useCopyToClipboard} from "@uidotdev/usehooks";
-import {Check, Copy} from 'lucide-react';
 
 /**
  * 타이포그래피 예제 컴포넌트
  * 폰트 패밀리, 크기, 가중치 및 사용 예시를 보여줍니다.
  */
 export function TypographyExamples() {
-    const [copiedText, setCopiedText] = useCopyToClipboard();
+    const [copiedText, setCopiedText] = useState<string>("");
 
-    const handleCopy = (text: string) => {
-        setCopiedText(text);
-        setTimeout(() => setCopiedText(''), 2000);
+    const handleCopy = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopiedText(text);
+            setTimeout(() => setCopiedText(''), 2000);
+        } catch (error) {
+            console.error('Failed to copy:', error);
+        }
     };
 
     return (
@@ -44,7 +47,7 @@ export function TypographyExamples() {
             {/* 폰트 크기 섹션 */}
             <section className="space-y-4">
                 <h3 className="text-xl font-semibold">폰트 크기</h3>
-                <Card variant="outlined" className="overflow-hidden">
+                <Card className="overflow-hidden border-2 border-neutral-300">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
@@ -81,7 +84,7 @@ export function TypographyExamples() {
             {/* 폰트 가중치 섹션 */}
             <section className="space-y-4">
                 <h3 className="text-xl font-semibold">폰트 가중치</h3>
-                <Card variant="outlined" className="overflow-hidden">
+                <Card className="overflow-hidden border-2 border-neutral-300">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
@@ -115,7 +118,7 @@ export function TypographyExamples() {
             <section className="space-y-4">
                 <h3 className="text-xl font-semibold">타이포그래피 사용 예시</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card variant="outlined" className="p-6 space-y-6">
+                    <Card className="p-6 space-y-6 border-2 border-neutral-300">
                         <h4 className="font-semibold text-lg">제목 계층</h4>
                         <div className="space-y-4">
                             <div>
@@ -145,7 +148,7 @@ export function TypographyExamples() {
                         </div>
                     </Card>
 
-                    <Card variant="outlined" className="p-6 space-y-6">
+                    <Card className="p-6 space-y-6 border-2 border-neutral-300">
                         <h4 className="font-semibold text-lg">본문 텍스트</h4>
                         <div className="space-y-4">
                             <div>
@@ -181,7 +184,7 @@ export function TypographyExamples() {
             <section className="space-y-4">
                 <h3 className="text-xl font-semibold">타이포그래피 사용 가이드라인</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card variant="outlined" className="p-6 bg-green-50 border-green-200">
+                    <Card className="p-6 bg-green-50 border-2 border-green-200">
                         <h4 className="font-medium text-green-800 mb-2">권장사항</h4>
                         <ul className="list-disc pl-5 space-y-1 text-green-700">
                             <li>일관된 폰트 크기 체계 사용하기</li>
@@ -191,7 +194,7 @@ export function TypographyExamples() {
                             <li>중요도에 따라 폰트 가중치 차별화하기</li>
                         </ul>
                     </Card>
-                    <Card variant="outlined" className="p-6 bg-amber-50 border-amber-200">
+                    <Card className="p-6 bg-amber-50 border-2 border-amber-200">
                         <h4 className="font-medium text-amber-800 mb-2">피해야 할 사항</h4>
                         <ul className="list-disc pl-5 space-y-1 text-amber-700">
                             <li>너무 많은 폰트 크기 혼합하기</li>
@@ -224,7 +227,7 @@ function FontFamilyCard({name, description, fontFamily, sampleText, isMono = fal
     };
 
     return (
-        <Card variant="outlined" className="overflow-hidden">
+        <Card className="overflow-hidden border-2 border-neutral-300">
             <div
                 className="p-4 bg-neutral-50 dark:bg-primary-600 border-b border-neutral-200 dark:border-neutral-700 flex justify-between items-center">
                 <div>
@@ -234,9 +237,9 @@ function FontFamilyCard({name, description, fontFamily, sampleText, isMono = fal
                 <button className="p-1.5 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                         onClick={handleCopy}>
                     {copied ? (
-                        <Check className="h-4 w-4 text-green-500"/>
+                        <span className="text-green-500">✓</span>
                     ) : (
-                        <Copy className="h-4 w-4 text-neutral-500 dark:text-neutral-400"/>
+                        <span className="text-neutral-500 dark:text-neutral-400">📋</span>
                     )}
                 </button>
             </div>
@@ -262,7 +265,7 @@ function FontFamilyCard({name, description, fontFamily, sampleText, isMono = fal
 
 interface CopyButtonProps {
     text: string;
-    copiedText: string | null;
+    copiedText: string;
     onCopy: (text: string) => void;
 }
 
@@ -275,9 +278,9 @@ function CopyButton({text, copiedText, onCopy}: CopyButtonProps) {
             onClick={() => onCopy(text)}>
             <span className="font-mono">{text}</span>
             {isCopied ? (
-                <Check className="h-3 w-3 ml-1.5 text-green-500"/>
+                <span className="ml-1.5 text-green-500">✓</span>
             ) : (
-                <Copy className="h-3 w-3 ml-1.5 text-neutral-500"/>
+                <span className="ml-1.5 text-neutral-500">📋</span>
             )}
         </button>
     );

@@ -1,9 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { saveWalkToFirestore } from "@/lib/firebase/walks";
 
 export default function AddWalkForm() {
+    const [user, setUser] = useState<User | null>(null);
+    
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+        
+        return () => unsubscribe();
+    }, []);
     const [isWalking, setIsWalking] = useState(false);
     const [startTime, setStartTime] = useState<string | null>(null);
     const [route, setRoute] = useState<{ lat: number; lng: number }[]>([]);
@@ -32,13 +43,15 @@ export default function AddWalkForm() {
 
     // 산책 종료
     const handleEndWalk = async () => {
-        if (!startTime) return;
+        if (!startTime || !user?.uid) return;
 
         const endTime = new Date().toISOString();
         const duration = Math.round((new Date(endTime).getTime() - new Date(startTime).getTime()) / 60000);
         const distance = calculateDistance(route);
 
         await saveWalkToFirestore({
+            id: `walk_${Date.now()}`, // 고유 ID 생성
+            userId: user.uid,
             dogIds: ["coco123"], // TODO: 여러 마리 선택 가능하게 수정
             startTime,
             endTime,

@@ -15,7 +15,7 @@ export default function DogProfile({ dogs }: DogProfileProps) {
                     {dogs.map((dog) => (
                         <li key={dog.id} className="flex items-center gap-4 mt-2">
                             <img
-                                src={dog.photoURL || "/default-dog.png"}
+                                src={dog.profileImage || "/default-dog.png"}
                                 alt={dog.name}
                                 className="w-12 h-12 rounded-full border border-gray-300"
                             />
