@@ -3,7 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from "@radix-ui
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
-import { Button, ButtonProps } from "@/components/ui/Button"
+import { ButtonProps } from "@/components/ui/button"
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav

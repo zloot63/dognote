@@ -1,4 +1,3 @@
-// Core shadcn/ui components
 export { Button, buttonVariants } from './Button';
 export { Input } from './Input';
 export { Label } from './Label';
@@ -7,7 +6,7 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export { Avatar, AvatarImage, AvatarFallback } from './Avatar';
 export { Progress } from './Progress';
 export { Checkbox } from './Checkbox';
-export { RadioGroup, RadioGroupItem } from './radio-group';
+export { RadioGroup, RadioGroupItem } from './RadioGroup';
 export { Radio, RadioCard, RadioButton } from './Radio';
 export { 
   Select, 
@@ -29,7 +28,9 @@ export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tool
 // Enhanced UI components (shadcn/ui structure)
 export { Modal } from './Modal';
 export type { ModalProps, ModalCloseReason } from './Modal';
-export { Badge, NumberBadge, StatusBadge, badgeVariants } from './badge';
+export { VisuallyHidden } from './VisuallyHidden';
+export type { VisuallyHiddenProps } from './VisuallyHidden';
+export { Badge, NumberBadge, StatusBadge, badgeVariants } from './Badge';
 export { 
   Spinner, 
   Loading, 
@@ -61,7 +62,7 @@ export {
   BreadcrumbEllipsis,
   EnhancedBreadcrumb,
   SimpleBreadcrumb,
-} from './breadcrumb';
+} from './Breadcrumb';
 
 // Pagination components
 export {
@@ -74,7 +75,7 @@ export {
   PaginationPrevious,
   EnhancedPagination,
   SimplePagination,
-} from './pagination';
+} from './Pagination';
 
 // Toast components
 export {
@@ -87,13 +88,13 @@ export {
   ToastAction,
   type ToastProps,
   type ToastActionElement,
-} from './toast';
+} from './Toast';
 export { useToast, toast } from '../../hooks/use-toast';
-export { Toaster } from './toaster';
+export { Toaster } from './Toaster';
 
 // Calendar and Popover components
-export { Calendar } from './calendar';
-export { Popover, PopoverTrigger, PopoverContent } from './popover';
+export { Calendar } from './Calendar';
+export { Popover, PopoverTrigger, PopoverContent } from './Popover';
 
 // Dialog components
 export {
@@ -107,9 +108,9 @@ export {
   DialogFooter,
   DialogTitle,
   DialogDescription,
-} from './dialog';
+} from './Dialog';
 
 // Skeleton component
-export { Skeleton } from './skeleton';
+export { Skeleton } from './Skeleton';
 
 // Note: Separator is already exported from Divider.tsx, no need for duplicate export

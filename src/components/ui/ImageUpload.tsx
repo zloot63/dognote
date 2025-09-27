@@ -45,6 +45,7 @@ const ImageUpload = React.forwardRef<HTMLDivElement, ImageUploadProps>(
     const [dragActive, setDragActive] = React.useState(false);
     const [uploadedFiles, setUploadedFiles] = React.useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = React.useState<string[]>([]);
+    const [existingImageUrl, setExistingImageUrl] = React.useState<string | undefined>();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     // 파일 유효성 검사
@@ -137,7 +138,7 @@ const ImageUpload = React.forwardRef<HTMLDivElement, ImageUploadProps>(
       const newUrls = previewUrls.filter((_, i) => i !== index);
       
       // URL 정리
-      if (previewUrls[index]) {
+      if (previewUrls[index] && previewUrls[index].startsWith('blob:')) {
         URL.revokeObjectURL(previewUrls[index]);
       }
       
@@ -156,10 +157,35 @@ const ImageUpload = React.forwardRef<HTMLDivElement, ImageUploadProps>(
       fileInputRef.current?.click();
     }, []);
 
+    // value prop 처리 - 기존 이미지 URL 또는 File 객체
+    React.useEffect(() => {
+      if (value) {
+        if (typeof value === 'string') {
+          // 기존 이미지 URL인 경우
+          setExistingImageUrl(value);
+          setUploadedFiles([]);
+          setPreviewUrls([]);
+        } else if (value instanceof File) {
+          // File 객체인 경우
+          setUploadedFiles([value]);
+          const url = URL.createObjectURL(value);
+          setPreviewUrls([url]);
+          setExistingImageUrl(undefined);
+        }
+      } else if (defaultValue && typeof defaultValue === 'string') {
+        // defaultValue가 있는 경우
+        setExistingImageUrl(defaultValue);
+      }
+    }, [value, defaultValue]);
+
     // 컴포넌트 언마운트 시 URL 정리
     React.useEffect(() => {
       return () => {
-        previewUrls.forEach(url => URL.revokeObjectURL(url));
+        previewUrls.forEach(url => {
+          if (url.startsWith('blob:')) {
+            URL.revokeObjectURL(url);
+          }
+        });
       };
     }, [previewUrls]);
 
@@ -195,7 +221,7 @@ const ImageUpload = React.forwardRef<HTMLDivElement, ImageUploadProps>(
             className="hidden"
           />
           
-          {uploadedFiles.length === 0 ? (
+          {uploadedFiles.length === 0 && !existingImageUrl ? (
             <div className="flex flex-col items-center justify-center text-center">
               <UploadIcon className="h-10 w-10 text-muted-foreground mb-4" />
               <div className="space-y-2">
@@ -212,12 +238,40 @@ const ImageUpload = React.forwardRef<HTMLDivElement, ImageUploadProps>(
             </div>
           ) : (
             <div className="space-y-4">
-              {preview && previewUrls.length > 0 && (
+              {preview && (previewUrls.length > 0 || existingImageUrl) && (
                 <div className={cn(
                   "grid gap-4",
                   multiple ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4" : "grid-cols-1"
                 )}>
-                  {previewUrls.map((url, index) => (
+                  {existingImageUrl && uploadedFiles.length === 0 ? (
+                    <div className="relative group">
+                      <div 
+                        className="relative aspect-square rounded-lg overflow-hidden border bg-muted"
+                        style={cropAspectRatio ? { aspectRatio: cropAspectRatio } : undefined}
+                      >
+                        <Image
+                          src={existingImageUrl}
+                          alt="Current profile"
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExistingImageUrl(undefined);
+                          onChange?.(null);
+                        }}
+                      >
+                        <Cross2Icon className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : previewUrls.map((url, index) => (
                     <div key={index} className="relative group">
                       <div 
                         className="relative aspect-square rounded-lg overflow-hidden border bg-muted"
@@ -248,7 +302,7 @@ const ImageUpload = React.forwardRef<HTMLDivElement, ImageUploadProps>(
                 </div>
               )}
               
-              {!preview && (
+              {!preview && uploadedFiles.length > 0 && (
                 <div className="space-y-2">
                   {uploadedFiles.map((file, index) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">

@@ -1,6 +1,5 @@
 import React from 'react';
 import {Button} from '@/components/ui/Button';
-import {ComponentVariant} from '@/lib/theme-utils';
 
 interface ButtonExamplesProps {
   className?: string;

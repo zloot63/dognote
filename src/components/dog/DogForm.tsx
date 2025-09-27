@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { useSession } from 'next-auth/react';
 import { 
   Dog, 
   DogFormData, 
@@ -10,6 +11,8 @@ import {
   ACTIVITY_LEVEL_LABELS, 
   SIZE_LABELS,
 } from '@/types/dog';
+import { uploadDogProfileImage } from '@/lib/firebase/storage';
+import { toast } from 'sonner';
 import {
   Button,
   Input,
@@ -49,10 +52,17 @@ const DogForm: React.FC<DogFormProps> = ({
   isLoading = false,
   className
 }) => {
+  const { data: session } = useSession();
   const isEditMode = !!dog;
   const [selectedTemperaments, setSelectedTemperaments] = useState<string[]>(
     dog?.temperament || []
   );
+  const [isUploading, setIsUploading] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>(
+    dog?.profileImage
+  );
+  
   // 알레르기와 의료 상태는 현재 폼에서 직접 관리하지 않고 향후 확장 예정
   const allergies = dog?.allergies || [];
   const medicalConditions = dog?.medicalConditions || [];
@@ -69,7 +79,7 @@ const DogForm: React.FC<DogFormProps> = ({
       gender: dog?.gender || 'male',
       birthDate: dog?.birthDate || '',
       weight: dog?.weight || 0,
-      profileImage: dog?.profileImage || undefined,
+      profileImage: dog?.profileImage || '',
       description: dog?.description || '',
       isNeutered: dog?.isNeutered || false,
       microchipId: dog?.microchipId || '',
@@ -103,16 +113,68 @@ const DogForm: React.FC<DogFormProps> = ({
     setValue('temperament', updated);
   };
 
+  // 이미지 변경 핸들러
+  const handleImageChange = useCallback((file: File | File[] | null) => {
+    if (file && !Array.isArray(file)) {
+      setProfileImageFile(file);
+      // 미리보기 URL 생성
+      const previewUrl = URL.createObjectURL(file);
+      setProfileImageUrl(previewUrl);
+      setValue('profileImage', file);
+    } else {
+      setProfileImageFile(null);
+      setProfileImageUrl(dog?.profileImage);
+      setValue('profileImage', dog?.profileImage || '');
+    }
+  }, [dog, setValue]);
+
   const onFormSubmit = async (data: DogFormData) => {
+    if (!session?.user?.id) {
+      toast.error('로그인이 필요합니다.');
+      return;
+    }
+
     try {
-      await onSubmit({
+      setIsUploading(true);
+      
+      let finalImageUrl = profileImageUrl;
+      
+      // 새 이미지가 선택된 경우 Firebase Storage에 업로드
+      if (profileImageFile) {
+        try {
+          finalImageUrl = await uploadDogProfileImage(
+            profileImageFile,
+            session.user.id,
+            dog?.id
+          );
+          toast.success('이미지가 업로드되었습니다.');
+        } catch (uploadError) {
+          console.error('Image upload error:', uploadError);
+          toast.error('이미지 업로드에 실패했습니다.');
+          setIsUploading(false);
+          return;
+        }
+      }
+      
+      // 폼 데이터와 함께 제출
+      const formData: DogFormData = {
         ...data,
+        profileImage: finalImageUrl,
         temperament: selectedTemperaments,
         allergies,
         medicalConditions
-      });
+      };
+      
+      await onSubmit(formData);
+      
+      // 성공 메시지
+      toast.success(isEditMode ? '반려견 정보가 수정되었습니다.' : '반려견이 등록되었습니다.');
+      
     } catch (error) {
       console.error('Form submission error:', error);
+      toast.error('저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -130,15 +192,26 @@ const DogForm: React.FC<DogFormProps> = ({
                 <Controller
                   name="profileImage"
                   control={control}
-                  render={({ field }) => (
-                    <ImageUpload
-                      label="프로필 사진"
-                      value={field.value}
-                      onChange={field.onChange}
-                      acceptedTypes={['image/*']}
-                      maxSize={5}
-                      className="mb-4"
-                    />
+                  render={() => (
+                    <div className="space-y-2">
+                      <ImageUpload
+                        label="프로필 사진"
+                        value={profileImageFile || profileImageUrl}
+                        defaultValue={profileImageUrl}
+                        onChange={handleImageChange}
+                        acceptedTypes={['image/jpeg', 'image/png', 'image/webp', 'image/gif']}
+                        maxSize={5}
+                        preview={true}
+                        disabled={isLoading || isUploading}
+                        helperText="JPEG, PNG, WebP, GIF 형식, 최대 5MB"
+                        className="mb-4"
+                      />
+                      {profileImageUrl && !profileImageFile && (
+                        <p className="text-sm text-muted-foreground">
+                          현재 프로필 이미지가 설정되어 있습니다.
+                        </p>
+                      )}
+                    </div>
                   )}
                 />
               </GridItem>
@@ -569,10 +642,10 @@ const DogForm: React.FC<DogFormProps> = ({
           </Button>
           <Button
             type="submit"
-            loading={isLoading}
-            disabled={!isValid}
+            loading={isLoading || isUploading}
+            disabled={!isValid || isLoading || isUploading}
           >
-            {isEditMode ? '수정하기' : '등록하기'}
+            {isUploading ? '이미지 업로드 중...' : (isEditMode ? '수정하기' : '등록하기')}
           </Button>
         </div>
       </form>

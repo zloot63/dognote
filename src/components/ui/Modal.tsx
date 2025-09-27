@@ -2,6 +2,7 @@ import React from 'react';
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
+import { VisuallyHidden } from './VisuallyHidden';
 
 export type ModalCloseReason = 'escapeKeyDown' | 'backdropClick' | 'closeButton';
 
@@ -52,6 +53,7 @@ const ModalContent = React.forwardRef<
     fullScreen?: boolean;
     fullWidth?: boolean;
     showCloseButton?: boolean;
+    title?: string;
     onClose?: (event: Event | React.MouseEvent, reason: ModalCloseReason) => void;
   }
 >(({ 
@@ -61,6 +63,7 @@ const ModalContent = React.forwardRef<
   fullScreen = false,
   fullWidth = false,
   showCloseButton = true,
+  title,
   onClose,
   ...props 
 }, ref) => {
@@ -104,6 +107,15 @@ const ModalContent = React.forwardRef<
         }}
         {...props}
       >
+        {/* ✅ Always include DialogTitle for accessibility */}
+        {title ? (
+          <ModalTitle>{title}</ModalTitle>
+        ) : (
+          <VisuallyHidden>
+            <ModalTitle>Modal</ModalTitle>
+          </VisuallyHidden>
+        )}
+        
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close 
@@ -227,26 +239,22 @@ const Modal: React.FC<ModalProps> = ({
         fullScreen={fullScreen}
         fullWidth={fullWidth}
         showCloseButton={showCloseButton}
+        title={title}
         onClose={handleClose}
         className={className}
         aria-labelledby={title ? titleId : undefined}
         aria-describedby={description ? descriptionId : undefined}
       >
-        {/* Header - Always include DialogTitle for accessibility */}
-        <ModalHeader fullScreen={fullScreen} className={!title && !description ? 'sr-only' : ''}>
-          <ModalTitle 
-            id={titleId}
-            fullScreen={fullScreen}
-            className={!title ? 'sr-only' : ''}
-          >
-            {title || 'Modal'}
-          </ModalTitle>
-          {description && (
-            <ModalDescription id={descriptionId}>
-              {description}
-            </ModalDescription>
-          )}
-        </ModalHeader>
+        {/* Header - Only show if title or description exists */}
+        {(title || description) && (
+          <ModalHeader fullScreen={fullScreen}>
+            {description && (
+              <ModalDescription id={descriptionId}>
+                {description}
+              </ModalDescription>
+            )}
+          </ModalHeader>
+        )}
 
         {/* Content */}
         <div className={cn(
