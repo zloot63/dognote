@@ -1,45 +1,44 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  'inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+          'border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80',
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
+          'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
+        outline: 'text-foreground',
         success:
-          "border-transparent bg-green-500 text-white shadow hover:bg-green-500/80",
+          'border-transparent bg-green-500 text-white shadow hover:bg-green-500/80',
         warning:
-          "border-transparent bg-yellow-500 text-white shadow hover:bg-yellow-500/80",
-        info:
-          "border-transparent bg-blue-500 text-white shadow hover:bg-blue-500/80",
+          'border-transparent bg-yellow-500 text-white shadow hover:bg-yellow-500/80',
+        info: 'border-transparent bg-blue-500 text-white shadow hover:bg-blue-500/80',
       },
       size: {
-        sm: "px-2 py-0.5 text-xs",
-        md: "px-2.5 py-0.5 text-xs",
-        lg: "px-3 py-1 text-sm",
+        sm: 'px-2 py-0.5 text-xs',
+        md: 'px-2.5 py-0.5 text-xs',
+        lg: 'px-3 py-1 text-sm',
       },
       shape: {
-        default: "rounded-md",
-        rounded: "rounded-full",
-        square: "rounded-none",
+        default: 'rounded-md',
+        rounded: 'rounded-full',
+        square: 'rounded-none',
       },
     },
     defaultVariants: {
-      variant: "default",
-      size: "md",
-      shape: "default",
+      variant: 'default',
+      size: 'md',
+      shape: 'default',
     },
   }
-)
+);
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -53,10 +52,10 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
         className={cn(badgeVariants({ variant, size, shape }), className)}
         {...props}
       />
-    )
+    );
   }
-)
-Badge.displayName = "Badge"
+);
+Badge.displayName = 'Badge';
 
 // NumberBadge component for displaying numbers
 export interface NumberBadgeProps extends BadgeProps {
@@ -66,7 +65,19 @@ export interface NumberBadgeProps extends BadgeProps {
 }
 
 const NumberBadge = React.forwardRef<HTMLDivElement, NumberBadgeProps>(
-  ({ count, max = 99, showZero = false, className, variant = "destructive", size = "sm", shape = "rounded", ...props }, ref) => {
+  (
+    {
+      count,
+      max = 99,
+      showZero = false,
+      className,
+      variant = 'destructive',
+      size = 'sm',
+      shape = 'rounded',
+      ...props
+    },
+    ref
+  ) => {
     if (count === 0 && !showZero) {
       return null;
     }
@@ -79,7 +90,7 @@ const NumberBadge = React.forwardRef<HTMLDivElement, NumberBadgeProps>(
         variant={variant}
         size={size}
         shape={shape}
-        className={cn("min-w-[1.25rem] justify-center", className)}
+        className={cn('min-w-[1.25rem] justify-center', className)}
         {...props}
       >
         {displayCount}
@@ -87,7 +98,7 @@ const NumberBadge = React.forwardRef<HTMLDivElement, NumberBadgeProps>(
     );
   }
 );
-NumberBadge.displayName = "NumberBadge";
+NumberBadge.displayName = 'NumberBadge';
 
 // StatusBadge component for displaying status
 export interface StatusBadgeProps extends BadgeProps {
@@ -112,17 +123,15 @@ const StatusBadge = React.forwardRef<HTMLDivElement, StatusBadgeProps>(
       <Badge
         ref={ref}
         variant={config.variant}
-        className={cn("gap-1", className)}
+        className={cn('gap-1', className)}
         {...props}
       >
-        {showDot && (
-          <span className="h-1.5 w-1.5 rounded-full bg-current" />
-        )}
+        {showDot && <span className="h-1.5 w-1.5 rounded-full bg-current" />}
         {config.label}
       </Badge>
     );
   }
 );
-StatusBadge.displayName = "StatusBadge";
+StatusBadge.displayName = 'StatusBadge';
 
-export { Badge, NumberBadge, StatusBadge, badgeVariants }
+export { Badge, NumberBadge, StatusBadge, badgeVariants };

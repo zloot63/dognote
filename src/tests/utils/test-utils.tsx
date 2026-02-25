@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from '@/providers/AuthProvider';
 import { vi } from 'vitest';
 
 // Mock Next.js router
@@ -20,13 +21,12 @@ export const mockRouter = {
   },
 };
 
-// Mock Firebase Auth User
+// Mock Auth User
 export const mockUser = {
-  uid: 'test-user-id',
+  id: 'test-user-id',
   email: 'test@example.com',
-  displayName: 'Test User',
-  photoURL: null,
-  emailVerified: true,
+  name: 'Test User',
+  image: null,
 };
 
 // Mock Session
@@ -49,7 +49,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <AuthProvider>{children}</AuthProvider>
     </QueryClientProvider>
   );
 };
@@ -62,32 +62,22 @@ const customRender = (
 export * from '@testing-library/react';
 export { customRender as render };
 
-// Mock Firebase services
-export const mockFirebaseServices = () => {
-  vi.mock('firebase/app', () => ({
-    initializeApp: vi.fn(),
-  }));
-
-  vi.mock('firebase/auth', () => ({
-    getAuth: vi.fn(() => ({})),
-    signInWithPopup: vi.fn(),
-    signOut: vi.fn(),
-    onAuthStateChanged: vi.fn(),
-    GoogleAuthProvider: vi.fn(),
-  }));
-
-  vi.mock('firebase/firestore', () => ({
-    getFirestore: vi.fn(() => ({})),
-    collection: vi.fn(),
-    doc: vi.fn(),
-    addDoc: vi.fn(),
-    updateDoc: vi.fn(),
-    deleteDoc: vi.fn(),
-    getDocs: vi.fn(),
-    getDoc: vi.fn(),
-    query: vi.fn(),
-    where: vi.fn(),
-    orderBy: vi.fn(),
-    limit: vi.fn(),
+// Mock Supabase services
+export const mockSupabaseServices = () => {
+  vi.mock('@/lib/supabase', () => ({
+    supabase: {
+      from: vi.fn(() => ({
+        select: vi.fn(),
+        insert: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+      })),
+      auth: {
+        getUser: vi.fn(),
+        signInWithOAuth: vi.fn(),
+        signOut: vi.fn(),
+        onAuthStateChange: vi.fn(),
+      },
+    },
   }));
 };

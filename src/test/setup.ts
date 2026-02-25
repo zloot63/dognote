@@ -15,8 +15,12 @@ afterEach(() => {
 const originalConsoleError = console.error;
 console.error = (...args) => {
   if (
-    /Warning: ReactDOM.render is no longer supported in React 18/.test(args[0]) ||
-    /Warning: The current testing environment is not configured to support act/.test(args[0])
+    /Warning: ReactDOM.render is no longer supported in React 18/.test(
+      args[0]
+    ) ||
+    /Warning: The current testing environment is not configured to support act/.test(
+      args[0]
+    )
   ) {
     return;
   }

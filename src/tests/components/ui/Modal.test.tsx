@@ -10,7 +10,7 @@ describe('Modal Component', () => {
         <div>Modal content</div>
       </Modal>
     );
-    
+
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('Modal content')).toBeInTheDocument();
   });
@@ -21,37 +21,37 @@ describe('Modal Component', () => {
         <div>Modal content</div>
       </Modal>
     );
-    
+
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('calls onClose when backdrop is clicked', async () => {
     const onClose = vi.fn();
     const user = userEvent.setup();
-    
+
     render(
       <Modal open={true} onClose={onClose}>
         <div>Modal content</div>
       </Modal>
     );
-    
+
     // Click on backdrop (overlay)
     const overlay = screen.getByRole('dialog').parentElement;
     await user.click(overlay!);
-    
+
     expect(onClose).toHaveBeenCalledWith(expect.anything(), 'backdropClick');
   });
 
   it('calls onClose when escape key is pressed', async () => {
     const onClose = vi.fn();
     const user = userEvent.setup();
-    
+
     render(
       <Modal open={true} onClose={onClose}>
         <div>Modal content</div>
       </Modal>
     );
-    
+
     await user.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalledWith(expect.anything(), 'escapeKeyDown');
   });
@@ -62,7 +62,7 @@ describe('Modal Component', () => {
         <div>Fullscreen modal</div>
       </Modal>
     );
-    
+
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveClass('h-full');
   });
@@ -73,7 +73,7 @@ describe('Modal Component', () => {
         <div>Small modal</div>
       </Modal>
     );
-    
+
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveClass('max-w-sm');
   });
@@ -81,16 +81,16 @@ describe('Modal Component', () => {
   it('respects closeOnBackdropClick prop', async () => {
     const onClose = vi.fn();
     const user = userEvent.setup();
-    
+
     render(
       <Modal open={true} onClose={onClose} closeOnBackdropClick={false}>
         <div>Modal content</div>
       </Modal>
     );
-    
+
     const overlay = screen.getByRole('dialog').parentElement;
     await user.click(overlay!);
-    
+
     expect(onClose).not.toHaveBeenCalled();
   });
 });

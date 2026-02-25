@@ -25,7 +25,7 @@ export function Sidebar({
   activeCategory,
   setActiveCategory,
   activeComponent,
-  setActiveComponent
+  setActiveComponent,
 }: SidebarProps) {
   return (
     <div className="w-64 bg-white border-r border-neutral-200 min-h-screen">
@@ -33,9 +33,9 @@ export function Sidebar({
         <h1 className="text-2xl font-bold text-neutral-900">Design System</h1>
         <p className="text-sm text-neutral-600 mt-1">DogNote UI Components</p>
       </div>
-      
+
       <nav className="px-4">
-        {categories.map((category) => (
+        {categories.map(category => (
           <div key={category.id} className="mb-6">
             <button
               onClick={() => setActiveCategory(category.id)}
@@ -48,10 +48,10 @@ export function Sidebar({
               {category.icon}
               <span className="font-medium">{category.title}</span>
             </button>
-            
+
             {activeCategory === category.id && (
               <div className="ml-8 mt-2 space-y-1">
-                {category.items.map((item) => (
+                {category.items.map(item => (
                   <button
                     key={item}
                     onClick={() => setActiveComponent(item)}

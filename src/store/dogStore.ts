@@ -8,7 +8,7 @@ interface DogState {
   selectedDog: Dog | null;
   isLoading: boolean;
   error: string | null;
-  
+
   // 필터링 및 정렬
   searchQuery: string;
   sortBy: 'name' | 'age' | 'breed' | 'createdAt';
@@ -25,18 +25,18 @@ interface DogState {
   updateDog: (id: string, updates: Partial<Dog>) => void;
   removeDog: (id: string) => void;
   setSelectedDog: (dog: Dog | null) => void;
-  
+
   // 로딩/에러 상태
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  
+
   // 필터링/검색
   setSearchQuery: (query: string) => void;
   setSortBy: (sortBy: DogState['sortBy']) => void;
   setSortOrder: (order: DogState['sortOrder']) => void;
   setFilter: (filter: Partial<DogState['filterBy']>) => void;
   clearFilters: () => void;
-  
+
   // 계산된 값들
   getFilteredDogs: () => Dog[];
   getDogById: (id: string) => Dog | undefined;
@@ -57,59 +57,72 @@ export const useDogStore = create<DogState>()(
       filterBy: {},
 
       // 기본 액션
-      setDogs: (dogs) => set({ dogs }),
-      
-      addDog: (dog) => set((state) => ({ 
-        dogs: [...state.dogs, dog] 
-      })),
-      
-      updateDog: (id, updates) => set((state) => ({
-        dogs: state.dogs.map(dog => 
-          dog.id === id ? { ...dog, ...updates, updatedAt: new Date().toISOString() } : dog
-        ),
-        selectedDog: state.selectedDog?.id === id 
-          ? { ...state.selectedDog, ...updates, updatedAt: new Date().toISOString() }
-          : state.selectedDog
-      })),
-      
-      removeDog: (id) => set((state) => ({
-        dogs: state.dogs.filter(dog => dog.id !== id),
-        selectedDog: state.selectedDog?.id === id ? null : state.selectedDog
-      })),
-      
-      setSelectedDog: (dog) => set({ selectedDog: dog }),
+      setDogs: dogs => set({ dogs }),
+
+      addDog: dog =>
+        set(state => ({
+          dogs: [...state.dogs, dog],
+        })),
+
+      updateDog: (id, updates) =>
+        set(state => ({
+          dogs: state.dogs.map(dog =>
+            dog.id === id
+              ? { ...dog, ...updates, updatedAt: new Date().toISOString() }
+              : dog
+          ),
+          selectedDog:
+            state.selectedDog?.id === id
+              ? {
+                  ...state.selectedDog,
+                  ...updates,
+                  updatedAt: new Date().toISOString(),
+                }
+              : state.selectedDog,
+        })),
+
+      removeDog: id =>
+        set(state => ({
+          dogs: state.dogs.filter(dog => dog.id !== id),
+          selectedDog: state.selectedDog?.id === id ? null : state.selectedDog,
+        })),
+
+      setSelectedDog: dog => set({ selectedDog: dog }),
 
       // 로딩/에러 상태
-      setLoading: (isLoading) => set({ isLoading }),
-      setError: (error) => set({ error }),
+      setLoading: isLoading => set({ isLoading }),
+      setError: error => set({ error }),
 
       // 필터링/검색
-      setSearchQuery: (searchQuery) => set({ searchQuery }),
-      setSortBy: (sortBy) => set({ sortBy }),
-      setSortOrder: (sortOrder) => set({ sortOrder }),
-      setFilter: (filter) => set((state) => ({ 
-        filterBy: { ...state.filterBy, ...filter } 
-      })),
-      clearFilters: () => set({ 
-        searchQuery: '', 
-        filterBy: {},
-        sortBy: 'name',
-        sortOrder: 'asc'
-      }),
+      setSearchQuery: searchQuery => set({ searchQuery }),
+      setSortBy: sortBy => set({ sortBy }),
+      setSortOrder: sortOrder => set({ sortOrder }),
+      setFilter: filter =>
+        set(state => ({
+          filterBy: { ...state.filterBy, ...filter },
+        })),
+      clearFilters: () =>
+        set({
+          searchQuery: '',
+          filterBy: {},
+          sortBy: 'name',
+          sortOrder: 'asc',
+        }),
 
       // 계산된 값들
       getFilteredDogs: () => {
         const { dogs, searchQuery, sortBy, sortOrder, filterBy } = get();
-        
+
         let filtered: Dog[] = dogs;
 
         // 검색 필터
         if (searchQuery) {
           const query = searchQuery.toLowerCase();
-          filtered = filtered.filter((dog: Dog) => 
-            dog.name.toLowerCase().includes(query) ||
-            dog.breed.toLowerCase().includes(query) ||
-            dog.description?.toLowerCase().includes(query)
+          filtered = filtered.filter(
+            (dog: Dog) =>
+              dog.name.toLowerCase().includes(query) ||
+              dog.breed.toLowerCase().includes(query) ||
+              dog.description?.toLowerCase().includes(query)
           );
         }
 
@@ -127,7 +140,7 @@ export const useDogStore = create<DogState>()(
         // 정렬
         filtered.sort((a, b) => {
           let aValue: string | number | Date, bValue: string | number | Date;
-          
+
           switch (sortBy) {
             case 'name':
               aValue = a.name.toLowerCase();
@@ -157,7 +170,7 @@ export const useDogStore = create<DogState>()(
         return filtered;
       },
 
-      getDogById: (id) => {
+      getDogById: id => {
         return get().dogs.find(dog => dog.id === id);
       },
 
@@ -168,14 +181,17 @@ export const useDogStore = create<DogState>()(
           name: dog.name,
           breed: dog.breed,
           profileImage: dog.profileImage,
-          age: Math.floor((Date.now() - new Date(dog.birthDate).getTime()) / (1000 * 60 * 60 * 24 * 30.44)),
+          age: Math.floor(
+            (Date.now() - new Date(dog.birthDate).getTime()) /
+              (1000 * 60 * 60 * 24 * 30.44)
+          ),
           weight: dog.weight,
-          size: dog.size
+          size: dog.size,
         }));
-      }
+      },
     }),
     {
-      name: 'dog-store'
+      name: 'dog-store',
     }
   )
 );

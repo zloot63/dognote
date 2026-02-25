@@ -1,40 +1,37 @@
 import React from 'react';
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
-const containerVariants = cva(
-  "w-full",
-  {
-    variants: {
-      size: {
-        sm: "max-w-sm",
-        md: "max-w-md",
-        lg: "max-w-4xl",
-        xl: "max-w-6xl",
-        "2xl": "max-w-7xl",
-        full: "max-w-full",
-      },
-      padding: {
-        none: "",
-        sm: "px-4 py-2",
-        md: "px-6 py-4",
-        lg: "px-8 py-6",
-        xl: "px-12 py-8",
-      },
-      center: {
-        true: "mx-auto",
-        false: "",
-      },
+const containerVariants = cva('w-full', {
+  variants: {
+    size: {
+      sm: 'max-w-sm',
+      md: 'max-w-md',
+      lg: 'max-w-4xl',
+      xl: 'max-w-6xl',
+      '2xl': 'max-w-7xl',
+      full: 'max-w-full',
     },
-    defaultVariants: {
-      size: "lg",
-      padding: "md",
-      center: true,
+    padding: {
+      none: '',
+      sm: 'px-4 py-2',
+      md: 'px-6 py-4',
+      lg: 'px-8 py-6',
+      xl: 'px-12 py-8',
     },
-  }
-);
+    center: {
+      true: 'mx-auto',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    size: 'lg',
+    padding: 'md',
+    center: true,
+  },
+});
 
-export interface ContainerProps 
+export interface ContainerProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof containerVariants> {
   children: React.ReactNode;
@@ -53,39 +50,36 @@ const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
     );
   }
 );
-Container.displayName = "Container";
+Container.displayName = 'Container';
 
 // 섹션 컨테이너 컴포넌트
-const sectionVariants = cva(
-  "",
-  {
-    variants: {
-      background: {
-        none: "",
-        muted: "bg-muted",
-        card: "bg-card",
-        accent: "bg-accent",
-      },
-      border: {
-        true: "border border-border",
-        false: "",
-      },
-      shadow: {
-        none: "",
-        sm: "shadow-sm",
-        md: "shadow-md",
-        lg: "shadow-lg",
-      },
+const sectionVariants = cva('', {
+  variants: {
+    background: {
+      none: '',
+      muted: 'bg-muted',
+      card: 'bg-card',
+      accent: 'bg-accent',
     },
-    defaultVariants: {
-      background: "none",
-      border: false,
-      shadow: "none",
+    border: {
+      true: 'border border-border',
+      false: '',
     },
-  }
-);
+    shadow: {
+      none: '',
+      sm: 'shadow-sm',
+      md: 'shadow-md',
+      lg: 'shadow-lg',
+    },
+  },
+  defaultVariants: {
+    background: 'none',
+    border: false,
+    shadow: 'none',
+  },
+});
 
-export interface SectionProps 
+export interface SectionProps
   extends React.HTMLAttributes<HTMLElement>,
     VariantProps<typeof containerVariants>,
     VariantProps<typeof sectionVariants> {
@@ -94,21 +88,24 @@ export interface SectionProps
 }
 
 const Section = React.forwardRef<HTMLElement, SectionProps>(
-  ({ 
-    as: Component = 'section',
-    className,
-    size = 'lg',
-    padding = 'lg',
-    center = true,
-    background = 'none',
-    border = false,
-    shadow = 'none',
-    children,
-    ...props 
-  }, ref) => {
+  (
+    {
+      as: Component = 'section',
+      className,
+      size = 'lg',
+      padding = 'lg',
+      center = true,
+      background = 'none',
+      border = false,
+      shadow = 'none',
+      children,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <Component
-        ref={ref as any}
+        ref={ref as React.ForwardedRef<T>}
         className={cn(
           containerVariants({ size, padding, center }),
           sectionVariants({ background, border, shadow }),
@@ -121,6 +118,6 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(
     );
   }
 );
-Section.displayName = "Section";
+Section.displayName = 'Section';
 
 export { Container, Section, containerVariants, sectionVariants };

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import React from 'react';
 import Navigation from './Navigation';
-import WalkButton from "@/components/walk/WalkButton";
+import WalkButton from '@/components/walk/WalkButton';
 
 interface BottomNavProps {
   className?: string;
@@ -11,7 +11,7 @@ interface BottomNavProps {
 
 const BottomNav: React.FC<BottomNavProps> = ({
   className = '',
-  showWalkButton = true
+  showWalkButton = true,
 }) => {
   return (
     <div className={`fixed bottom-0 left-0 right-0 z-50 ${className}`}>
@@ -21,12 +21,12 @@ const BottomNav: React.FC<BottomNavProps> = ({
           <WalkButton />
         </div>
       )}
-      
+
       {/* 네비게이션 바 */}
       <div className="bg-white border-t border-gray-200 shadow-lg">
         <div className="px-2 py-1">
-          <Navigation 
-            variant="bottom" 
+          <Navigation
+            variant="bottom"
             showLabels={true}
             className="max-w-md mx-auto"
           />

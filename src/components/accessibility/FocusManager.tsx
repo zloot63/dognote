@@ -1,6 +1,6 @@
 /**
  * 포커스 관리 컴포넌트
- * 
+ *
  * 키보드 네비게이션과 포커스 트랩을 관리합니다.
  * WCAG 2.1 AA - 2.1.1 (Keyboard) 및 2.4.3 (Focus Order) 준수
  */
@@ -26,13 +26,13 @@ const FOCUSABLE_ELEMENTS = [
   'select:not([disabled])',
   'details',
   '[tabindex]:not([tabindex="-1"])',
-  '[contenteditable="true"]'
+  '[contenteditable="true"]',
 ].join(', ');
 
 /**
  * FocusManager 컴포넌트
  * 모달이나 드롭다운에서 포커스를 트랩하고 관리합니다.
- * 
+ *
  * @example
  * ```tsx
  * <FocusManager enabled={isModalOpen} autoFocus restoreFocus>
@@ -43,12 +43,12 @@ const FOCUSABLE_ELEMENTS = [
  * </FocusManager>
  * ```
  */
-export const FocusManager = ({ 
-  children, 
+export const FocusManager = ({
+  children,
   enabled = true,
   autoFocus = false,
   restoreFocus = true,
-  className 
+  className,
 }: FocusManagerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
@@ -58,10 +58,10 @@ export const FocusManager = ({
    */
   const getFocusableElements = useCallback((): HTMLElement[] => {
     if (!containerRef.current) return [];
-    
+
     const elements = containerRef.current.querySelectorAll(FOCUSABLE_ELEMENTS);
     return Array.from(elements).filter(
-      (element): element is HTMLElement => 
+      (element): element is HTMLElement =>
         element instanceof HTMLElement && element.tabIndex !== -1
     );
   }, []);
@@ -69,40 +69,57 @@ export const FocusManager = ({
   /**
    * Tab 키 이벤트를 처리하여 포커스를 트랩합니다.
    */
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (!enabled || event.key !== 'Tab') return;
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!enabled || event.key !== 'Tab') return;
 
-    const focusableElements = getFocusableElements();
-    if (focusableElements.length === 0) return;
+      const focusableElements = getFocusableElements();
+      if (focusableElements.length === 0) return;
 
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-    const currentElement = document.activeElement as HTMLElement;
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const currentElement = document.activeElement as HTMLElement;
 
-    // Shift + Tab (역방향)
-    if (event.shiftKey) {
-      if (currentElement === firstElement || !containerRef.current?.contains(currentElement)) {
-        event.preventDefault();
-        lastElement.focus();
+      // Shift + Tab (역방향)
+      if (event.shiftKey) {
+        if (
+          currentElement === firstElement ||
+          !containerRef.current?.contains(currentElement)
+        ) {
+          event.preventDefault();
+          lastElement.focus();
+        }
       }
-    } 
-    // Tab (순방향)
-    else {
-      if (currentElement === lastElement || !containerRef.current?.contains(currentElement)) {
-        event.preventDefault();
-        firstElement.focus();
+      // Tab (순방향)
+      else {
+        if (
+          currentElement === lastElement ||
+          !containerRef.current?.contains(currentElement)
+        ) {
+          event.preventDefault();
+          firstElement.focus();
+        }
       }
-    }
-  }, [enabled, getFocusableElements]);
+    },
+    [enabled, getFocusableElements]
+  );
 
   /**
    * Escape 키로 포커스 트랩에서 벗어날 수 있도록 합니다.
    */
-  const handleEscapeKey = useCallback((event: KeyboardEvent) => {
-    if (enabled && event.key === 'Escape' && restoreFocus && previouslyFocusedElement.current) {
-      previouslyFocusedElement.current.focus();
-    }
-  }, [enabled, restoreFocus]);
+  const handleEscapeKey = useCallback(
+    (event: KeyboardEvent) => {
+      if (
+        enabled &&
+        event.key === 'Escape' &&
+        restoreFocus &&
+        previouslyFocusedElement.current
+      ) {
+        previouslyFocusedElement.current.focus();
+      }
+    },
+    [enabled, restoreFocus]
+  );
 
   useEffect(() => {
     if (!enabled) return;
@@ -132,7 +149,14 @@ export const FocusManager = ({
         previouslyFocusedElement.current.focus();
       }
     };
-  }, [enabled, autoFocus, restoreFocus, handleKeyDown, handleEscapeKey, getFocusableElements]);
+  }, [
+    enabled,
+    autoFocus,
+    restoreFocus,
+    handleKeyDown,
+    handleEscapeKey,
+    getFocusableElements,
+  ]);
 
   return (
     <div ref={containerRef} className={className}>

@@ -30,7 +30,9 @@ export async function checkGPSPermission(): Promise<GPSPermissionStatus> {
   }
 
   try {
-    const permission = await navigator.permissions.query({ name: 'geolocation' });
+    const permission = await navigator.permissions.query({
+      name: 'geolocation',
+    });
     return {
       granted: permission.state === 'granted',
       denied: permission.state === 'denied',
@@ -59,7 +61,7 @@ export function requestGPSPermission(): Promise<GPSPosition> {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      position => {
         const gpsPosition: GPSPosition = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
@@ -68,12 +70,13 @@ export function requestGPSPermission(): Promise<GPSPosition> {
         };
         resolve(gpsPosition);
       },
-      (error) => {
+      error => {
         let errorMessage = 'GPS 권한 요청에 실패했습니다.';
-        
+
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = 'GPS 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요.';
+            errorMessage =
+              'GPS 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요.';
             break;
           case error.POSITION_UNAVAILABLE:
             errorMessage = 'GPS 위치 정보를 사용할 수 없습니다.';
@@ -82,7 +85,7 @@ export function requestGPSPermission(): Promise<GPSPosition> {
             errorMessage = 'GPS 위치 요청 시간이 초과되었습니다.';
             break;
         }
-        
+
         reject(new Error(errorMessage));
       },
       {
@@ -107,7 +110,7 @@ export function startGPSTracking(
   }
 
   const watchId = navigator.geolocation.watchPosition(
-    (position) => {
+    position => {
       const gpsPosition: GPSPosition = {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
@@ -116,9 +119,9 @@ export function startGPSTracking(
       };
       onPosition(gpsPosition);
     },
-    (error) => {
+    error => {
       let errorMessage = 'GPS 추적 중 오류가 발생했습니다.';
-      
+
       switch (error.code) {
         case error.PERMISSION_DENIED:
           errorMessage = 'GPS 권한이 거부되었습니다.';
@@ -130,7 +133,7 @@ export function startGPSTracking(
           errorMessage = 'GPS 위치 요청 시간이 초과되었습니다.';
           break;
       }
-      
+
       onError(errorMessage);
     },
     {

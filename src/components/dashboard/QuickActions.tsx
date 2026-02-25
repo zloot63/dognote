@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
-import { Button } from '@/components/ui';
 import { useRouter } from 'next/navigation';
 
 interface QuickAction {
@@ -23,7 +22,7 @@ interface QuickActionsProps {
 
 const QuickActions: React.FC<QuickActionsProps> = ({
   className = '',
-  customActions = []
+  customActions = [],
 }) => {
   const router = useRouter();
 
@@ -84,7 +83,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
 
   const handleActionClick = (action: QuickAction) => {
     if (action.disabled) return;
-    
+
     if (action.onClick) {
       action.onClick();
     } else if (action.href) {
@@ -99,7 +98,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {actions.map((action) => (
+          {actions.map(action => (
             <button
               key={action.id}
               onClick={() => handleActionClick(action)}
@@ -107,23 +106,20 @@ const QuickActions: React.FC<QuickActionsProps> = ({
               className={`
                 relative p-4 rounded-lg text-white text-left transition-all duration-200
                 ${action.color}
-                ${action.disabled 
-                  ? 'opacity-50 cursor-not-allowed' 
-                  : 'hover:scale-105 hover:shadow-lg active:scale-95'
+                ${
+                  action.disabled
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:scale-105 hover:shadow-lg active:scale-95'
                 }
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
               `}
             >
               {/* 아이콘 */}
-              <div className="text-2xl mb-2">
-                {action.icon}
-              </div>
-              
+              <div className="text-2xl mb-2">{action.icon}</div>
+
               {/* 제목 */}
-              <div className="font-semibold text-sm mb-1">
-                {action.title}
-              </div>
-              
+              <div className="font-semibold text-sm mb-1">{action.title}</div>
+
               {/* 설명 */}
               <div className="text-xs opacity-90 line-clamp-2">
                 {action.description}

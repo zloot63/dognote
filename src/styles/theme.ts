@@ -121,20 +121,41 @@ export const typography = {
     sans: ['Inter', 'system-ui', 'sans-serif'] as string[],
     mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'] as string[],
   },
-  
+
   fontSize: {
     xs: ['0.75rem', { lineHeight: '1rem' }] as [string, { lineHeight: string }],
-    sm: ['0.875rem', { lineHeight: '1.25rem' }] as [string, { lineHeight: string }],
-    base: ['1rem', { lineHeight: '1.5rem' }] as [string, { lineHeight: string }],
-    lg: ['1.125rem', { lineHeight: '1.75rem' }] as [string, { lineHeight: string }],
-    xl: ['1.25rem', { lineHeight: '1.75rem' }] as [string, { lineHeight: string }],
-    '2xl': ['1.5rem', { lineHeight: '2rem' }] as [string, { lineHeight: string }],
-    '3xl': ['1.875rem', { lineHeight: '2.25rem' }] as [string, { lineHeight: string }],
-    '4xl': ['2.25rem', { lineHeight: '2.5rem' }] as [string, { lineHeight: string }],
+    sm: ['0.875rem', { lineHeight: '1.25rem' }] as [
+      string,
+      { lineHeight: string },
+    ],
+    base: ['1rem', { lineHeight: '1.5rem' }] as [
+      string,
+      { lineHeight: string },
+    ],
+    lg: ['1.125rem', { lineHeight: '1.75rem' }] as [
+      string,
+      { lineHeight: string },
+    ],
+    xl: ['1.25rem', { lineHeight: '1.75rem' }] as [
+      string,
+      { lineHeight: string },
+    ],
+    '2xl': ['1.5rem', { lineHeight: '2rem' }] as [
+      string,
+      { lineHeight: string },
+    ],
+    '3xl': ['1.875rem', { lineHeight: '2.25rem' }] as [
+      string,
+      { lineHeight: string },
+    ],
+    '4xl': ['2.25rem', { lineHeight: '2.5rem' }] as [
+      string,
+      { lineHeight: string },
+    ],
     '5xl': ['3rem', { lineHeight: '1' }] as [string, { lineHeight: string }],
     '6xl': ['3.75rem', { lineHeight: '1' }] as [string, { lineHeight: string }],
   },
-  
+
   fontWeight: {
     light: '300',
     normal: '400',
@@ -149,51 +170,51 @@ export const typography = {
 export const spacing = {
   px: '1px',
   0: '0',
-  0.5: '0.125rem',  // 2px
-  1: '0.25rem',     // 4px
-  1.5: '0.375rem',  // 6px
-  2: '0.5rem',      // 8px
-  2.5: '0.625rem',  // 10px
-  3: '0.75rem',     // 12px
-  3.5: '0.875rem',  // 14px
-  4: '1rem',        // 16px
-  5: '1.25rem',     // 20px
-  6: '1.5rem',      // 24px
-  7: '1.75rem',     // 28px
-  8: '2rem',        // 32px
-  9: '2.25rem',     // 36px
-  10: '2.5rem',     // 40px
-  11: '2.75rem',    // 44px
-  12: '3rem',       // 48px
-  14: '3.5rem',     // 56px
-  16: '4rem',       // 64px
-  20: '5rem',       // 80px
-  24: '6rem',       // 96px
-  28: '7rem',       // 112px
-  32: '8rem',       // 128px
-  36: '9rem',       // 144px
-  40: '10rem',      // 160px
-  44: '11rem',      // 176px
-  48: '12rem',      // 192px
-  52: '13rem',      // 208px
-  56: '14rem',      // 224px
-  60: '15rem',      // 240px
-  64: '16rem',      // 256px
-  72: '18rem',      // 288px
-  80: '20rem',      // 320px
-  96: '24rem',      // 384px
+  0.5: '0.125rem', // 2px
+  1: '0.25rem', // 4px
+  1.5: '0.375rem', // 6px
+  2: '0.5rem', // 8px
+  2.5: '0.625rem', // 10px
+  3: '0.75rem', // 12px
+  3.5: '0.875rem', // 14px
+  4: '1rem', // 16px
+  5: '1.25rem', // 20px
+  6: '1.5rem', // 24px
+  7: '1.75rem', // 28px
+  8: '2rem', // 32px
+  9: '2.25rem', // 36px
+  10: '2.5rem', // 40px
+  11: '2.75rem', // 44px
+  12: '3rem', // 48px
+  14: '3.5rem', // 56px
+  16: '4rem', // 64px
+  20: '5rem', // 80px
+  24: '6rem', // 96px
+  28: '7rem', // 112px
+  32: '8rem', // 128px
+  36: '9rem', // 144px
+  40: '10rem', // 160px
+  44: '11rem', // 176px
+  48: '12rem', // 192px
+  52: '13rem', // 208px
+  56: '14rem', // 224px
+  60: '15rem', // 240px
+  64: '16rem', // 256px
+  72: '18rem', // 288px
+  80: '20rem', // 320px
+  96: '24rem', // 384px
 } as const;
 
 // Border radius scale
 export const borderRadius = {
   none: '0',
-  sm: '0.125rem',   // 2px
-  base: '0.25rem',  // 4px
-  md: '0.375rem',   // 6px
-  lg: '0.5rem',     // 8px
-  xl: '0.75rem',    // 12px
-  '2xl': '1rem',    // 16px
-  '3xl': '1.5rem',  // 24px
+  sm: '0.125rem', // 2px
+  base: '0.25rem', // 4px
+  md: '0.375rem', // 6px
+  lg: '0.5rem', // 8px
+  xl: '0.75rem', // 12px
+  '2xl': '1rem', // 16px
+  '3xl': '1.5rem', // 24px
   full: '9999px',
 } as const;
 
@@ -213,18 +234,18 @@ export const boxShadow = {
 export const components = {
   button: {
     height: {
-      xs: spacing[7],    // 28px
-      sm: spacing[8],    // 32px
-      md: spacing[10],   // 40px
-      lg: spacing[11],   // 44px
-      xl: spacing[12],   // 48px
+      xs: spacing[7], // 28px
+      sm: spacing[8], // 32px
+      md: spacing[10], // 40px
+      lg: spacing[11], // 44px
+      xl: spacing[12], // 48px
     },
     padding: {
-      xs: `${spacing[1]} ${spacing[2]}`,      // 4px 8px
-      sm: `${spacing[1.5]} ${spacing[3]}`,    // 6px 12px
-      md: `${spacing[2]} ${spacing[4]}`,      // 8px 16px
-      lg: `${spacing[2.5]} ${spacing[6]}`,    // 10px 24px
-      xl: `${spacing[3]} ${spacing[8]}`,      // 12px 32px
+      xs: `${spacing[1]} ${spacing[2]}`, // 4px 8px
+      sm: `${spacing[1.5]} ${spacing[3]}`, // 6px 12px
+      md: `${spacing[2]} ${spacing[4]}`, // 8px 16px
+      lg: `${spacing[2.5]} ${spacing[6]}`, // 10px 24px
+      xl: `${spacing[3]} ${spacing[8]}`, // 12px 32px
     },
     fontSize: {
       xs: typography.fontSize.xs,
@@ -241,17 +262,17 @@ export const components = {
       xl: borderRadius.xl,
     },
   },
-  
+
   input: {
     height: {
-      sm: spacing[8],    // 32px
-      md: spacing[10],   // 40px
-      lg: spacing[12],   // 48px
+      sm: spacing[8], // 32px
+      md: spacing[10], // 40px
+      lg: spacing[12], // 48px
     },
     padding: {
-      sm: `${spacing[1.5]} ${spacing[3]}`,    // 6px 12px
-      md: `${spacing[2]} ${spacing[4]}`,      // 8px 16px
-      lg: `${spacing[3]} ${spacing[4]}`,      // 12px 16px
+      sm: `${spacing[1.5]} ${spacing[3]}`, // 6px 12px
+      md: `${spacing[2]} ${spacing[4]}`, // 8px 16px
+      lg: `${spacing[3]} ${spacing[4]}`, // 12px 16px
     },
     fontSize: {
       sm: typography.fontSize.sm,
@@ -264,12 +285,12 @@ export const components = {
       lg: borderRadius.lg,
     },
   },
-  
+
   card: {
     padding: {
-      sm: spacing[4],    // 16px
-      md: spacing[6],    // 24px
-      lg: spacing[8],    // 32px
+      sm: spacing[4], // 16px
+      md: spacing[6], // 24px
+      lg: spacing[8], // 32px
     },
     borderRadius: {
       sm: borderRadius.lg,

@@ -1,35 +1,41 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/hooks/useAuth";
-import { useDogs } from "@/hooks/useDogs";
-import { useDogStore } from "@/store/dogStore";
-import AuthGuard from "@/components/auth/AuthGuard";
-import { Button } from "@/components/ui";
-import { useRouter } from "next/navigation";
-import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
-import { useEffect } from "react";
+import { useAuth } from '@/hooks/useAuthSupabase';
+import { useDogs } from '@/hooks/useDogs';
+import { useDogStore } from '@/store/dogStore';
+import AuthGuard from '@/components/auth/AuthGuard';
+import { Button } from '@/components/ui';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+const getProviderDisplayName = (provider?: string) => {
+  const providerNames: Record<string, string> = {
+    google: 'Google',
+    github: 'GitHub',
+    kakao: 'Kakao',
+    email: '이메일',
+  };
+  return providerNames[provider || ''] || provider;
+};
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
-  
-  // Firebase Auth 연동 상태 확인
-  const { isFirebaseAuthenticated, isLoading: authLoading } = useFirebaseAuth();
 
   // 강아지 데이터 조회
   const { isLoading: dogsLoading, error: dogsError, refetch } = useDogs();
   const { dogs } = useDogStore();
 
-  // Firebase 인증이 완료된 후에만 강아지 데이터 refetch
+  // 인증이 완료된 후에만 강아지 데이터 refetch
   useEffect(() => {
-    if (isFirebaseAuthenticated && !dogsLoading) {
+    if (isAuthenticated && !dogsLoading) {
       refetch();
     }
-  }, [isFirebaseAuthenticated, refetch, dogsLoading]);
+  }, [isAuthenticated, refetch, dogsLoading]);
 
-  // 전체 로딩 상태 (NextAuth + Firebase Auth)
+  // 전체 로딩 상태
   const isLoading = authLoading || dogsLoading;
-  
+
   // 강아지 데이터 (React Query 데이터 우선, 없으면 스토어 데이터)
   const currentDogs = dogs || [];
   const hasDogs = currentDogs.length > 0;
@@ -48,23 +54,35 @@ export default function DashboardPage() {
     );
   }
 
-  // Firebase 인증 실패
-  if (!isFirebaseAuthenticated) {
+  // 인증 실패
+  if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
           <div className="text-center">
             <div className="text-yellow-600 mb-4">
-              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg
+                className="mx-auto h-12 w-12"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-yellow-900 mb-2">인증 연동 중</h3>
+            <h3 className="text-lg font-medium text-yellow-900 mb-2">
+              인증 연동 중
+            </h3>
             <p className="text-yellow-700 mb-4">
-              Firebase 인증을 연동하고 있습니다. 잠시만 기다려주세요.
+              인증을 연동하고 있습니다. 잠시만 기다려주세요.
             </p>
-            <Button 
-              onClick={() => window.location.reload()} 
+            <Button
+              onClick={() => window.location.reload()}
               variant="outline"
               className="border-yellow-300 text-yellow-700 hover:bg-yellow-50"
             >
@@ -85,10 +103,12 @@ export default function DashboardPage() {
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <span className="text-2xl font-bold text-indigo-600">🐾 DogNote</span>
+                  <span className="text-2xl font-bold text-indigo-600">
+                    🐾 DogNote
+                  </span>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   {user?.image && (
@@ -102,7 +122,7 @@ export default function DashboardPage() {
                     {user?.name}
                   </span>
                 </div>
-                
+
                 <button
                   onClick={logout}
                   className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -130,16 +150,30 @@ export default function DashboardPage() {
               <div className="bg-red-50 border border-red-200 rounded-lg p-6">
                 <div className="text-center">
                   <div className="text-red-600 mb-4">
-                    <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+                    <svg
+                      className="mx-auto h-12 w-12"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-red-900 mb-2">데이터 로드 오류</h3>
+                  <h3 className="text-lg font-medium text-red-900 mb-2">
+                    데이터 로드 오류
+                  </h3>
                   <p className="text-red-700 mb-4">
-                    {dogsError instanceof Error ? dogsError.message : '강아지 목록을 불러오는데 실패했습니다.'}
+                    {dogsError instanceof Error
+                      ? dogsError.message
+                      : '강아지 목록을 불러오는데 실패했습니다.'}
                   </p>
-                  <Button 
-                    onClick={() => window.location.reload()} 
+                  <Button
+                    onClick={() => window.location.reload()}
                     variant="outline"
                     className="border-red-300 text-red-700 hover:bg-red-50"
                   >
@@ -159,7 +193,8 @@ export default function DashboardPage() {
                       환영합니다, {user?.name}님! 🎉
                     </h1>
                     <p className="text-lg text-gray-600 mb-6">
-                      DogNote에 처음 오셨네요! 반려견을 등록하고 산책 기록을 시작해보세요.
+                      DogNote에 처음 오셨네요! 반려견을 등록하고 산책 기록을
+                      시작해보세요.
                     </p>
                   </div>
 
@@ -168,38 +203,63 @@ export default function DashboardPage() {
                       🐾 첫 번째 반려견을 등록해주세요
                     </h2>
                     <p className="text-gray-600 mb-4">
-                      반려견의 정보를 등록하면 맞춤형 산책 기록과 건강 관리 서비스를 이용하실 수 있습니다.
+                      반려견의 정보를 등록하면 맞춤형 산책 기록과 건강 관리
+                      서비스를 이용하실 수 있습니다.
                     </p>
                     <ul className="text-sm text-gray-600 space-y-2 mb-6">
                       <li className="flex items-center">
-                        <svg className="h-4 w-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          className="h-4 w-4 text-green-500 mr-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         GPS 기반 산책 경로 추적
                       </li>
                       <li className="flex items-center">
-                        <svg className="h-4 w-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          className="h-4 w-4 text-green-500 mr-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         건강 기록 및 관리
                       </li>
                       <li className="flex items-center">
-                        <svg className="h-4 w-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          className="h-4 w-4 text-green-500 mr-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         포인트 적립 시스템
                       </li>
                     </ul>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button 
+                      <Button
                         onClick={() => router.push('/dogs')}
                         size="lg"
                         className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3"
                       >
                         🐕 반려견 등록하기
                       </Button>
-                      <Button 
+                      <Button
                         onClick={() => router.push('/dogs')}
                         variant="outline"
                         size="lg"
@@ -212,10 +272,18 @@ export default function DashboardPage() {
 
                   {/* 사용자 정보 카드 */}
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="text-sm font-medium text-gray-500 mb-2">계정 정보</h3>
+                    <h3 className="text-sm font-medium text-gray-500 mb-2">
+                      계정 정보
+                    </h3>
                     <div className="text-sm text-gray-700 space-y-1">
-                      <p><span className="font-medium">이메일:</span> {user?.email}</p>
-                      <p><span className="font-medium">로그인 방식:</span> {user?.provider}</p>
+                      <p>
+                        <span className="font-medium">이메일:</span>{' '}
+                        {user?.email}
+                      </p>
+                      <p>
+                        <span className="font-medium">로그인 방식:</span>{' '}
+                        {getProviderDisplayName(user?.provider)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -228,15 +296,21 @@ export default function DashboardPage() {
                     환영합니다, {user?.name}님! 🎉
                   </h1>
                   <p className="text-lg text-gray-600 mb-8">
-                    등록된 반려견 {currentDogs.length}마리와 함께 DogNote를 즐겨보세요!
+                    등록된 반려견 {currentDogs.length}마리와 함께 DogNote를
+                    즐겨보세요!
                   </p>
-                  
+
                   {/* 등록된 강아지 요약 */}
                   <div className="bg-white rounded-lg shadow p-6 max-w-md mx-auto mb-8">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">등록된 반려견</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      등록된 반려견
+                    </h2>
                     <div className="space-y-2">
-                      {currentDogs.slice(0, 3).map((dog) => (
-                        <div key={dog.id} className="flex items-center justify-between text-sm">
+                      {currentDogs.slice(0, 3).map(dog => (
+                        <div
+                          key={dog.id}
+                          className="flex items-center justify-between text-sm"
+                        >
                           <span className="font-medium">{dog.name}</span>
                           <span className="text-gray-500">{dog.breed}</span>
                         </div>
@@ -248,7 +322,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div className="mt-4 pt-4 border-t">
-                      <Button 
+                      <Button
                         onClick={() => router.push('/dogs')}
                         variant="outline"
                         size="sm"
@@ -261,19 +335,31 @@ export default function DashboardPage() {
 
                   {/* 사용자 정보 카드 */}
                   <div className="bg-white rounded-lg shadow p-6 max-w-md mx-auto">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">계정 정보</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      계정 정보
+                    </h2>
                     <div className="space-y-3 text-left">
                       <div>
-                        <span className="text-sm font-medium text-gray-500">이메일:</span>
+                        <span className="text-sm font-medium text-gray-500">
+                          이메일:
+                        </span>
                         <p className="text-sm text-gray-900">{user?.email}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-gray-500">로그인 방식:</span>
-                        <p className="text-sm text-gray-900 capitalize">{user?.provider}</p>
+                        <span className="text-sm font-medium text-gray-500">
+                          로그인 방식:
+                        </span>
+                        <p className="text-sm text-gray-900">
+                          {getProviderDisplayName(user?.provider)}
+                        </p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-gray-500">사용자 ID:</span>
-                        <p className="text-sm text-gray-900 font-mono">{user?.id}</p>
+                        <span className="text-sm font-medium text-gray-500">
+                          사용자 ID:
+                        </span>
+                        <p className="text-sm text-gray-900 font-mono">
+                          {user?.id}
+                        </p>
                       </div>
                     </div>
                   </div>

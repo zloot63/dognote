@@ -1,7 +1,17 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { formatDistance } from '@/lib/gps';
 
@@ -23,17 +33,24 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
   walks,
   chartType = 'line',
   period = 'month',
-  className = ''
+  className = '',
 }) => {
   // 기간별 데이터 집계
   const chartData = useMemo(() => {
     const now = new Date();
-    const data: { [key: string]: { date: string; distance: number; count: number; duration: number } } = {};
+    const data: {
+      [key: string]: {
+        date: string;
+        distance: number;
+        count: number;
+        duration: number;
+      };
+    } = {};
 
     // 기간 설정
     let daysToShow = 30;
     let dateFormat = (date: Date) => `${date.getMonth() + 1}/${date.getDate()}`;
-    
+
     if (period === 'week') {
       daysToShow = 7;
       dateFormat = (date: Date) => {
@@ -51,12 +68,12 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
       date.setDate(date.getDate() - i);
       const dateKey = date.toISOString().split('T')[0];
       const displayDate = dateFormat(date);
-      
+
       data[dateKey] = {
         date: displayDate,
         distance: 0,
         count: 0,
-        duration: 0
+        duration: 0,
       };
     }
 
@@ -64,7 +81,7 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
     walks.forEach(walk => {
       const walkDate = new Date(walk.date);
       const dateKey = walkDate.toISOString().split('T')[0];
-      
+
       if (data[dateKey]) {
         data[dateKey].distance += walk.distance;
         data[dateKey].count += 1;
@@ -88,23 +105,30 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
       totalWalks,
       totalDuration,
       avgDistance,
-      avgDuration
+      avgDuration,
     };
   }, [chartData]);
 
   // 커스텀 툴팁
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: Array<{
+      value: number;
+      payload: { distance: number; duration: number };
+    }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-medium">{label}</p>
-          <p className="text-blue-600">
-            거리: {formatDistance(data.distance)}
-          </p>
-          <p className="text-green-600">
-            산책 횟수: {data.count}회
-          </p>
+          <p className="text-blue-600">거리: {formatDistance(data.distance)}</p>
+          <p className="text-green-600">산책 횟수: {data.count}회</p>
           {data.duration > 0 && (
             <p className="text-purple-600">
               시간: {Math.floor(data.duration / 60)}분
@@ -147,7 +171,8 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-600">
-              {Math.floor(stats.totalDuration / 3600)}h {Math.floor((stats.totalDuration % 3600) / 60)}m
+              {Math.floor(stats.totalDuration / 3600)}h{' '}
+              {Math.floor((stats.totalDuration % 3600) / 60)}m
             </div>
             <div className="text-xs text-muted-foreground">총 시간</div>
           </div>
@@ -165,21 +190,17 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
             {chartType === 'line' ? (
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="date" 
-                  fontSize={12}
-                  tick={{ fontSize: 12 }}
-                />
-                <YAxis 
-                  tickFormatter={(value) => formatDistance(value)}
+                <XAxis dataKey="date" fontSize={12} tick={{ fontSize: 12 }} />
+                <YAxis
+                  tickFormatter={value => formatDistance(value)}
                   fontSize={12}
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Line 
-                  type="monotone" 
-                  dataKey="distance" 
-                  stroke="#3b82f6" 
+                <Line
+                  type="monotone"
+                  dataKey="distance"
+                  stroke="#3b82f6"
                   strokeWidth={2}
                   dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6 }}
@@ -188,22 +209,14 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
             ) : (
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="date" 
-                  fontSize={12}
-                  tick={{ fontSize: 12 }}
-                />
-                <YAxis 
-                  tickFormatter={(value) => formatDistance(value)}
+                <XAxis dataKey="date" fontSize={12} tick={{ fontSize: 12 }} />
+                <YAxis
+                  tickFormatter={value => formatDistance(value)}
                   fontSize={12}
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar 
-                  dataKey="distance" 
-                  fill="#3b82f6" 
-                  radius={[2, 2, 0, 0]}
-                />
+                <Bar dataKey="distance" fill="#3b82f6" radius={[2, 2, 0, 0]} />
               </BarChart>
             )}
           </ResponsiveContainer>
@@ -211,28 +224,28 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
 
         {/* 기간 선택 버튼 (향후 확장용) */}
         <div className="flex justify-center mt-4 space-x-2">
-          <button 
+          <button
             className={`px-3 py-1 text-xs rounded ${
-              period === 'week' 
-                ? 'bg-blue-500 text-white' 
+              period === 'week'
+                ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
             주간
           </button>
-          <button 
+          <button
             className={`px-3 py-1 text-xs rounded ${
-              period === 'month' 
-                ? 'bg-blue-500 text-white' 
+              period === 'month'
+                ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
             월간
           </button>
-          <button 
+          <button
             className={`px-3 py-1 text-xs rounded ${
-              period === 'year' 
-                ? 'bg-blue-500 text-white' 
+              period === 'year'
+                ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >

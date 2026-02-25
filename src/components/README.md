@@ -35,34 +35,35 @@ src/components/
 
 ```tsx
 // ✅ UI 컴포넌트 패턴 (Button.tsx 예제)
-import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
 
 // Variant 스타일 정의
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
+        destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
+        outline:
+          'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
+        secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
+        link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        default: 'h-9 px-4 py-2',
+        sm: 'h-8 rounded-md px-3 text-xs',
+        lg: 'h-10 rounded-md px-8',
+        icon: 'h-9 w-9',
       },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default",
+      variant: 'default',
+      size: 'default',
     },
   }
 );
@@ -77,17 +78,13 @@ export interface ButtonProps
 // forwardRef를 사용한 컴포넌트 정의
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
+    const Comp = asChild ? Slot : 'button';
     return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
+      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
     );
   }
 );
-Button.displayName = "Button";
+Button.displayName = 'Button';
 
 export { Button, buttonVariants };
 ```
@@ -129,11 +126,15 @@ const DogForm: React.FC<DogFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
-  className
+  className,
 }) => {
   // 1. Hooks 선언부
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { control, handleSubmit, formState: { errors } } = useForm<DogFormData>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<DogFormData>();
 
   // 2. 이벤트 핸들러 정의
   const handleFormSubmit = async (data: DogFormData) => {
@@ -146,7 +147,7 @@ const DogForm: React.FC<DogFormProps> = ({
 
   // 3. 렌더링
   return (
-    <Card className={cn("max-w-2xl mx-auto", className)}>
+    <Card className={cn('max-w-2xl mx-auto', className)}>
       <CardHeader>
         <CardTitle>{dog ? '강아지 정보 수정' : '새 강아지 등록'}</CardTitle>
       </CardHeader>
@@ -176,35 +177,22 @@ export default DogForm;
 
 ```tsx
 // ✅ 레이아웃 컴포넌트 패턴 (Header.tsx 예제)
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { Menu, ChevronDown } from "lucide-react";
-import Image from "next/image";
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuthSupabase';
+import { useDogs } from '@/hooks/useDogs';
+import { Menu, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Header() {
-  // 1. State 관리
-  const [user, setUser] = useState<User | null>(null);
+  // 1. 인증 & 데이터 훅
+  const { user, isAuthenticated, logout } = useAuth();
+  const { data: dogList = [] } = useDogs();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // 2. Effects
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      // Additional logic...
-    });
-    
-    return unsubscribe;
-  }, []);
-
-  // 3. 렌더링
-  return (
-    <header className="bg-white shadow-sm border-b">
-      {/* Header content */}
-    </header>
-  );
+  // 2. 렌더링
+  return <header className="bg-white shadow-sm border-b">{/* Header content */}</header>;
 }
 ```
 
@@ -234,7 +222,7 @@ export interface ComponentProps {
   // 필수 props
   title: string;
   onSubmit: (data: FormData) => Promise<void>;
-  
+
   // 선택적 props
   className?: string;
   isLoading?: boolean;
@@ -270,9 +258,11 @@ export interface ComponentNameProps {
 }
 
 // 2. 컴포넌트 정의
-const ComponentName: React.FC<ComponentNameProps> = ({
-  // Props 구조분해할당
-}) => {
+const ComponentName: React.FC<ComponentNameProps> = (
+  {
+    // Props 구조분해할당
+  }
+) => {
   // 3. Hooks (useState, useEffect, custom hooks)
   const [state, setState] = useState();
 
@@ -291,11 +281,7 @@ const ComponentName: React.FC<ComponentNameProps> = ({
   if (error) return <div>Error: {error.message}</div>;
 
   // 7. 메인 렌더링
-  return (
-    <div className={cn("base-classes", className)}>
-      {/* 컴포넌트 내용 */}
-    </div>
-  );
+  return <div className={cn('base-classes', className)}>{/* 컴포넌트 내용 */}</div>;
 };
 
 // 8. displayName 설정 (forwardRef 사용 시)
@@ -317,15 +303,15 @@ const Button = ({ variant, size, disabled }: ButtonProps) => {
     <button
       className={cn(
         // 기본 스타일
-        "inline-flex items-center justify-center rounded-md font-medium transition-colors",
+        'inline-flex items-center justify-center rounded-md font-medium transition-colors',
         // 조건부 스타일
         {
-          "bg-primary text-white hover:bg-primary/90": variant === 'primary',
-          "bg-gray-100 text-gray-900 hover:bg-gray-200": variant === 'secondary',
-          "opacity-50 cursor-not-allowed": disabled,
-          "h-8 px-3 text-xs": size === 'sm',
-          "h-10 px-4 text-sm": size === 'md',
-          "h-12 px-6 text-base": size === 'lg',
+          'bg-primary text-white hover:bg-primary/90': variant === 'primary',
+          'bg-gray-100 text-gray-900 hover:bg-gray-200': variant === 'secondary',
+          'opacity-50 cursor-not-allowed': disabled,
+          'h-8 px-3 text-xs': size === 'sm',
+          'h-10 px-4 text-sm': size === 'md',
+          'h-12 px-6 text-base': size === 'lg',
         },
         className
       )}
@@ -340,9 +326,9 @@ const Button = ({ variant, size, disabled }: ButtonProps) => {
 
 ```tsx
 // ✅ 테마 색상 활용
-className="bg-primary text-primary-foreground"  // 테마 색상
-className="bg-card text-card-foreground"        // 카드 색상
-className="border-border"                       // 테마 보더
+className = 'bg-primary text-primary-foreground'; // 테마 색상
+className = 'bg-card text-card-foreground'; // 카드 색상
+className = 'border-border'; // 테마 보더
 ```
 
 ---
@@ -354,11 +340,7 @@ className="border-border"                       // 테마 보더
 ```tsx
 // ✅ 메모이제이션이 필요한 컴포넌트
 const DogCard = React.memo<DogCardProps>(({ dog, onEdit, onDelete }) => {
-  return (
-    <Card>
-      {/* 카드 내용 */}
-    </Card>
-  );
+  return <Card>{/* 카드 내용 */}</Card>;
 });
 ```
 
@@ -367,9 +349,12 @@ const DogCard = React.memo<DogCardProps>(({ dog, onEdit, onDelete }) => {
 ```tsx
 const DogList: React.FC<DogListProps> = ({ dogs, onEdit, onDelete }) => {
   // ✅ 콜백 함수 메모이제이션
-  const handleEdit = useCallback((id: string) => {
-    onEdit(id);
-  }, [onEdit]);
+  const handleEdit = useCallback(
+    (id: string) => {
+      onEdit(id);
+    },
+    [onEdit]
+  );
 
   // ✅ 비싼 계산 메모이제이션
   const sortedDogs = useMemo(() => {
@@ -379,12 +364,7 @@ const DogList: React.FC<DogListProps> = ({ dogs, onEdit, onDelete }) => {
   return (
     <div>
       {sortedDogs.map(dog => (
-        <DogCard 
-          key={dog.id} 
-          dog={dog} 
-          onEdit={handleEdit}
-          onDelete={onDelete}
-        />
+        <DogCard key={dog.id} dog={dog} onEdit={handleEdit} onDelete={onDelete} />
       ))}
     </div>
   );
@@ -404,10 +384,7 @@ interface ErrorBoundaryState {
   error?: Error;
 }
 
-class ErrorBoundary extends React.Component<
-  React.PropsWithChildren<{}>,
-  ErrorBoundaryState
-> {
+class ErrorBoundary extends React.Component<React.PropsWithChildren<{}>, ErrorBoundaryState> {
   constructor(props: React.PropsWithChildren<{}>) {
     super(props);
     this.state = { hasError: false };
@@ -510,7 +487,7 @@ const mockDog = {
 describe('DogCard', () => {
   it('강아지 정보를 올바르게 렌더링한다', () => {
     render(<DogCard dog={mockDog} onEdit={jest.fn()} onDelete={jest.fn()} />);
-    
+
     expect(screen.getByText('멍멍이')).toBeInTheDocument();
     expect(screen.getByText('골든 리트리버')).toBeInTheDocument();
     expect(screen.getByText('3살')).toBeInTheDocument();
@@ -519,7 +496,7 @@ describe('DogCard', () => {
   it('수정 버튼 클릭 시 onEdit 콜백이 호출된다', () => {
     const mockOnEdit = jest.fn();
     render(<DogCard dog={mockDog} onEdit={mockOnEdit} onDelete={jest.fn()} />);
-    
+
     fireEvent.click(screen.getByText('수정'));
     expect(mockOnEdit).toHaveBeenCalledWith(mockDog.id);
   });
@@ -575,25 +552,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 ### **2. 스크린 리더 지원**
 
 ```tsx
-const Button: React.FC<ButtonProps> = ({ 
-  children, 
-  ariaLabel, 
-  isLoading,
-  ...props 
-}) => {
+const Button: React.FC<ButtonProps> = ({ children, ariaLabel, isLoading, ...props }) => {
   return (
-    <button
-      {...props}
-      aria-label={ariaLabel}
-      aria-busy={isLoading}
-      disabled={isLoading}
-    >
-      {isLoading && (
-        <span aria-hidden="true" className="loader" />
-      )}
-      <span className={isLoading ? 'sr-only' : undefined}>
-        {children}
-      </span>
+    <button {...props} aria-label={ariaLabel} aria-busy={isLoading} disabled={isLoading}>
+      {isLoading && <span aria-hidden="true" className="loader" />}
+      <span className={isLoading ? 'sr-only' : undefined}>{children}</span>
     </button>
   );
 };
@@ -606,28 +569,33 @@ const Button: React.FC<ButtonProps> = ({
 새로운 컴포넌트를 작성할 때 다음 체크리스트를 확인하세요:
 
 ### **코드 품질**
+
 - [ ] TypeScript Props 인터페이스 정의
 - [ ] ESLint/Prettier 규칙 준수
 - [ ] 적절한 네이밍 컨벤션 사용
 - [ ] displayName 설정 (forwardRef 사용 시)
 
 ### **성능**
+
 - [ ] 불필요한 리렌더링 방지 (memo, useCallback, useMemo)
 - [ ] 적절한 key props 사용
 - [ ] 이벤트 핸들러 최적화
 
 ### **접근성**
+
 - [ ] 적절한 ARIA 속성 사용
 - [ ] 키보드 네비게이션 지원
 - [ ] 스크린 리더 호환성
 - [ ] 색상 대비 및 포커스 표시
 
 ### **테스팅**
+
 - [ ] 주요 기능에 대한 유닛 테스트
 - [ ] 사용자 인터랙션 테스트
 - [ ] 접근성 테스트
 
 ### **문서화**
+
 - [ ] JSDoc 주석 (복잡한 로직의 경우)
 - [ ] Props 문서화
 - [ ] 사용 예제 제공

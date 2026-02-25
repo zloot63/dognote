@@ -52,16 +52,16 @@ const Radio: React.FC<RadioProps> = ({
   return (
     <div className="space-y-3">
       {label && (
-        <label className="text-sm font-medium leading-none">
-          {label}
-        </label>
+        <label className="text-sm font-medium leading-none">{label}</label>
       )}
-      
-      <div className={cn(
-        'space-y-2',
-        orientation === 'horizontal' && 'flex flex-wrap gap-4 space-y-0'
-      )}>
-        {options?.map((option) => (
+
+      <div
+        className={cn(
+          'space-y-2',
+          orientation === 'horizontal' && 'flex flex-wrap gap-4 space-y-0'
+        )}
+      >
+        {options?.map(option => (
           <div key={option.value} className="flex items-start space-x-2">
             <div className="relative flex items-center">
               <input
@@ -69,7 +69,9 @@ const Radio: React.FC<RadioProps> = ({
                 id={`${name}-${option.value}`}
                 name={name}
                 value={option.value}
-                checked={value ? value === option.value : defaultValue === option.value}
+                checked={
+                  value ? value === option.value : defaultValue === option.value
+                }
                 disabled={option.disabled}
                 onChange={() => handleChange(option.value)}
                 className={cn(
@@ -79,17 +81,25 @@ const Radio: React.FC<RadioProps> = ({
                 )}
               />
               {/* Custom radio indicator */}
-              <div className={cn(
-                'pointer-events-none absolute inset-0 flex items-center justify-center',
-                sizeStyles[size]
-              )}>
-                <div className={cn(
-                  'rounded-full bg-primary opacity-0 peer-checked:opacity-100 transition-opacity',
-                  size === 'sm' ? 'h-1.5 w-1.5' : size === 'md' ? 'h-2 w-2' : 'h-2.5 w-2.5'
-                )} />
+              <div
+                className={cn(
+                  'pointer-events-none absolute inset-0 flex items-center justify-center',
+                  sizeStyles[size]
+                )}
+              >
+                <div
+                  className={cn(
+                    'rounded-full bg-primary opacity-0 peer-checked:opacity-100 transition-opacity',
+                    size === 'sm'
+                      ? 'h-1.5 w-1.5'
+                      : size === 'md'
+                        ? 'h-2 w-2'
+                        : 'h-2.5 w-2.5'
+                  )}
+                />
               </div>
             </div>
-            
+
             <div className="grid gap-1.5 leading-none">
               <label
                 htmlFor={`${name}-${option.value}`}
@@ -103,10 +113,12 @@ const Radio: React.FC<RadioProps> = ({
                 {option.label}
               </label>
               {option.description && (
-                <p className={cn(
-                  'text-muted-foreground',
-                  size === 'sm' ? 'text-xs' : 'text-sm'
-                )}>
+                <p
+                  className={cn(
+                    'text-muted-foreground',
+                    size === 'sm' ? 'text-xs' : 'text-sm'
+                  )}
+                >
                   {option.description}
                 </p>
               )}
@@ -114,10 +126,8 @@ const Radio: React.FC<RadioProps> = ({
           </div>
         ))}
       </div>
-      
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+
+      {error && <p className="text-sm text-destructive">{error}</p>}
       {helperText && !error && (
         <p className="text-sm text-muted-foreground">{helperText}</p>
       )}

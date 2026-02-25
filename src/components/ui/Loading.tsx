@@ -1,43 +1,37 @@
 import React from 'react';
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 // Spinner variants using cva
-const spinnerVariants = cva(
-  "animate-spin text-current",
-  {
-    variants: {
-      size: {
-        sm: "h-4 w-4",
-        md: "h-6 w-6",
-        lg: "h-8 w-8",
-        xl: "h-12 w-12",
-      },
+const spinnerVariants = cva('animate-spin text-current', {
+  variants: {
+    size: {
+      sm: 'h-4 w-4',
+      md: 'h-6 w-6',
+      lg: 'h-8 w-8',
+      xl: 'h-12 w-12',
     },
-    defaultVariants: {
-      size: "md",
-    },
-  }
-);
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+});
 
 // Skeleton variants using cva
-const skeletonVariants = cva(
-  "animate-pulse bg-muted",
-  {
-    variants: {
-      variant: {
-        text: "h-4 rounded",
-        circular: "rounded-full",
-        rectangular: "rounded",
-      },
+const skeletonVariants = cva('animate-pulse bg-muted', {
+  variants: {
+    variant: {
+      text: 'h-4 rounded',
+      circular: 'rounded-full',
+      rectangular: 'rounded',
     },
-    defaultVariants: {
-      variant: "rectangular",
-    },
-  }
-);
+  },
+  defaultVariants: {
+    variant: 'rectangular',
+  },
+});
 
-interface SpinnerProps 
+interface SpinnerProps
   extends React.SVGAttributes<SVGElement>,
     VariantProps<typeof spinnerVariants> {}
 
@@ -68,7 +62,7 @@ const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(
     );
   }
 );
-Spinner.displayName = "Spinner";
+Spinner.displayName = 'Spinner';
 
 // Loading component with text
 interface LoadingProps extends VariantProps<typeof spinnerVariants> {
@@ -79,10 +73,10 @@ interface LoadingProps extends VariantProps<typeof spinnerVariants> {
 const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
   ({ text = '로딩 중...', size = 'md', className }, ref) => {
     return (
-      <div 
+      <div
         ref={ref}
         className={cn(
-          "flex flex-col items-center justify-center space-y-2 p-4",
+          'flex flex-col items-center justify-center space-y-2 p-4',
           className
         )}
       >
@@ -92,7 +86,7 @@ const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
     );
   }
 );
-Loading.displayName = "Loading";
+Loading.displayName = 'Loading';
 
 // Enhanced Skeleton with more options
 interface EnhancedSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -102,23 +96,30 @@ interface EnhancedSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   lines?: number;
 }
 
-const EnhancedSkeleton = React.forwardRef<HTMLDivElement, EnhancedSkeletonProps>(
-  ({ className, variant = 'rectangular', width, height, lines = 1, ...props }, ref) => {
-    const baseClasses = "animate-pulse bg-muted";
-    
+const EnhancedSkeleton = React.forwardRef<
+  HTMLDivElement,
+  EnhancedSkeletonProps
+>(
+  (
+    { className, variant = 'rectangular', width, height, lines = 1, ...props },
+    ref
+  ) => {
+    const baseClasses = 'animate-pulse bg-muted';
+
     const variantClasses = {
-      text: "h-4 rounded",
-      circular: "rounded-full",
-      rectangular: "rounded",
+      text: 'h-4 rounded',
+      circular: 'rounded-full',
+      rectangular: 'rounded',
     };
 
     const style: React.CSSProperties = {};
     if (width) style.width = typeof width === 'number' ? `${width}px` : width;
-    if (height) style.height = typeof height === 'number' ? `${height}px` : height;
+    if (height)
+      style.height = typeof height === 'number' ? `${height}px` : height;
 
     if (variant === 'text' && lines > 1) {
       return (
-        <div ref={ref} className={cn("space-y-2", className)} {...props}>
+        <div ref={ref} className={cn('space-y-2', className)} {...props}>
           {Array.from({ length: lines }).map((_, index) => (
             <div
               key={index}
@@ -140,15 +141,15 @@ const EnhancedSkeleton = React.forwardRef<HTMLDivElement, EnhancedSkeletonProps>
     );
   }
 );
-EnhancedSkeleton.displayName = "EnhancedSkeleton";
+EnhancedSkeleton.displayName = 'EnhancedSkeleton';
 
 // Card Skeleton component
-interface CardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CardSkeletonProps = React.HTMLAttributes<HTMLDivElement>;
 
 const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(
   ({ className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn("space-y-3 p-4", className)} {...props}>
+      <div ref={ref} className={cn('space-y-3 p-4', className)} {...props}>
         <EnhancedSkeleton className="h-4 w-3/4" />
         <EnhancedSkeleton className="h-4 w-1/2" />
         <EnhancedSkeleton className="h-20 w-full" />
@@ -156,7 +157,7 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(
     );
   }
 );
-CardSkeleton.displayName = "CardSkeleton";
+CardSkeleton.displayName = 'CardSkeleton';
 
 // List Skeleton component
 interface ListSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -166,7 +167,7 @@ interface ListSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 const ListSkeleton = React.forwardRef<HTMLDivElement, ListSkeletonProps>(
   ({ items = 3, className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn("space-y-3", className)} {...props}>
+      <div ref={ref} className={cn('space-y-3', className)} {...props}>
         {Array.from({ length: items }).map((_, index) => (
           <div key={index} className="flex items-center space-x-3">
             <EnhancedSkeleton variant="circular" className="h-12 w-12" />
@@ -180,14 +181,14 @@ const ListSkeleton = React.forwardRef<HTMLDivElement, ListSkeletonProps>(
     );
   }
 );
-ListSkeleton.displayName = "ListSkeleton";
+ListSkeleton.displayName = 'ListSkeleton';
 
-export { 
-  Spinner, 
-  Loading, 
-  EnhancedSkeleton, 
-  CardSkeleton, 
-  ListSkeleton, 
+export {
+  Spinner,
+  Loading,
+  EnhancedSkeleton,
+  CardSkeleton,
+  ListSkeleton,
   spinnerVariants,
-  skeletonVariants
+  skeletonVariants,
 };

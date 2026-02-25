@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
 import React from 'react';
-import Header from "@/components/layout/Header";
-import BottomNav from "@/components/layout/BottomNav";
-import Footer from "@/components/layout/Footer";
+import Header from '@/components/layout/Header';
+import BottomNav from '@/components/layout/BottomNav';
+import Footer from '@/components/layout/Footer';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,12 +22,12 @@ const Layout: React.FC<LayoutProps> = ({
   showFooter = false,
   showWalkButton = true,
   variant = 'default',
-  className = ''
+  className = '',
 }) => {
   // 변형별 스타일 설정
   const getLayoutClasses = () => {
     const baseClasses = 'min-h-screen bg-gray-50';
-    
+
     switch (variant) {
       case 'dashboard':
         return `${baseClasses} bg-gradient-to-br from-blue-50 to-indigo-100`;
@@ -42,17 +42,17 @@ const Layout: React.FC<LayoutProps> = ({
 
   const getMainClasses = () => {
     let classes = 'flex-grow';
-    
+
     // 헤더가 있는 경우 상단 여백
     if (showHeader) {
       classes += ' pt-16'; // Header 높이만큼 여백
     }
-    
+
     // 하단 네비게이션이 있는 경우 하단 여백
     if (showBottomNav) {
       classes += ' pb-20'; // BottomNav 높이만큼 여백
     }
-    
+
     // 변형별 패딩
     switch (variant) {
       case 'dashboard':
@@ -67,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({
       default:
         classes += ' p-4';
     }
-    
+
     return classes;
   };
 
@@ -79,31 +79,26 @@ const Layout: React.FC<LayoutProps> = ({
           <Header />
         </div>
       )}
-      
+
       {/* 메인 컨텐츠 */}
       <main className={getMainClasses()}>
         {variant === 'dashboard' ? (
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto">{children}</div>
         ) : (
           children
         )}
       </main>
-      
+
       {/* 풀 푸터 (데스크톱용) */}
       {showFooter && (
         <div className="hidden md:block">
           <Footer variant="full" />
         </div>
       )}
-      
+
       {/* 하단 네비게이션 (모바일용) */}
       {showBottomNav && (
-        <BottomNav 
-          showWalkButton={showWalkButton}
-          className="md:hidden"
-        />
+        <BottomNav showWalkButton={showWalkButton} className="md:hidden" />
       )}
     </div>
   );

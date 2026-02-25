@@ -15,25 +15,25 @@ export interface SelectOption {
 }
 
 export interface CustomSelectProps {
+  id?: string;
   placeholder?: string;
   options: SelectOption[];
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
   onChange?: (value: string) => void; // DogList에서 사용하는 prop명
-  searchable?: boolean;
   disabled?: boolean;
   className?: string;
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
+  id,
   placeholder,
   options,
   value,
   defaultValue,
   onValueChange,
   onChange,
-  searchable = false,
   disabled = false,
   className,
 }) => {
@@ -49,11 +49,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       onValueChange={handleValueChange}
       disabled={disabled}
     >
-      <SelectTrigger className={className}>
+      <SelectTrigger className={className} id={id}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {options.map((option) => (
+        {options.map(option => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
           </SelectItem>

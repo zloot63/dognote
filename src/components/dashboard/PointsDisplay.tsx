@@ -20,7 +20,7 @@ interface PointsDisplayProps {
 
 const PointsDisplay: React.FC<PointsDisplayProps> = ({
   pointsData,
-  className = ''
+  className = '',
 }) => {
   const {
     totalPoints,
@@ -28,7 +28,7 @@ const PointsDisplay: React.FC<PointsDisplayProps> = ({
     weeklyPoints,
     todayPoints,
     rank = 'Bronze',
-    nextMilestone = 1000
+    nextMilestone = 1000,
   } = pointsData;
 
   // 다음 마일스톤까지 남은 포인트
@@ -38,24 +38,36 @@ const PointsDisplay: React.FC<PointsDisplayProps> = ({
   // 랭크별 색상 설정
   const getRankColor = (rank: string) => {
     switch (rank.toLowerCase()) {
-      case 'bronze': return 'bg-amber-600';
-      case 'silver': return 'bg-gray-400';
-      case 'gold': return 'bg-yellow-500';
-      case 'platinum': return 'bg-purple-500';
-      case 'diamond': return 'bg-blue-500';
-      default: return 'bg-gray-500';
+      case 'bronze':
+        return 'bg-amber-600';
+      case 'silver':
+        return 'bg-gray-400';
+      case 'gold':
+        return 'bg-yellow-500';
+      case 'platinum':
+        return 'bg-purple-500';
+      case 'diamond':
+        return 'bg-blue-500';
+      default:
+        return 'bg-gray-500';
     }
   };
 
   // 랭크별 아이콘
   const getRankIcon = (rank: string) => {
     switch (rank.toLowerCase()) {
-      case 'bronze': return '🥉';
-      case 'silver': return '🥈';
-      case 'gold': return '🥇';
-      case 'platinum': return '💎';
-      case 'diamond': return '💠';
-      default: return '🏅';
+      case 'bronze':
+        return '🥉';
+      case 'silver':
+        return '🥈';
+      case 'gold':
+        return '🥇';
+      case 'platinum':
+        return '💎';
+      case 'diamond':
+        return '💠';
+      default:
+        return '🏅';
     }
   };
 
@@ -75,9 +87,7 @@ const PointsDisplay: React.FC<PointsDisplayProps> = ({
           <div className="text-4xl font-bold text-blue-600 mb-2">
             {totalPoints.toLocaleString()}
           </div>
-          <div className="text-sm text-muted-foreground">
-            총 누적 포인트
-          </div>
+          <div className="text-sm text-muted-foreground">총 누적 포인트</div>
         </div>
 
         {/* 진행률 바 */}
@@ -85,11 +95,13 @@ const PointsDisplay: React.FC<PointsDisplayProps> = ({
           <div className="flex justify-between text-sm">
             <span>다음 마일스톤까지</span>
             <span className="font-medium">
-              {pointsToNext > 0 ? `${pointsToNext.toLocaleString()}P 남음` : '달성!'}
+              {pointsToNext > 0
+                ? `${pointsToNext.toLocaleString()}P 남음`
+                : '달성!'}
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3">
-            <div 
+            <div
               className="bg-blue-600 h-3 rounded-full transition-all duration-300"
               style={{ width: `${progressPercentage}%` }}
             />

@@ -22,41 +22,66 @@ export default function WalkTestPage() {
     startTime: null,
     duration: 0,
     distance: 0,
-    positions: []
+    positions: [],
   });
 
   const [showEndModal, setShowEndModal] = useState(false);
-  const [testPositions, setTestPositions] = useState<GPSPosition[]>([
+  const [testPositions] = useState<GPSPosition[]>([
     // 테스트용 GPS 위치 데이터 (서울 시내 산책 경로)
-    { lat: 37.5665, lng: 126.9780, timestamp: new Date().toISOString(), accuracy: 5 },
-    { lat: 37.5670, lng: 126.9785, timestamp: new Date(Date.now() + 30000).toISOString(), accuracy: 5 },
-    { lat: 37.5675, lng: 126.9790, timestamp: new Date(Date.now() + 60000).toISOString(), accuracy: 5 },
-    { lat: 37.5680, lng: 126.9795, timestamp: new Date(Date.now() + 90000).toISOString(), accuracy: 5 },
-    { lat: 37.5685, lng: 126.9800, timestamp: new Date(Date.now() + 120000).toISOString(), accuracy: 5 },
+    {
+      lat: 37.5665,
+      lng: 126.978,
+      timestamp: new Date().toISOString(),
+      accuracy: 5,
+    },
+    {
+      lat: 37.567,
+      lng: 126.9785,
+      timestamp: new Date(Date.now() + 30000).toISOString(),
+      accuracy: 5,
+    },
+    {
+      lat: 37.5675,
+      lng: 126.979,
+      timestamp: new Date(Date.now() + 60000).toISOString(),
+      accuracy: 5,
+    },
+    {
+      lat: 37.568,
+      lng: 126.9795,
+      timestamp: new Date(Date.now() + 90000).toISOString(),
+      accuracy: 5,
+    },
+    {
+      lat: 37.5685,
+      lng: 126.98,
+      timestamp: new Date(Date.now() + 120000).toISOString(),
+      accuracy: 5,
+    },
   ]);
 
   // 산책 시작 핸들러
   const handleWalkStart = (walkId: string) => {
-    console.log('산책 시작:', walkId);
+    console.warn('산책 시작:', walkId);
     setCurrentWalk(prev => ({
       ...prev,
       walkId,
       isActive: true,
       startTime: new Date(),
-      positions: [testPositions[0]] // 첫 번째 위치로 시작
+      positions: [testPositions[0]], // 첫 번째 위치로 시작
     }));
   };
 
   // 산책 종료 핸들러
   const handleWalkEnd = (walk: Walk) => {
-    console.log('산책 종료:', walk);
+    console.warn('산책 종료:', walk);
     setShowEndModal(true);
   };
 
   // 산책 완료 모달 제출 핸들러
   const handleWalkEndSubmit = (data: WalkEndData) => {
-    console.log('산책 완료 데이터:', data);
-    
+    console.warn('산책 완료 데이터:', data);
+
     // 산책 상태 초기화
     setCurrentWalk({
       walkId: null,
@@ -64,9 +89,9 @@ export default function WalkTestPage() {
       startTime: null,
       duration: 0,
       distance: 0,
-      positions: []
+      positions: [],
     });
-    
+
     setShowEndModal(false);
     alert('산책이 성공적으로 완료되었습니다!');
   };
@@ -74,14 +99,14 @@ export default function WalkTestPage() {
   // 테스트용 GPS 위치 시뮬레이션
   const simulateGPSTracking = () => {
     if (!currentWalk.isActive) return;
-    
+
     const nextPositionIndex = currentWalk.positions.length;
     if (nextPositionIndex < testPositions.length) {
       setCurrentWalk(prev => ({
         ...prev,
         positions: [...prev.positions, testPositions[nextPositionIndex]],
         duration: prev.duration + 30, // 30초씩 증가
-        distance: prev.distance + Math.random() * 50 + 20 // 20-70m씩 증가
+        distance: prev.distance + Math.random() * 50 + 20, // 20-70m씩 증가
       }));
     }
   };
@@ -94,7 +119,7 @@ export default function WalkTestPage() {
       startTime: null,
       duration: 0,
       distance: 0,
-      positions: []
+      positions: [],
     });
     setShowEndModal(false);
   };
@@ -136,20 +161,25 @@ export default function WalkTestPage() {
               데이터 리셋
             </button>
           </div>
-          
+
           {/* 현재 상태 표시 */}
           <div className="p-4 bg-muted rounded-lg">
             <h3 className="font-medium mb-2">현재 상태</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <span className="font-medium">상태:</span>{' '}
-                <span className={currentWalk.isActive ? 'text-green-600' : 'text-gray-600'}>
+                <span
+                  className={
+                    currentWalk.isActive ? 'text-green-600' : 'text-gray-600'
+                  }
+                >
                   {currentWalk.isActive ? '추적 중' : '대기 중'}
                 </span>
               </div>
               <div>
                 <span className="font-medium">시간:</span>{' '}
-                {Math.floor(currentWalk.duration / 60)}분 {currentWalk.duration % 60}초
+                {Math.floor(currentWalk.duration / 60)}분{' '}
+                {currentWalk.duration % 60}초
               </div>
               <div>
                 <span className="font-medium">거리:</span>{' '}
@@ -193,7 +223,7 @@ export default function WalkTestPage() {
                 <li>✅ 실시간 시간/거리 표시</li>
                 <li>✅ GPS 위치 수집 상태</li>
                 <li>✅ 하버사인 거리 계산</li>
-                <li>✅ Firestore 연동 (시뮬레이션)</li>
+                <li>✅ Supabase 연동 (시뮬레이션)</li>
                 <li>✅ 산책 종료 시 이슈/메모 입력</li>
                 <li>✅ 지도 경로 표시</li>
               </ul>
@@ -255,7 +285,7 @@ export default function WalkTestPage() {
           walkData={{
             duration: currentWalk.duration,
             distance: currentWalk.distance,
-            startTime: currentWalk.startTime || new Date()
+            startTime: currentWalk.startTime || new Date(),
           }}
           onClose={() => setShowEndModal(false)}
           onSubmit={handleWalkEndSubmit}

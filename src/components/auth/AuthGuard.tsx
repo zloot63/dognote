@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/hooks/useAuth";
-import { ReactNode } from "react";
+import { useAuth } from '@/hooks/useAuthSupabase';
+import { ReactNode } from 'react';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -9,10 +9,10 @@ interface AuthGuardProps {
 }
 
 export default function AuthGuard({ children, fallback }: AuthGuardProps) {
-  const { isLoading, isAuthenticated, requireAuth } = useAuth();
+  const { loading, isAuthenticated, requireAuth } = useAuth();
 
   // 로딩 중일 때 표시할 컴포넌트
-  if (isLoading) {
+  if (loading) {
     return (
       fallback || (
         <div className="flex justify-center items-center min-h-screen">

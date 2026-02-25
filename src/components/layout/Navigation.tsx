@@ -3,15 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Home, 
-  PawPrint, 
-  MapPin, 
-  Heart, 
-  Calendar, 
+import {
+  Home,
+  PawPrint,
+  MapPin,
+  Heart,
+  Calendar,
   Settings,
   Users,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
 
 interface NavigationItem {
@@ -32,7 +32,7 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({
   className = '',
   variant = 'sidebar',
-  showLabels = true
+  showLabels = true,
 }) => {
   const pathname = usePathname();
 
@@ -41,57 +41,57 @@ const Navigation: React.FC<NavigationProps> = ({
       id: 'dashboard',
       label: '대시보드',
       href: '/dashboard',
-      icon: Home
+      icon: Home,
     },
     {
       id: 'dogs',
       label: '반려견 관리',
       href: '/dogs',
-      icon: PawPrint
+      icon: PawPrint,
     },
     {
       id: 'walks',
       label: '산책',
       href: '/walks',
-      icon: MapPin
+      icon: MapPin,
     },
     {
       id: 'health',
       label: '건강 관리',
       href: '/health',
-      icon: Heart
+      icon: Heart,
     },
     {
       id: 'schedule',
       label: '일정',
       href: '/schedule',
-      icon: Calendar
+      icon: Calendar,
     },
     {
       id: 'community',
       label: '커뮤니티',
       href: '/community',
       icon: Users,
-      disabled: true
+      disabled: true,
     },
     {
       id: 'analytics',
       label: '통계',
       href: '/analytics',
       icon: BarChart3,
-      disabled: true
+      disabled: true,
     },
     {
       id: 'settings',
       label: '설정',
       href: '/settings',
-      icon: Settings
-    }
+      icon: Settings,
+    },
   ];
 
   const isActive = (href: string) => {
     if (!pathname) return false;
-    
+
     if (href === '/dashboard') {
       return pathname === '/' || pathname === '/dashboard';
     }
@@ -99,12 +99,13 @@ const Navigation: React.FC<NavigationProps> = ({
   };
 
   const getItemClasses = (item: NavigationItem) => {
-    const baseClasses = 'flex items-center transition-colors duration-200 rounded-lg';
-    const activeClasses = isActive(item.href) 
-      ? 'bg-blue-100 text-blue-700 font-medium' 
+    const baseClasses =
+      'flex items-center transition-colors duration-200 rounded-lg';
+    const activeClasses = isActive(item.href)
+      ? 'bg-blue-100 text-blue-700 font-medium'
       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900';
-    const disabledClasses = item.disabled 
-      ? 'opacity-50 cursor-not-allowed' 
+    const disabledClasses = item.disabled
+      ? 'opacity-50 cursor-not-allowed'
       : 'cursor-pointer';
 
     // 변형별 클래스
@@ -149,11 +150,7 @@ const Navigation: React.FC<NavigationProps> = ({
     const content = (
       <>
         <IconComponent className={getIconClasses()} />
-        {showLabels && (
-          <span className={getLabelClasses()}>
-            {item.label}
-          </span>
-        )}
+        {showLabels && <span className={getLabelClasses()}>{item.label}</span>}
         {item.badge && item.badge > 0 && (
           <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
             {item.badge > 99 ? '99+' : item.badge}
@@ -180,7 +177,7 @@ const Navigation: React.FC<NavigationProps> = ({
   // 변형별 컨테이너 클래스
   const getContainerClasses = () => {
     const baseClasses = className;
-    
+
     switch (variant) {
       case 'sidebar':
         return `${baseClasses} flex flex-col space-y-1`;

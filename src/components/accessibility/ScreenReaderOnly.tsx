@@ -1,6 +1,6 @@
 /**
  * 스크린 리더 전용 텍스트 컴포넌트
- * 
+ *
  * 시각적으로는 숨겨져 있지만 스크린 리더에는 읽혀지는 텍스트를 제공합니다.
  * WCAG 2.1 AA 준수를 위한 핵심 컴포넌트입니다.
  */
@@ -16,7 +16,7 @@ interface ScreenReaderOnlyProps {
 
 /**
  * ScreenReaderOnly 컴포넌트
- * 
+ *
  * @example
  * ```tsx
  * <button>
@@ -25,10 +25,10 @@ interface ScreenReaderOnlyProps {
  * </button>
  * ```
  */
-export const ScreenReaderOnly = ({ 
-  children, 
+export const ScreenReaderOnly = ({
+  children,
   className,
-  as: Component = 'span'
+  as: Component = 'span',
 }: ScreenReaderOnlyProps) => {
   return (
     <Component

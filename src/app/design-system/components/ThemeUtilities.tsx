@@ -1,5 +1,4 @@
 import React from 'react';
-import themeUtils from '@/lib/theme-utils';
 
 interface ThemeUtilitiesProps {
   className?: string;
@@ -56,7 +55,7 @@ const classes = themeUtils.cn(
 );`,
 
     createComponentClasses: `// 컴포넌트 클래스 생성하기
-const buttonClasses = themeUtils.createComponentClasses('button', 'primary', 'md');`
+const buttonClasses = themeUtils.createComponentClasses('button', 'primary', 'md');`,
   };
 
   return (
@@ -64,8 +63,9 @@ const buttonClasses = themeUtils.createComponentClasses('button', 'primary', 'md
       <div>
         <h3 className="text-xl font-semibold mb-4">테마 유틸리티</h3>
         <p className="mb-4">
-          DogNote 디자인 시스템은 일관된 테마 적용을 위한 다양한 유틸리티 함수를 제공합니다.
-          이 함수들은 색상, 간격, 폰트 크기 등의 디자인 토큰을 쉽게 사용할 수 있게 해줍니다.
+          DogNote 디자인 시스템은 일관된 테마 적용을 위한 다양한 유틸리티 함수를
+          제공합니다. 이 함수들은 색상, 간격, 폰트 크기 등의 디자인 토큰을 쉽게
+          사용할 수 있게 해줍니다.
         </p>
 
         {/* 테마 유틸리티 섹션 */}

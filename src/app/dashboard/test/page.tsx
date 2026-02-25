@@ -17,32 +17,32 @@ export default function DashboardTestPage() {
       id: '1',
       date: new Date().toISOString(),
       distance: 1500,
-      duration: 1800
+      duration: 1800,
     },
     {
       id: '2',
       date: new Date(Date.now() - 86400000).toISOString(),
       distance: 2200,
-      duration: 2400
+      duration: 2400,
     },
     {
       id: '3',
       date: new Date(Date.now() - 2 * 86400000).toISOString(),
       distance: 1800,
-      duration: 2100
+      duration: 2100,
     },
     {
       id: '4',
       date: new Date(Date.now() - 3 * 86400000).toISOString(),
       distance: 2500,
-      duration: 3000
+      duration: 3000,
     },
     {
       id: '5',
       date: new Date(Date.now() - 4 * 86400000).toISOString(),
       distance: 1200,
-      duration: 1500
-    }
+      duration: 1500,
+    },
   ];
 
   const mockPointsData = {
@@ -51,7 +51,7 @@ export default function DashboardTestPage() {
     weeklyPoints: 85,
     todayPoints: 15,
     rank: 'Silver',
-    nextMilestone: 2000
+    nextMilestone: 2000,
   };
 
   const mockWalkRecords = [
@@ -66,7 +66,7 @@ export default function DashboardTestPage() {
       status: 'completed' as const,
       rating: 4,
       issues: ['행동 문제'],
-      notes: '오늘은 다른 강아지들과 잘 어울렸어요!'
+      notes: '오늘은 다른 강아지들과 잘 어울렸어요!',
     },
     {
       id: '2',
@@ -77,7 +77,7 @@ export default function DashboardTestPage() {
       duration: 2400,
       dogNames: ['멍멍이'],
       status: 'completed' as const,
-      rating: 5
+      rating: 5,
     },
     {
       id: '3',
@@ -89,8 +89,8 @@ export default function DashboardTestPage() {
       dogNames: ['왈왈이'],
       status: 'completed' as const,
       rating: 3,
-      notes: '비가 와서 짧게 산책했어요.'
-    }
+      notes: '비가 와서 짧게 산책했어요.',
+    },
   ];
 
   const mockHealthRecords = [
@@ -101,7 +101,7 @@ export default function DashboardTestPage() {
       title: '종합백신 접종',
       status: 'upcoming' as const,
       dueDate: new Date(Date.now() + 7 * 86400000).toISOString(),
-      dogName: '멍멍이'
+      dogName: '멍멍이',
     },
     {
       id: '2',
@@ -110,7 +110,7 @@ export default function DashboardTestPage() {
       title: '정기 건강검진',
       status: 'overdue' as const,
       dueDate: new Date(Date.now() - 5 * 86400000).toISOString(),
-      dogName: '왈왈이'
+      dogName: '왈왈이',
     },
     {
       id: '3',
@@ -118,8 +118,8 @@ export default function DashboardTestPage() {
       type: 'weight' as const,
       title: '체중 측정',
       status: 'completed' as const,
-      dogName: '멍멍이'
-    }
+      dogName: '멍멍이',
+    },
   ];
 
   return (
@@ -150,37 +150,43 @@ export default function DashboardTestPage() {
               <h3 className="text-lg font-medium mb-2">포인트 현황</h3>
               <PointsDisplay pointsData={mockPointsData} />
             </div>
-            
+
             {/* 건강 요약 */}
             <div>
               <h3 className="text-lg font-medium mb-2">건강 관리 요약</h3>
-              <HealthSummary 
+              <HealthSummary
                 healthRecords={mockHealthRecords}
                 onViewAll={() => alert('건강 기록 전체 보기')}
                 onAddRecord={() => alert('건강 기록 추가')}
               />
             </div>
-            
+
             {/* 산책 통계 차트 */}
             <div className="lg:col-span-2">
               <h3 className="text-lg font-medium mb-2">산책 통계 차트</h3>
               <WalkStatsChart walks={mockWalkData} />
             </div>
-            
+
             {/* 최근 산책 기록 */}
             <div>
               <h3 className="text-lg font-medium mb-2">최근 산책 기록</h3>
-              <RecentWalksList 
+              <RecentWalksList
                 walks={mockWalkRecords}
                 onShowMore={() => alert('더 많은 산책 기록 보기')}
-                onWalkClick={(walkId) => alert(`산책 기록 ${walkId} 클릭`)}
+                onWalkClick={walkId => alert(`산책 기록 ${walkId} 클릭`)}
               />
             </div>
 
             {/* 차트 타입 테스트 */}
             <div>
-              <h3 className="text-lg font-medium mb-2">차트 타입 테스트 (Bar Chart)</h3>
-              <WalkStatsChart walks={mockWalkData} chartType="bar" period="week" />
+              <h3 className="text-lg font-medium mb-2">
+                차트 타입 테스트 (Bar Chart)
+              </h3>
+              <WalkStatsChart
+                walks={mockWalkData}
+                chartType="bar"
+                period="week"
+              />
             </div>
           </div>
         </section>

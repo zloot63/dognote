@@ -1,23 +1,27 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import LoginButton from "@/components/auth/LoginButton";
+import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import LoginButton from '@/components/auth/LoginButton';
 
 export default function LoginPage() {
   const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "authenticated") {
-      console.log("✅ 로그인 성공, 홈으로 이동");
-      router.replace("/"); // ✅ replace 사용 (뒤로가기 방지)
+    if (status === 'authenticated') {
+      console.warn('✅ 로그인 성공, 홈으로 이동');
+      router.replace('/'); // ✅ replace 사용 (뒤로가기 방지)
     }
-  }, [status, router]); 
+  }, [status, router]);
 
-  if (status === "loading") {
-    return <div className="flex justify-center items-center h-screen">🔄 로그인 상태 확인 중...</div>;
+  if (status === 'loading') {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        🔄 로그인 상태 확인 중...
+      </div>
+    );
   }
 
   return (

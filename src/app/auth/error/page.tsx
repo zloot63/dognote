@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AuthErrorPage() {
   const searchParams = useSearchParams();
-  const errorCode = searchParams?.get("error");
+  const errorCode = searchParams?.get('error');
 
   const getErrorMessage = (errorCode: string | null | undefined) => {
     switch (errorCode) {
-      case "Configuration":
-        return "서버 설정에 문제가 있습니다. 관리자에게 문의하세요.";
-      case "AccessDenied":
-        return "접근이 거부되었습니다. 권한을 확인해주세요.";
-      case "Verification":
-        return "인증 토큰이 만료되었거나 이미 사용되었습니다.";
-      case "Default":
-        return "로그인 중 오류가 발생했습니다.";
+      case 'Configuration':
+        return '서버 설정에 문제가 있습니다. 관리자에게 문의하세요.';
+      case 'AccessDenied':
+        return '접근이 거부되었습니다. 권한을 확인해주세요.';
+      case 'Verification':
+        return '인증 토큰이 만료되었거나 이미 사용되었습니다.';
+      case 'Default':
+        return '로그인 중 오류가 발생했습니다.';
       default:
-        return "알 수 없는 오류가 발생했습니다.";
+        return '알 수 없는 오류가 발생했습니다.';
     }
   };
 
@@ -42,13 +42,9 @@ export default function AuthErrorPage() {
               />
             </svg>
           </div>
-          
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            로그인 오류
-          </h2>
-          <p className="text-gray-600 mb-6">
-            {getErrorMessage(errorCode)}
-          </p>
+
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">로그인 오류</h2>
+          <p className="text-gray-600 mb-6">{getErrorMessage(errorCode)}</p>
         </div>
 
         <div className="space-y-4">
@@ -58,7 +54,7 @@ export default function AuthErrorPage() {
           >
             다시 로그인하기
           </Link>
-          
+
           <Link
             href="/"
             className="w-full flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"

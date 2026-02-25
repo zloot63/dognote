@@ -27,11 +27,15 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
   healthRecords,
   onViewAll,
   onAddRecord,
-  className = ''
+  className = '',
 }) => {
   // 상태별 기록 분류
-  const upcomingRecords = healthRecords.filter(record => record.status === 'upcoming');
-  const overdueRecords = healthRecords.filter(record => record.status === 'overdue');
+  const upcomingRecords = healthRecords.filter(
+    record => record.status === 'upcoming'
+  );
+  const overdueRecords = healthRecords.filter(
+    record => record.status === 'overdue'
+  );
   const recentRecords = healthRecords
     .filter(record => record.status === 'completed')
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -40,24 +44,36 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
   // 타입별 아이콘
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'vaccination': return '💉';
-      case 'checkup': return '🩺';
-      case 'medication': return '💊';
-      case 'symptom': return '🤒';
-      case 'weight': return '⚖️';
-      default: return '📋';
+      case 'vaccination':
+        return '💉';
+      case 'checkup':
+        return '🩺';
+      case 'medication':
+        return '💊';
+      case 'symptom':
+        return '🤒';
+      case 'weight':
+        return '⚖️';
+      default:
+        return '📋';
     }
   };
 
   // 타입별 한글명
   const getTypeName = (type: string) => {
     switch (type) {
-      case 'vaccination': return '예방접종';
-      case 'checkup': return '건강검진';
-      case 'medication': return '투약';
-      case 'symptom': return '증상';
-      case 'weight': return '체중측정';
-      default: return '기타';
+      case 'vaccination':
+        return '예방접종';
+      case 'checkup':
+        return '건강검진';
+      case 'medication':
+        return '투약';
+      case 'symptom':
+        return '증상';
+      case 'weight':
+        return '체중측정';
+      default:
+        return '기타';
     }
   };
 
@@ -76,7 +92,7 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -86,7 +102,7 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
     const targetDate = new Date(dateString);
     const diffTime = targetDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return '오늘';
     if (diffDays > 0) return `D-${diffDays}`;
     return `D+${Math.abs(diffDays)}`;
@@ -115,7 +131,7 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
         {/* 긴급/예정 알림 */}
         {(overdueRecords.length > 0 || upcomingRecords.length > 0) && (
           <div className="space-y-2">
-            {overdueRecords.map((record) => (
+            {overdueRecords.map(record => (
               <div
                 key={record.id}
                 className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg"
@@ -127,17 +143,16 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
                       {record.title}
                     </div>
                     <div className="text-xs text-red-600">
-                      {record.dogName} • {record.dueDate && getDday(record.dueDate)}
+                      {record.dogName} •{' '}
+                      {record.dueDate && getDday(record.dueDate)}
                     </div>
                   </div>
                 </div>
-                <Badge className="bg-red-500 text-white text-xs">
-                  지연
-                </Badge>
+                <Badge className="bg-red-500 text-white text-xs">지연</Badge>
               </div>
             ))}
 
-            {upcomingRecords.slice(0, 2).map((record) => (
+            {upcomingRecords.slice(0, 2).map(record => (
               <div
                 key={record.id}
                 className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg"
@@ -149,13 +164,12 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
                       {record.title}
                     </div>
                     <div className="text-xs text-blue-600">
-                      {record.dogName} • {record.dueDate && getDday(record.dueDate)}
+                      {record.dogName} •{' '}
+                      {record.dueDate && getDday(record.dueDate)}
                     </div>
                   </div>
                 </div>
-                <Badge className="bg-blue-500 text-white text-xs">
-                  예정
-                </Badge>
+                <Badge className="bg-blue-500 text-white text-xs">예정</Badge>
               </div>
             ))}
           </div>
@@ -168,7 +182,7 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
               최근 기록
             </h4>
             <div className="space-y-2">
-              {recentRecords.map((record) => (
+              {recentRecords.map(record => (
                 <div
                   key={record.id}
                   className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
@@ -176,9 +190,7 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
                   <div className="flex items-center space-x-3">
                     <span className="text-lg">{getTypeIcon(record.type)}</span>
                     <div>
-                      <div className="font-medium text-sm">
-                        {record.title}
-                      </div>
+                      <div className="font-medium text-sm">{record.title}</div>
                       <div className="text-xs text-muted-foreground">
                         {record.dogName} • {formatDate(record.date)}
                       </div>
@@ -197,9 +209,7 @@ const HealthSummary: React.FC<HealthSummaryProps> = ({
         {healthRecords.length === 0 && (
           <div className="text-center py-8">
             <div className="text-4xl mb-4">🏥</div>
-            <p className="text-muted-foreground mb-2">
-              건강 기록이 없습니다.
-            </p>
+            <p className="text-muted-foreground mb-2">건강 기록이 없습니다.</p>
             <p className="text-sm text-muted-foreground">
               반려견의 건강 관리를 시작해보세요.
             </p>

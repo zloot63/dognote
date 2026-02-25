@@ -11,7 +11,9 @@ import { Button } from '@/components/ui';
  * 레이아웃 컴포넌트 통합 테스트 페이지
  */
 export default function LayoutTestPage() {
-  const [currentVariant, setCurrentVariant] = useState<'default' | 'dashboard' | 'minimal' | 'auth'>('default');
+  const [currentVariant, setCurrentVariant] = useState<
+    'default' | 'dashboard' | 'minimal' | 'auth'
+  >('default');
   const [showHeader, setShowHeader] = useState(true);
   const [showBottomNav, setShowBottomNav] = useState(true);
   const [showFooter, setShowFooter] = useState(false);
@@ -21,7 +23,7 @@ export default function LayoutTestPage() {
     { key: 'default', label: '기본' },
     { key: 'dashboard', label: '대시보드' },
     { key: 'minimal', label: '미니멀' },
-    { key: 'auth', label: '인증' }
+    { key: 'auth', label: '인증' },
   ] as const;
 
   return (
@@ -51,7 +53,9 @@ export default function LayoutTestPage() {
           <CardContent className="space-y-6">
             {/* 변형 선택 */}
             <div>
-              <label className="block text-sm font-medium mb-2">레이아웃 변형</label>
+              <label className="block text-sm font-medium mb-2">
+                레이아웃 변형
+              </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {variants.map(({ key, label }) => (
                   <Button
@@ -73,37 +77,37 @@ export default function LayoutTestPage() {
                 <input
                   type="checkbox"
                   checked={showHeader}
-                  onChange={(e) => setShowHeader(e.target.checked)}
+                  onChange={e => setShowHeader(e.target.checked)}
                   className="rounded"
                 />
                 <span className="text-sm">헤더 표시</span>
               </label>
-              
+
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={showBottomNav}
-                  onChange={(e) => setShowBottomNav(e.target.checked)}
+                  onChange={e => setShowBottomNav(e.target.checked)}
                   className="rounded"
                 />
                 <span className="text-sm">하단 네비</span>
               </label>
-              
+
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={showFooter}
-                  onChange={(e) => setShowFooter(e.target.checked)}
+                  onChange={e => setShowFooter(e.target.checked)}
                   className="rounded"
                 />
                 <span className="text-sm">푸터 표시</span>
               </label>
-              
+
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={showWalkButton}
-                  onChange={(e) => setShowWalkButton(e.target.checked)}
+                  onChange={e => setShowWalkButton(e.target.checked)}
                   className="rounded"
                 />
                 <span className="text-sm">산책 버튼</span>
@@ -114,11 +118,33 @@ export default function LayoutTestPage() {
             <div className="bg-gray-50 p-4 rounded-lg">
               <h4 className="font-medium mb-2">현재 설정</h4>
               <div className="text-sm text-gray-600 space-y-1">
-                <div>변형: <span className="font-medium">{currentVariant}</span></div>
-                <div>헤더: <span className="font-medium">{showHeader ? '표시' : '숨김'}</span></div>
-                <div>하단 네비: <span className="font-medium">{showBottomNav ? '표시' : '숨김'}</span></div>
-                <div>푸터: <span className="font-medium">{showFooter ? '표시' : '숨김'}</span></div>
-                <div>산책 버튼: <span className="font-medium">{showWalkButton ? '표시' : '숨김'}</span></div>
+                <div>
+                  변형: <span className="font-medium">{currentVariant}</span>
+                </div>
+                <div>
+                  헤더:{' '}
+                  <span className="font-medium">
+                    {showHeader ? '표시' : '숨김'}
+                  </span>
+                </div>
+                <div>
+                  하단 네비:{' '}
+                  <span className="font-medium">
+                    {showBottomNav ? '표시' : '숨김'}
+                  </span>
+                </div>
+                <div>
+                  푸터:{' '}
+                  <span className="font-medium">
+                    {showFooter ? '표시' : '숨김'}
+                  </span>
+                </div>
+                <div>
+                  산책 버튼:{' '}
+                  <span className="font-medium">
+                    {showWalkButton ? '표시' : '숨김'}
+                  </span>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -182,15 +208,15 @@ export default function LayoutTestPage() {
 
         {/* 샘플 컨텐츠 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
+          {[1, 2, 3, 4, 5, 6].map(i => (
             <Card key={i}>
               <CardHeader>
                 <CardTitle>샘플 카드 {i}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  레이아웃 테스트를 위한 샘플 컨텐츠입니다. 
-                  다양한 화면 크기에서 레이아웃이 어떻게 동작하는지 확인할 수 있습니다.
+                  레이아웃 테스트를 위한 샘플 컨텐츠입니다. 다양한 화면 크기에서
+                  레이아웃이 어떻게 동작하는지 확인할 수 있습니다.
                 </p>
                 <Button className="mt-4 w-full" size="sm">
                   테스트 버튼 {i}

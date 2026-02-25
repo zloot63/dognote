@@ -1,8 +1,3 @@
-import { Timestamp, FieldValue } from "firebase/firestore";
-
-/**
- * 읽기 시점: Firestore에서 문서를 가져올 때
- */
 export interface Schedule {
   id: string;
   dogId: string;
@@ -10,23 +5,10 @@ export interface Schedule {
   type: string;
   title?: string;
   description?: string;
-  scheduledAt: Timestamp; // 실제 Timestamp
+  scheduledAt: string | Date;
   completed: boolean;
-  createdAt: Timestamp;
-  updatedAt?: Timestamp;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
 }
 
-/**
- * 쓰기 시점: Firestore에 문서를 저장할 때
- */
-export interface ScheduleWrite {
-  dogId: string;
-  userId: string;
-  type: string;
-  title?: string;
-  description?: string;
-  scheduledAt: FieldValue | Timestamp; // serverTimestamp() or Timestamp
-  completed: boolean;
-  createdAt: FieldValue | Timestamp;
-  updatedAt: FieldValue | Timestamp;
-}
+export type ScheduleWrite = Omit<Schedule, 'id'>;

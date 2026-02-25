@@ -31,7 +31,7 @@ import {
   CardDescription,
   CardContent,
   DatePicker,
-  DateRangePicker
+  DateRangePicker,
 } from '@/components/ui';
 import {
   Home,
@@ -45,7 +45,6 @@ import {
   Download,
   Lock,
   Trash2,
-  Calendar
 } from 'lucide-react';
 
 // 실제 useToast 훅 사용
@@ -61,8 +60,11 @@ export default function UITestPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [dateRange, setDateRange] = useState<{from: Date | undefined, to: Date | undefined}>({from: undefined, to: undefined});
-  
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({ from: undefined, to: undefined });
+
   const { toast } = useToast();
 
   const handleLoadingDemo = () => {
@@ -75,7 +77,7 @@ export default function UITestPage() {
   // 브레드크럼 아이템
   const breadcrumbItems = [
     { label: '홈', href: '/', icon: <Home className="h-4 w-4" /> },
-    { label: 'UI 테스트', href: '/ui-test' }
+    { label: 'UI 테스트', href: '/ui-test' },
   ];
 
   return (
@@ -88,7 +90,8 @@ export default function UITestPage() {
             UI 컴포넌트 테스트
           </h1>
           <p className="text-lg text-neutral-600">
-            DogNote 프로젝트의 모든 UI 컴포넌트를 테스트하고 확인할 수 있는 페이지입니다.
+            DogNote 프로젝트의 모든 UI 컴포넌트를 테스트하고 확인할 수 있는
+            페이지입니다.
           </p>
         </div>
 
@@ -125,7 +128,9 @@ export default function UITestPage() {
 
                 {/* 아이콘 버튼 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">아이콘 버튼</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    아이콘 버튼
+                  </h4>
                   <div className="flex gap-3">
                     <Button variant="outline" size="sm">
                       <Heart className="h-4 w-4 mr-2" />
@@ -164,12 +169,14 @@ export default function UITestPage() {
               <div className="space-y-6">
                 {/* 입력 필드 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">입력 필드</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    입력 필드
+                  </h4>
                   <div className="grid gap-4 md:grid-cols-2">
                     <Input
                       placeholder="기본 입력 필드"
                       value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
+                      onChange={e => setInputValue(e.target.value)}
                     />
                     <div className="relative">
                       <Input
@@ -191,33 +198,44 @@ export default function UITestPage() {
                         placeholder="오류 상태"
                         className="border-red-300 focus:border-red-500"
                       />
-                      <p className="text-sm text-red-600">필수 입력 항목입니다</p>
+                      <p className="text-sm text-red-600">
+                        필수 입력 항목입니다
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 {/* 텍스트 영역 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">텍스트 영역</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    텍스트 영역
+                  </h4>
                   <Textarea
                     placeholder="여러 줄 텍스트를 입력하세요..."
                     value={textareaValue}
-                    onChange={(e) => setTextareaValue(e.target.value)}
+                    onChange={e => setTextareaValue(e.target.value)}
                     rows={4}
                   />
                 </div>
 
                 {/* 체크박스 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">체크박스</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    체크박스
+                  </h4>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         checked={isChecked}
-                        onCheckedChange={(checked) => setIsChecked(checked === true)}
+                        onCheckedChange={checked =>
+                          setIsChecked(checked === true)
+                        }
                         id="checkbox-1"
                       />
-                      <label htmlFor="checkbox-1" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      <label
+                        htmlFor="checkbox-1"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
                         기본 체크박스
                       </label>
                     </div>
@@ -227,7 +245,10 @@ export default function UITestPage() {
                         onCheckedChange={() => {}}
                         id="checkbox-2"
                       />
-                      <label htmlFor="checkbox-2" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      <label
+                        htmlFor="checkbox-2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
                         선택된 체크박스
                       </label>
                     </div>
@@ -238,7 +259,10 @@ export default function UITestPage() {
                         disabled
                         id="checkbox-3"
                       />
-                      <label htmlFor="checkbox-3" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      <label
+                        htmlFor="checkbox-3"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
                         비활성화된 체크박스
                       </label>
                     </div>
@@ -247,7 +271,9 @@ export default function UITestPage() {
 
                 {/* 라디오 버튼 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">라디오 버튼</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    라디오 버튼
+                  </h4>
                   <Radio
                     name="radio-group"
                     value={selectedRadio}
@@ -255,14 +281,16 @@ export default function UITestPage() {
                     options={[
                       { value: 'option1', label: '옵션 1' },
                       { value: 'option2', label: '옵션 2' },
-                      { value: 'option3', label: '옵션 3' }
+                      { value: 'option3', label: '옵션 3' },
                     ]}
                   />
                 </div>
 
                 {/* 셀렉트 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">셀렉트</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    셀렉트
+                  </h4>
                   <Select value={selectValue} onValueChange={setSelectValue}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="옵션을 선택하세요" />
@@ -277,18 +305,26 @@ export default function UITestPage() {
 
                 {/* 날짜 선택 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">날짜 선택</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    날짜 선택
+                  </h4>
                   <div className="grid gap-4 md:grid-cols-2">
                     <DatePicker
                       label="날짜 선택"
                       value={selectedDate || undefined}
-                      onChange={(date) => setSelectedDate(date)}
+                      onChange={date => setSelectedDate(date)}
                       placeholder="날짜를 선택하세요"
                     />
                     <DateRangePicker
                       label="기간 선택"
                       value={dateRange}
-                      onChange={(range) => setDateRange(range ? {from: range.from, to: range.to} : {from: undefined, to: undefined})}
+                      onChange={range =>
+                        setDateRange(
+                          range
+                            ? { from: range.from, to: range.to }
+                            : { from: undefined, to: undefined }
+                        )
+                      }
                       placeholder="기간을 선택하세요"
                     />
                   </div>
@@ -325,7 +361,9 @@ export default function UITestPage() {
 
                 {/* 아바타 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">아바타</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    아바타
+                  </h4>
                   <div className="flex items-center gap-4">
                     <Avatar className="h-8 w-8" />
                     <Avatar className="h-10 w-10" />
@@ -339,7 +377,9 @@ export default function UITestPage() {
 
                 {/* 프로그레스 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">프로그레스</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    프로그레스
+                  </h4>
                   <div className="space-y-4">
                     <Progress value={progressValue} />
                     <Progress value={25} className="[&>div]:bg-green-500" />
@@ -361,11 +401,17 @@ export default function UITestPage() {
 
                 {/* 스켈레톤 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">스켈레톤</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    스켈레톤
+                  </h4>
                   <div className="space-y-4">
                     <EnhancedSkeleton variant="text" lines={3} />
                     <div className="flex items-center space-x-3">
-                      <EnhancedSkeleton variant="circular" width={40} height={40} />
+                      <EnhancedSkeleton
+                        variant="circular"
+                        width={40}
+                        height={40}
+                      />
                       <div className="flex-1">
                         <EnhancedSkeleton variant="text" />
                         <EnhancedSkeleton variant="text" width="60%" />
@@ -393,25 +439,51 @@ export default function UITestPage() {
                 {/* 모달 */}
                 <div>
                   <h4 className="font-semibold text-neutral-800 mb-3">모달</h4>
-                  <Button onClick={() => setModalOpen(true)}>
-                    모달 열기
-                  </Button>
+                  <Button onClick={() => setModalOpen(true)}>모달 열기</Button>
                 </div>
 
                 {/* 토스트 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">토스트 알림</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    토스트 알림
+                  </h4>
                   <div className="flex flex-wrap gap-3">
-                    <Button size="sm" onClick={() => toast.success('성공!', '작업이 성공적으로 완료되었습니다.')}>
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        toast.success(
+                          '성공!',
+                          '작업이 성공적으로 완료되었습니다.'
+                        )
+                      }
+                    >
                       성공 토스트
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => toast.error('오류!', '문제가 발생했습니다.')}>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() =>
+                        toast.error('오류!', '문제가 발생했습니다.')
+                      }
+                    >
                       오류 토스트
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => toast.warning('경고!', '주의가 필요합니다.')}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        toast.warning('경고!', '주의가 필요합니다.')
+                      }
+                    >
                       경고 토스트
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => toast.info('정보', '새로운 정보가 있습니다.')}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        toast.info('정보', '새로운 정보가 있습니다.')
+                      }
+                    >
                       정보 토스트
                     </Button>
                   </div>
@@ -454,25 +526,43 @@ export default function UITestPage() {
               <div className="space-y-6">
                 {/* 컨테이너 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">컨테이너</h4>
-                  <Container size="md" padding="sm" className="bg-neutral-100 border border-neutral-200">
-                    <p className="text-center text-neutral-700">중간 크기의 컨테이너</p>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    컨테이너
+                  </h4>
+                  <Container
+                    size="md"
+                    padding="sm"
+                    className="bg-neutral-100 border border-neutral-200"
+                  >
+                    <p className="text-center text-neutral-700">
+                      중간 크기의 컨테이너
+                    </p>
                   </Container>
                 </div>
 
                 {/* 그리드 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">그리드</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    그리드
+                  </h4>
                   <Grid cols={3} gap="md">
-                    <div className="bg-primary-100 p-4 rounded-lg text-center">그리드 1</div>
-                    <div className="bg-primary-100 p-4 rounded-lg text-center">그리드 2</div>
-                    <div className="bg-primary-100 p-4 rounded-lg text-center">그리드 3</div>
+                    <div className="bg-primary-100 p-4 rounded-lg text-center">
+                      그리드 1
+                    </div>
+                    <div className="bg-primary-100 p-4 rounded-lg text-center">
+                      그리드 2
+                    </div>
+                    <div className="bg-primary-100 p-4 rounded-lg text-center">
+                      그리드 3
+                    </div>
                   </Grid>
                 </div>
 
                 {/* 구분선 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">구분선</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    구분선
+                  </h4>
                   <div className="space-y-4">
                     <p>위 내용</p>
                     <Divider />
@@ -484,12 +574,16 @@ export default function UITestPage() {
 
                 {/* 카드 변형 */}
                 <div>
-                  <h4 className="font-semibold text-neutral-800 mb-3">카드 변형</h4>
+                  <h4 className="font-semibold text-neutral-800 mb-3">
+                    카드 변형
+                  </h4>
                   <div className="grid gap-4 md:grid-cols-2">
                     <Card className="border">
                       <CardHeader>
                         <CardTitle>기본 카드</CardTitle>
-                        <CardDescription>기본 스타일의 카드입니다.</CardDescription>
+                        <CardDescription>
+                          기본 스타일의 카드입니다.
+                        </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p>카드 내용이 여기에 표시됩니다.</p>
@@ -499,7 +593,9 @@ export default function UITestPage() {
                     <Card className="shadow-lg">
                       <CardHeader>
                         <CardTitle>엘리베이티드 카드</CardTitle>
-                        <CardDescription>그림자가 있는 카드입니다.</CardDescription>
+                        <CardDescription>
+                          그림자가 있는 카드입니다.
+                        </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p>그림자 효과가 적용된 카드입니다.</p>
@@ -509,7 +605,9 @@ export default function UITestPage() {
                     <Card className="border hover:shadow-md cursor-pointer transition-shadow">
                       <CardHeader>
                         <CardTitle>인터랙티브 카드</CardTitle>
-                        <CardDescription>클릭 가능한 카드입니다.</CardDescription>
+                        <CardDescription>
+                          클릭 가능한 카드입니다.
+                        </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p>마우스 호버 효과가 있는 카드입니다.</p>
@@ -519,7 +617,9 @@ export default function UITestPage() {
                     <Card className="bg-neutral-50 border">
                       <CardHeader>
                         <CardTitle>채워진 카드</CardTitle>
-                        <CardDescription>배경색이 있는 카드입니다.</CardDescription>
+                        <CardDescription>
+                          배경색이 있는 카드입니다.
+                        </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p>배경색이 적용된 카드입니다.</p>
@@ -536,8 +636,8 @@ export default function UITestPage() {
       {/* 모달 */}
       <Modal
         open={modalOpen}
-        onClose={(reason) => {
-          console.log('Modal closed due to:', reason);
+        onClose={reason => {
+          console.warn('Modal closed due to:', reason);
           setModalOpen(false);
         }}
         title="테스트 모달"
@@ -550,13 +650,10 @@ export default function UITestPage() {
             <Button variant="outline" onClick={() => setModalOpen(false)}>
               취소
             </Button>
-            <Button onClick={() => setModalOpen(false)}>
-              확인
-            </Button>
+            <Button onClick={() => setModalOpen(false)}>확인</Button>
           </div>
         </div>
       </Modal>
-
     </div>
   );
 }

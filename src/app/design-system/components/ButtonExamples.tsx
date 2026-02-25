@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button} from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 
 interface ButtonExamplesProps {
   className?: string;
@@ -9,7 +9,7 @@ interface ButtonExamplesProps {
  * 버튼 컴포넌트 예제 모음
  * 다양한 변형과 상태를 보여줌
  */
-export function ButtonExamples({className = ''}: ButtonExamplesProps) {
+export function ButtonExamples({ className = '' }: ButtonExamplesProps) {
   // 버튼 변형 목록 (실제 지원되는 variant만)
   const variants = [
     'default',
@@ -17,7 +17,7 @@ export function ButtonExamples({className = ''}: ButtonExamplesProps) {
     'outline',
     'ghost',
     'destructive',
-    'link'
+    'link',
   ] as const;
 
   return (
@@ -25,8 +25,8 @@ export function ButtonExamples({className = ''}: ButtonExamplesProps) {
       <div>
         <h3 className="text-xl font-semibold mb-4">버튼</h3>
         <p className="mb-4">
-          버튼은 사용자 액션을 유도하는 인터랙티브 요소입니다.
-          다양한 변형, 크기, 상태를 지원합니다.
+          버튼은 사용자 액션을 유도하는 인터랙티브 요소입니다. 다양한 변형,
+          크기, 상태를 지원합니다.
         </p>
 
         {/* 버튼 변형 */}
@@ -34,7 +34,7 @@ export function ButtonExamples({className = ''}: ButtonExamplesProps) {
           <div>
             <h4 className="font-medium mb-3">변형 (Variants)</h4>
             <div className="flex flex-wrap gap-4">
-              {variants.map((variant) => (
+              {variants.map(variant => (
                 <Button key={variant} variant={variant}>
                   {variant.charAt(0).toUpperCase() + variant.slice(1)}
                 </Button>
@@ -73,25 +73,55 @@ export function ButtonExamples({className = ''}: ButtonExamplesProps) {
                   <div className="bg-primary-50 p-2 rounded text-xs">50</div>
                   <div className="bg-primary-100 p-2 rounded text-xs">100</div>
                   <div className="bg-primary-200 p-2 rounded text-xs">200</div>
-                  <div className="bg-primary-300 p-2 rounded text-xs text-white">300</div>
-                  <div className="bg-primary-400 p-2 rounded text-xs text-white">400</div>
-                  <div className="bg-primary-500 p-2 rounded text-xs text-white">500</div>
-                  <div className="bg-primary-600 p-2 rounded text-xs text-white">600</div>
-                  <div className="bg-primary-700 p-2 rounded text-xs text-white">700</div>
-                  <div className="bg-primary-800 p-2 rounded text-xs text-white">800</div>
-                  <div className="bg-primary-900 p-2 rounded text-xs text-white">900</div>
-                  <div className="bg-primary-950 p-2 rounded text-xs text-white">950</div>
+                  <div className="bg-primary-300 p-2 rounded text-xs text-white">
+                    300
+                  </div>
+                  <div className="bg-primary-400 p-2 rounded text-xs text-white">
+                    400
+                  </div>
+                  <div className="bg-primary-500 p-2 rounded text-xs text-white">
+                    500
+                  </div>
+                  <div className="bg-primary-600 p-2 rounded text-xs text-white">
+                    600
+                  </div>
+                  <div className="bg-primary-700 p-2 rounded text-xs text-white">
+                    700
+                  </div>
+                  <div className="bg-primary-800 p-2 rounded text-xs text-white">
+                    800
+                  </div>
+                  <div className="bg-primary-900 p-2 rounded text-xs text-white">
+                    900
+                  </div>
+                  <div className="bg-primary-950 p-2 rounded text-xs text-white">
+                    950
+                  </div>
                 </div>
               </div>
               <div>
-                <h5 className="text-sm font-medium mb-2">Custom Primary Buttons</h5>
+                <h5 className="text-sm font-medium mb-2">
+                  Custom Primary Buttons
+                </h5>
                 <div className="flex flex-wrap gap-2">
-                  <button className="bg-primary-300 text-white px-4 py-2 rounded">300</button>
-                  <button className="bg-primary-600 text-white px-4 py-2 rounded">600</button>
-                  <button className="bg-primary-700 text-white px-4 py-2 rounded">700</button>
-                  <button className="bg-primary-800 text-white px-4 py-2 rounded">800</button>
-                  <button className="bg-primary-900 text-white px-4 py-2 rounded">900</button>
-                  <button className="bg-primary-950 text-white px-4 py-2 rounded">950</button>
+                  <button className="bg-primary-300 text-white px-4 py-2 rounded">
+                    300
+                  </button>
+                  <button className="bg-primary-600 text-white px-4 py-2 rounded">
+                    600
+                  </button>
+                  <button className="bg-primary-700 text-white px-4 py-2 rounded">
+                    700
+                  </button>
+                  <button className="bg-primary-800 text-white px-4 py-2 rounded">
+                    800
+                  </button>
+                  <button className="bg-primary-900 text-white px-4 py-2 rounded">
+                    900
+                  </button>
+                  <button className="bg-primary-950 text-white px-4 py-2 rounded">
+                    950
+                  </button>
                 </div>
               </div>
             </div>

@@ -1,7 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Checkbox, TextArea } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Badge,
+  Checkbox,
+  TextArea,
+} from '@/components/ui';
 import { formatDistance, formatDuration } from '@/lib/gps';
 import { cn } from '@/lib/utils';
 
@@ -48,7 +57,7 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
   walkData,
   onClose,
   onSubmit,
-  isLoading = false
+  isLoading = false,
 }) => {
   const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
@@ -59,7 +68,7 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
 
   // 이슈 선택/해제 처리
   const handleIssueToggle = (issueId: string) => {
-    setSelectedIssues(prev => 
+    setSelectedIssues(prev =>
       prev.includes(issueId)
         ? prev.filter(id => id !== issueId)
         : [...prev, issueId]
@@ -69,24 +78,27 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
   // 폼 제출 처리
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const walkEndData: WalkEndData = {
       issues: selectedIssues,
       notes: notes.trim(),
-      rating
+      rating,
     };
-    
+
     onSubmit(walkEndData);
   };
 
   // 이슈를 카테고리별로 그룹화
-  const issuesByCategory = WALK_ISSUES.reduce((acc, issue) => {
-    if (!acc[issue.category]) {
-      acc[issue.category] = [];
-    }
-    acc[issue.category].push(issue);
-    return acc;
-  }, {} as Record<string, typeof WALK_ISSUES>);
+  const issuesByCategory = WALK_ISSUES.reduce(
+    (acc, issue) => {
+      if (!acc[issue.category]) {
+        acc[issue.category] = [];
+      }
+      acc[issue.category].push(issue);
+      return acc;
+    },
+    {} as Record<string, typeof WALK_ISSUES>
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
@@ -98,14 +110,14 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
             <span>거리: {formatDistance(walkData.distance)}</span>
           </div>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 산책 평가 */}
             <div className="space-y-3">
               <label className="text-sm font-medium">산책 만족도</label>
               <div className="flex justify-center space-x-2">
-                {[1, 2, 3, 4, 5].map((star) => (
+                {[1, 2, 3, 4, 5].map(star => (
                   <button
                     key={star}
                     type="button"
@@ -133,15 +145,18 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
               <label className="text-sm font-medium">
                 산책 중 발생한 이슈 (해당사항 선택)
               </label>
-              
+
               {Object.entries(issuesByCategory).map(([category, issues]) => (
                 <div key={category} className="space-y-2">
                   <h4 className="text-sm font-medium text-muted-foreground">
                     {category}
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {issues.map((issue) => (
-                      <div key={issue.id} className="flex items-center space-x-2">
+                    {issues.map(issue => (
+                      <div
+                        key={issue.id}
+                        className="flex items-center space-x-2"
+                      >
                         <Checkbox
                           checked={selectedIssues.includes(issue.id)}
                           onChange={() => handleIssueToggle(issue.id)}
@@ -161,7 +176,7 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
               <div className="space-y-2">
                 <label className="text-sm font-medium">선택된 이슈</label>
                 <div className="flex flex-wrap gap-2">
-                  {selectedIssues.map((issueId) => {
+                  {selectedIssues.map(issueId => {
                     const issue = WALK_ISSUES.find(i => i.id === issueId);
                     return (
                       <Badge key={issueId} variant="secondary">
@@ -180,7 +195,9 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
               </label>
               <TextArea
                 value={notes}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNotes(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setNotes(e.target.value)
+                }
                 placeholder="산책 중 특별한 사항이나 반려견의 상태에 대해 기록해주세요..."
                 rows={4}
                 maxLength={500}
@@ -201,11 +218,7 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
               >
                 취소
               </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="flex-1"
-              >
+              <Button type="submit" disabled={isLoading} className="flex-1">
                 {isLoading ? '저장 중...' : '산책 완료'}
               </Button>
             </div>

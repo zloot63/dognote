@@ -9,7 +9,7 @@ describe('Layout', () => {
         <div data-testid="test-content">테스트 콘텐츠</div>
       </Layout>
     );
-    
+
     expect(screen.getByText('테스트 제목')).toBeInTheDocument();
     expect(screen.getByText('테스트 설명')).toBeInTheDocument();
     expect(screen.getByTestId('test-content')).toBeInTheDocument();
@@ -21,7 +21,7 @@ describe('Layout', () => {
         <div data-testid="test-content">테스트 콘텐츠</div>
       </Layout>
     );
-    
+
     expect(screen.getByTestId('test-content')).toBeInTheDocument();
     expect(screen.getByText('테스트 콘텐츠')).toBeInTheDocument();
   });
@@ -32,7 +32,7 @@ describe('Layout', () => {
         <div data-testid="test-content">테스트 콘텐츠</div>
       </Layout>
     );
-    
+
     expect(screen.getByText('테스트 제목만 있음')).toBeInTheDocument();
     expect(screen.getByTestId('test-content')).toBeInTheDocument();
     // 설명이 없으므로 description 요소가 없어야 함

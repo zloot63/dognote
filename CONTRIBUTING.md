@@ -3,6 +3,7 @@
 Thanks for your interest in contributing to **DogNote**!
 
 We welcome all kinds of contributions, including:
+
 - Bug reports
 - Feature requests
 - Code improvements
@@ -14,7 +15,7 @@ We welcome all kinds of contributions, including:
 2. Create a new branch (`git checkout -b your-feature`)
 3. Make your changes
 4. Commit and push (`git commit -m "feat: add new feature"`)
-5. Submit a pull request 
+5. Submit a pull request
 
 Please make sure your code is clean and well-documented.
 

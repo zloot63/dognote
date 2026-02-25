@@ -1,12 +1,12 @@
 /**
  * 성능 모니터링 시스템
- * 
+ *
  * 이 모듈은 DogNote 애플리케이션의 성능을 모니터링하고
  * 메트릭을 수집하여 성능 최적화에 도움을 제공합니다.
- * 
+ *
  * 주요 기능:
  * - Core Web Vitals 측정 (FCP, LCP, CLS, FID)
- * - Firebase 성능 모니터링 연동
+ * - 성능 모니터링
  * - 커스텀 성능 메트릭 추적
  * - 성능 경고 및 알림
  */
@@ -35,17 +35,20 @@ class PerformanceMonitor {
    * Core Web Vitals 임계값
    */
   private readonly THRESHOLDS = {
-    FCP: { good: 1800, poor: 3000 },  // First Contentful Paint
-    LCP: { good: 2500, poor: 4000 },  // Largest Contentful Paint
-    CLS: { good: 0.1, poor: 0.25 },   // Cumulative Layout Shift
-    FID: { good: 100, poor: 300 },    // First Input Delay
-    INP: { good: 200, poor: 500 },    // Interaction to Next Paint
+    FCP: { good: 1800, poor: 3000 }, // First Contentful Paint
+    LCP: { good: 2500, poor: 4000 }, // Largest Contentful Paint
+    CLS: { good: 0.1, poor: 0.25 }, // Cumulative Layout Shift
+    FID: { good: 100, poor: 300 }, // First Input Delay
+    INP: { good: 200, poor: 500 }, // Interaction to Next Paint
   } as const;
 
   /**
    * 성능 메트릭 등급 결정
    */
-  private getRating(name: keyof typeof this.THRESHOLDS, value: number): 'good' | 'needs-improvement' | 'poor' {
+  private getRating(
+    name: keyof typeof this.THRESHOLDS,
+    value: number
+  ): 'good' | 'needs-improvement' | 'poor' {
     const threshold = this.THRESHOLDS[name];
     if (value <= threshold.good) return 'good';
     if (value <= threshold.poor) return 'needs-improvement';
@@ -59,9 +62,10 @@ class PerformanceMonitor {
     const metric: PerformanceMetric = {
       name,
       value,
-      rating: name in this.THRESHOLDS 
-        ? this.getRating(name as keyof typeof this.THRESHOLDS, value)
-        : 'good',
+      rating:
+        name in this.THRESHOLDS
+          ? this.getRating(name as keyof typeof this.THRESHOLDS, value)
+          : 'good',
       timestamp: Date.now(),
     };
 
@@ -75,7 +79,7 @@ class PerformanceMonitor {
 
     // 개발 환경에서 디버그 로깅
     if (!this.isProduction) {
-      console.log(`📊 Performance: ${name} = ${value}ms (${metric.rating})`);
+      console.warn(`📊 Performance: ${name} = ${value}ms (${metric.rating})`);
     }
   }
 
@@ -84,10 +88,10 @@ class PerformanceMonitor {
    */
   handleWebVitals(metric: WebVitalsMetric): void {
     this.recordMetric(metric.name, metric.value);
-    
-    // Firebase Performance Monitoring에 전송 (프로덕션)
+
+    // 성능 모니터링 서비스에 전송 (프로덕션)
     if (this.isProduction) {
-      this.sendToFirebasePerformance(metric);
+      this.sendToAnalytics(metric);
     }
   }
 
@@ -111,17 +115,17 @@ class PerformanceMonitor {
     try {
       performance.mark(`${name}-end`);
       performance.measure(name, `${name}-start`, `${name}-end`);
-      
+
       const measure = performance.getEntriesByName(name, 'measure')[0];
       const duration = measure?.duration || 0;
-      
+
       this.recordMetric(name, duration);
-      
+
       // 측정 마크 정리
       performance.clearMarks(`${name}-start`);
       performance.clearMarks(`${name}-end`);
       performance.clearMeasures(name);
-      
+
       return duration;
     } catch (error) {
       console.error('Performance measurement error:', error);
@@ -139,14 +143,18 @@ class PerformanceMonitor {
 
     window.addEventListener('load', () => {
       setTimeout(() => {
-        const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-        
+        const navigation = performance.getEntriesByType(
+          'navigation'
+        )[0] as PerformanceNavigationTiming;
+
         if (navigation) {
           // 주요 로드 메트릭 계산
           const ttfb = navigation.responseStart - navigation.requestStart;
-          const domLoad = navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart;
+          const domLoad =
+            navigation.domContentLoadedEventEnd -
+            navigation.domContentLoadedEventStart;
           const pageLoad = navigation.loadEventEnd - navigation.loadEventStart;
-          
+
           this.recordMetric('TTFB', ttfb);
           this.recordMetric('DOM-Load', domLoad);
           this.recordMetric('Page-Load', pageLoad);
@@ -154,7 +162,7 @@ class PerformanceMonitor {
 
         // Paint 메트릭 측정
         const paintEntries = performance.getEntriesByType('paint');
-        paintEntries.forEach((entry) => {
+        paintEntries.forEach(entry => {
           this.recordMetric(entry.name.toUpperCase(), entry.startTime);
         });
       }, 0);
@@ -167,18 +175,24 @@ class PerformanceMonitor {
   monitorResourceLoading(): void {
     if (typeof window === 'undefined') return;
 
-    const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
+    const observer = new PerformanceObserver(list => {
+      list.getEntries().forEach(entry => {
         if (entry.entryType === 'resource') {
           const resourceEntry = entry as PerformanceResourceTiming;
-          
+
           // 큰 리소스나 느린 로딩 감지
-          if (resourceEntry.transferSize > 500000) { // 500KB 이상
-            console.warn(`🚨 Large Resource: ${resourceEntry.name} (${Math.round(resourceEntry.transferSize / 1024)}KB)`);
+          if (resourceEntry.transferSize > 500000) {
+            // 500KB 이상
+            console.warn(
+              `🚨 Large Resource: ${resourceEntry.name} (${Math.round(resourceEntry.transferSize / 1024)}KB)`
+            );
           }
-          
-          if (resourceEntry.duration > 2000) { // 2초 이상
-            console.warn(`🚨 Slow Resource: ${resourceEntry.name} (${Math.round(resourceEntry.duration)}ms)`);
+
+          if (resourceEntry.duration > 2000) {
+            // 2초 이상
+            console.warn(
+              `🚨 Slow Resource: ${resourceEntry.name} (${Math.round(resourceEntry.duration)}ms)`
+            );
           }
         }
       });
@@ -188,16 +202,15 @@ class PerformanceMonitor {
   }
 
   /**
-   * Firebase Performance에 메트릭 전송 (프로덕션)
+   * 성능 메트릭 전송 (프로덕션)
    */
-  private sendToFirebasePerformance(metric: WebVitalsMetric): void {
+  private sendToAnalytics(metric: WebVitalsMetric): void {
     if (typeof window === 'undefined') return;
 
     try {
-      // Firebase Performance SDK 사용 예시
-      // 실제 구현에서는 Firebase Performance SDK를 import 해야 함
-      if ((window as any).gtag) {
-        (window as any).gtag('event', metric.name, {
+      const gtag = (window as { gtag?: (...args: unknown[]) => void }).gtag;
+      if (gtag) {
+        gtag('event', metric.name, {
           event_category: 'Web Vitals',
           value: Math.round(metric.value),
           metric_rating: metric.rating,
@@ -205,7 +218,7 @@ class PerformanceMonitor {
         });
       }
     } catch (error) {
-      console.error('Failed to send metric to Firebase:', error);
+      console.error('Failed to send performance metric:', error);
     }
   }
 
@@ -225,7 +238,7 @@ class PerformanceMonitor {
           timestamp: metric.timestamp,
           userAgent: navigator.userAgent,
           url: window.location.href,
-        })
+        }),
       }).catch(error => {
         console.error('Failed to send performance alert:', error);
       });
@@ -255,7 +268,11 @@ class PerformanceMonitor {
   } {
     const summary = this.metrics.reduce(
       (acc, metric) => {
-        acc[metric.rating === 'needs-improvement' ? 'needsImprovement' : metric.rating]++;
+        acc[
+          metric.rating === 'needs-improvement'
+            ? 'needsImprovement'
+            : metric.rating
+        ]++;
         return acc;
       },
       { good: 0, needsImprovement: 0, poor: 0 }
@@ -279,20 +296,22 @@ export function initPerformanceMonitoring(): void {
   if (typeof window === 'undefined') return;
 
   // Core Web Vitals 측정 (web-vitals 라이브러리 사용)
-  import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB, onINP }) => {
-    onFCP(performanceMonitor.handleWebVitals.bind(performanceMonitor));
-    onLCP(performanceMonitor.handleWebVitals.bind(performanceMonitor));
-    onCLS(performanceMonitor.handleWebVitals.bind(performanceMonitor));
-    onFID(performanceMonitor.handleWebVitals.bind(performanceMonitor));
-    onTTFB(performanceMonitor.handleWebVitals.bind(performanceMonitor));
-    onINP(performanceMonitor.handleWebVitals.bind(performanceMonitor));
-  }).catch(error => {
-    console.error('Failed to load web-vitals:', error);
-  });
+  import('web-vitals')
+    .then(({ onCLS, onFID, onFCP, onLCP, onTTFB, onINP }) => {
+      onFCP(performanceMonitor.handleWebVitals.bind(performanceMonitor));
+      onLCP(performanceMonitor.handleWebVitals.bind(performanceMonitor));
+      onCLS(performanceMonitor.handleWebVitals.bind(performanceMonitor));
+      onFID(performanceMonitor.handleWebVitals.bind(performanceMonitor));
+      onTTFB(performanceMonitor.handleWebVitals.bind(performanceMonitor));
+      onINP(performanceMonitor.handleWebVitals.bind(performanceMonitor));
+    })
+    .catch(error => {
+      console.error('Failed to load web-vitals:', error);
+    });
 
   // 페이지 로드 성능 측정
   performanceMonitor.measurePageLoad();
-  
+
   // 리소스 로딩 모니터링
   performanceMonitor.monitorResourceLoading();
 }

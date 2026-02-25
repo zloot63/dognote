@@ -35,7 +35,7 @@ const RecentWalksList: React.FC<RecentWalksListProps> = ({
   showMoreButton = true,
   onShowMore,
   onWalkClick,
-  className = ''
+  className = '',
 }) => {
   // 최신 순으로 정렬하고 제한된 개수만 표시
   const displayWalks = walks
@@ -52,10 +52,10 @@ const RecentWalksList: React.FC<RecentWalksListProps> = ({
     if (diffDays === 0) return '오늘';
     if (diffDays === 1) return '어제';
     if (diffDays < 7) return `${diffDays}일 전`;
-    
+
     return date.toLocaleDateString('ko-KR', {
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -63,17 +63,17 @@ const RecentWalksList: React.FC<RecentWalksListProps> = ({
   const formatTime = (timeString: string) => {
     return new Date(timeString).toLocaleTimeString('ko-KR', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   // 평점 표시
   const renderRating = (rating?: number) => {
     if (!rating) return null;
-    
+
     return (
       <div className="flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map((star) => (
+        {[1, 2, 3, 4, 5].map(star => (
           <span
             key={star}
             className={`text-xs ${
@@ -96,9 +96,7 @@ const RecentWalksList: React.FC<RecentWalksListProps> = ({
         <CardContent>
           <div className="text-center py-8">
             <div className="text-4xl mb-4">🚶‍♂️</div>
-            <p className="text-muted-foreground">
-              아직 산책 기록이 없습니다.
-            </p>
+            <p className="text-muted-foreground">아직 산책 기록이 없습니다.</p>
             <p className="text-sm text-muted-foreground mt-2">
               첫 산책을 시작해보세요!
             </p>
@@ -113,17 +111,17 @@ const RecentWalksList: React.FC<RecentWalksListProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>최근 산책 기록</span>
-          <Badge variant="secondary">
-            {walks.length}개 기록
-          </Badge>
+          <Badge variant="secondary">{walks.length}개 기록</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {displayWalks.map((walk) => (
+        {displayWalks.map(walk => (
           <div
             key={walk.id}
             className={`p-4 border rounded-lg transition-colors cursor-pointer hover:bg-gray-50 ${
-              walk.status === 'active' ? 'border-green-200 bg-green-50' : 'border-gray-200'
+              walk.status === 'active'
+                ? 'border-green-200 bg-green-50'
+                : 'border-gray-200'
             }`}
             onClick={() => onWalkClick?.(walk.id)}
           >
@@ -170,7 +168,9 @@ const RecentWalksList: React.FC<RecentWalksListProps> = ({
             {/* 반려견 정보 */}
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="text-xs text-muted-foreground">함께한 반려견:</span>
+                <span className="text-xs text-muted-foreground">
+                  함께한 반려견:
+                </span>
                 <div className="flex space-x-1">
                   {walk.dogNames.map((name, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
@@ -187,7 +187,9 @@ const RecentWalksList: React.FC<RecentWalksListProps> = ({
               <div className="mt-3 pt-3 border-t border-gray-100">
                 {walk.issues && walk.issues.length > 0 && (
                   <div className="mb-2">
-                    <span className="text-xs text-muted-foreground">이슈: </span>
+                    <span className="text-xs text-muted-foreground">
+                      이슈:{' '}
+                    </span>
                     <span className="text-xs text-red-600">
                       {walk.issues.length}개 발생
                     </span>

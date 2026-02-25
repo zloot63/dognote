@@ -45,10 +45,10 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                   id="default-input"
                   placeholder="기본 입력 필드"
                   value={inputValues.default}
-                  onChange={(e) => handleChange('default', e.target.value)}
+                  onChange={e => handleChange('default', e.target.value)}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="filled-input">채워진 스타일</Label>
                 <Input
@@ -56,10 +56,10 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                   className="bg-neutral-100 border-0 focus:bg-white focus:ring-4 focus:ring-primary-100"
                   placeholder="채워진 입력 필드"
                   value={inputValues.filled}
-                  onChange={(e) => handleChange('filled', e.target.value)}
+                  onChange={e => handleChange('filled', e.target.value)}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="underlined-input">밑줄 스타일</Label>
                 <Input
@@ -67,10 +67,10 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                   className="border-0 border-b-2 border-neutral-200 bg-transparent rounded-none focus:border-primary-500 focus:ring-0"
                   placeholder="밑줄 입력 필드"
                   value={inputValues.underlined}
-                  onChange={(e) => handleChange('underlined', e.target.value)}
+                  onChange={e => handleChange('underlined', e.target.value)}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="error-input">오류 상태</Label>
                 <Input
@@ -78,7 +78,7 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                   className="border-2 border-error-300 focus:border-error-500 focus:ring-4 focus:ring-error-100"
                   placeholder="오류 입력 필드"
                   value={inputValues.error}
-                  onChange={(e) => handleChange('error', e.target.value)}
+                  onChange={e => handleChange('error', e.target.value)}
                 />
                 <p className="text-error-600 text-sm">이 필드는 필수입니다.</p>
               </div>
@@ -96,10 +96,10 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                   placeholder="비활성화된 입력 필드"
                   disabled
                   value={inputValues.disabled}
-                  onChange={(e) => handleChange('disabled', e.target.value)}
+                  onChange={e => handleChange('disabled', e.target.value)}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="readonly-input">읽기 전용 상태</Label>
                 <Input
@@ -126,7 +126,7 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
                   placeholder="검색어 입력..."
                   className="pl-10"
                   value={inputValues.withIcon}
-                  onChange={(e) => handleChange('withIcon', e.target.value)}
+                  onChange={e => handleChange('withIcon', e.target.value)}
                 />
               </div>
             </div>
@@ -136,9 +136,15 @@ export function InputExamples({ className = '' }: InputExamplesProps) {
           <div>
             <h4 className="font-medium mb-3">크기 (Sizes)</h4>
             <div className="space-y-4">
-              <Input className="h-8 text-xs px-2 py-1" placeholder="작은 크기 (Small)" />
+              <Input
+                className="h-8 text-xs px-2 py-1"
+                placeholder="작은 크기 (Small)"
+              />
               <Input placeholder="중간 크기 (Medium)" />
-              <Input className="h-12 text-lg px-4 py-3" placeholder="큰 크기 (Large)" />
+              <Input
+                className="h-12 text-lg px-4 py-3"
+                placeholder="큰 크기 (Large)"
+              />
             </div>
           </div>
         </div>

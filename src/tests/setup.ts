@@ -9,7 +9,7 @@ afterEach(() => {
 
 // Global test setup
 beforeAll(() => {
-  // Mock Firebase Auth
+  // Mock browser APIs
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: (query: string) => ({
@@ -26,11 +26,23 @@ beforeAll(() => {
 
   // Mock IntersectionObserver
   global.IntersectionObserver = class IntersectionObserver {
-    constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {}
+    constructor(
+      callback: IntersectionObserverCallback,
+      options?: IntersectionObserverInit
+    ) {
+      void callback;
+      void options;
+    }
     disconnect() {}
-    observe(target: Element) {}
-    unobserve(target: Element) {}
-    takeRecords(): IntersectionObserverEntry[] { return []; }
+    observe(target: Element) {
+      void target;
+    }
+    unobserve(target: Element) {
+      void target;
+    }
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
     readonly root: Element | Document | null = null;
     readonly rootMargin: string = '';
     readonly thresholds: ReadonlyArray<number> = [];

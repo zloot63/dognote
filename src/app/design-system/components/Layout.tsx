@@ -18,16 +18,10 @@ export function Layout({ title, description, children }: LayoutProps) {
         <h2 className="text-3xl font-bold text-neutral-900 capitalize">
           {title}
         </h2>
-        {description && (
-          <p className="text-neutral-600 mt-2">
-            {description}
-          </p>
-        )}
+        {description && <p className="text-neutral-600 mt-2">{description}</p>}
       </div>
 
-      <Card className="p-6">
-        {children}
-      </Card>
+      <Card className="p-6">{children}</Card>
     </div>
   );
 }
