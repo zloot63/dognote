@@ -163,7 +163,7 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
     if (!label) {
       return (
         <Separator
-          ref={ref as React.ForwardedRef<typeof Separator>}
+          ref={ref}
           className={className}
           orientation={orientation || undefined}
           variant={variant}
@@ -178,7 +178,7 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
       // 세로 방향에서는 라벨을 지원하지 않음
       return (
         <Separator
-          ref={ref as React.ForwardedRef<typeof Separator>}
+          ref={ref}
           className={className}
           orientation={orientation}
           variant={variant}

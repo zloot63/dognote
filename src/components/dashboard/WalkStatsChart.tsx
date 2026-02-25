@@ -118,7 +118,7 @@ const WalkStatsChart: React.FC<WalkStatsChartProps> = ({
     active?: boolean;
     payload?: Array<{
       value: number;
-      payload: { distance: number; duration: number };
+      payload: { distance: number; duration: number; count: number };
     }>;
     label?: string;
   }) => {

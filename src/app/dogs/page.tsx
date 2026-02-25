@@ -130,7 +130,7 @@ const DogsPage: React.FC = () => {
         return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
       }
     });
-  }, [dogs, pageState.searchQuery, pageState.sortBy, pageState.sortOrder]);
+  }, [dogs, pageState]);
 
   // === AI 자동화: 에러 처리 강화된 이벤트 핸들러들 ===
   const handleSortChange = useCallback(
@@ -229,7 +229,7 @@ const DogsPage: React.FC = () => {
 
         if (error instanceof Error && error.message) {
           errorMessage += ` (${error.message})`;
-        } else if (error?.code === 'PGRST116') {
+        } else if ((error as { code?: string }).code === 'PGRST116') {
           errorMessage =
             '데이터베이스 테이블이 없습니다. Supabase Dashboard에서 SQL을 실행해주세요.';
         }

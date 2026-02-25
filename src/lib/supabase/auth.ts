@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../supabase';
 import { AuthError, Session, User } from '@supabase/supabase-js';
 
 export interface AuthState {

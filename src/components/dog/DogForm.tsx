@@ -21,7 +21,7 @@ import {
   Button,
   Input,
   Label,
-  TextArea,
+  Textarea,
   Select,
   SelectTrigger,
   SelectValue,
@@ -632,7 +632,7 @@ const DogForm = memo<DogFormProps>(
                     render={({ field }) => (
                       <div className="space-y-2">
                         <Label htmlFor="dogDescription">설명</Label>
-                        <TextArea
+                        <Textarea
                           id="dogDescription"
                           placeholder="강아지에 대한 추가 정보를 입력하세요"
                           rows={3}

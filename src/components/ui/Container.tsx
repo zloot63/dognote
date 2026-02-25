@@ -105,7 +105,7 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(
   ) => {
     return (
       <Component
-        ref={ref as React.ForwardedRef<T>}
+        ref={ref as React.ForwardedRef<HTMLDivElement>}
         className={cn(
           containerVariants({ size, padding, center }),
           sectionVariants({ background, border, shadow }),

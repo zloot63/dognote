@@ -1,5 +1,11 @@
-import { supabase } from '@/lib/supabase';
-import { Dog, DogFormData } from '@/types/dog';
+import { supabase } from '../supabase';
+import {
+  Dog,
+  DogFormData,
+  isValidGender,
+  isValidDogSize,
+  isValidActivityLevel,
+} from '@/types/dog';
 
 export interface CreateDogData {
   name: string;
@@ -156,7 +162,8 @@ export class DogService {
       userId: dbDog.user_id,
       name: dbDog.name,
       breed: dbDog.breed || '',
-      gender: dbDog.gender || 'male',
+      gender:
+        dbDog.gender && isValidGender(dbDog.gender) ? dbDog.gender : 'male',
       birthDate: dbDog.birth_date || '',
       weight: dbDog.weight || 0,
       profileImage: dbDog.profile_image,
@@ -165,8 +172,11 @@ export class DogService {
       microchipId: dbDog.microchip_id,
       registrationNumber: dbDog.registration_number,
       color: dbDog.color || '',
-      size: dbDog.size || 'medium',
-      activityLevel: dbDog.activity_level || 'moderate',
+      size: dbDog.size && isValidDogSize(dbDog.size) ? dbDog.size : 'medium',
+      activityLevel:
+        dbDog.activity_level && isValidActivityLevel(dbDog.activity_level)
+          ? dbDog.activity_level
+          : 'moderate',
       temperament: dbDog.temperament || [],
       allergies: dbDog.allergies || [],
       medicalConditions: dbDog.medical_conditions || [],
@@ -181,8 +191,8 @@ export class DogService {
         phone: '',
         address: '',
       },
-      createdAt: dbDog.created_at,
-      updatedAt: dbDog.updated_at,
+      createdAt: dbDog.created_at || new Date().toISOString(),
+      updatedAt: dbDog.updated_at || new Date().toISOString(),
     };
   }
 

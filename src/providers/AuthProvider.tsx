@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { AuthService } from '@/lib/supabase/index';
+import { AuthService } from '@/lib/supabase/auth';
 import { ensureUserProfile } from '@/lib/supabase/ensureUserProfile';
 
 interface AuthContextType {

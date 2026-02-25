@@ -1,11 +1,29 @@
 // 반려견 프로필 관련 타입 정의
 
+// 공통 타입 정의
+export type Gender = 'male' | 'female';
+export type DogSize = 'small' | 'medium' | 'large' | 'giant';
+export type ActivityLevel = 'low' | 'moderate' | 'high' | 'very_high';
+
+// 타입 가드 함수
+export const isValidGender = (value: string): value is Gender => {
+  return ['male', 'female'].includes(value);
+};
+
+export const isValidDogSize = (value: string): value is DogSize => {
+  return ['small', 'medium', 'large', 'giant'].includes(value);
+};
+
+export const isValidActivityLevel = (value: string): value is ActivityLevel => {
+  return ['low', 'moderate', 'high', 'very_high'].includes(value);
+};
+
 export interface Dog {
   id: string;
   userId: string; // 소유자 ID
   name: string;
   breed: string;
-  gender: 'male' | 'female';
+  gender: Gender;
   birthDate: string; // ISO 8601 format
   weight: number; // kg
   profileImage?: string;
@@ -14,8 +32,8 @@ export interface Dog {
   microchipId?: string;
   registrationNumber?: string;
   color: string;
-  size: 'small' | 'medium' | 'large' | 'giant';
-  activityLevel: 'low' | 'moderate' | 'high' | 'very_high';
+  size: DogSize;
+  activityLevel: ActivityLevel;
   temperament: string[];
   allergies: string[];
   medicalConditions: string[];
@@ -37,7 +55,7 @@ export interface Dog {
 export interface DogFormData {
   name: string;
   breed: string;
-  gender: 'male' | 'female';
+  gender: Gender;
   birthDate: string;
   weight: number;
   profileImage?: File | string;
@@ -46,8 +64,8 @@ export interface DogFormData {
   microchipId?: string;
   registrationNumber?: string;
   color: string;
-  size: 'small' | 'medium' | 'large' | 'giant';
-  activityLevel: 'low' | 'moderate' | 'high' | 'very_high';
+  size: DogSize;
+  activityLevel: ActivityLevel;
   temperament: string[];
   allergies: string[];
   medicalConditions: string[];

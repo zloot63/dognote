@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import './vitest.d.ts';
 import { beforeAll, afterEach, afterAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
 

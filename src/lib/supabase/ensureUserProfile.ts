@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../supabase';
 
 // Utility function to ensure user exists in users table
 // This can be called after login to ensure the user profile is created
