@@ -1,0 +1,3 @@
+# AI 자동화 룰: Git Hooks 자동 설정
+# 커밋 전 코드 품질 자동 검사
+npx lint-staged

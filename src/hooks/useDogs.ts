@@ -1,52 +1,173 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { listUserDogs, createDog, deleteDog } from "@/lib/firebase/dogs";
-import { Dog } from "@/types/dogs";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuthSupabase';
+import { DogService } from '@/lib/supabase/index';
+import { DogFormData } from '@/types/dog';
+import { useDogStore } from '@/store/dogStore';
+import * as React from 'react';
+
+// React Query 키 상수
+const QUERY_KEYS = {
+  dogs: (userId: string) => ['dogs', userId],
+  dog: (dogId: string) => ['dog', dogId],
+} as const;
 
 /**
- * ✅ 특정 사용자의 강아지 목록 가져오기 훅 (Read)
+ * 강아지 목록 조회 훅
  */
-export const useFetchDogs = (userId: string) => {
-  return useQuery<Dog[]>({
-    queryKey: ["dogs", userId],
-    queryFn: () => listUserDogs(userId),
-    enabled: Boolean(userId), // ✅ userId가 있을 때만 실행
+export const useDogs = () => {
+  const { user } = useAuth();
+  const { setDogs, setLoading, setError } = useDogStore();
+
+  const query = useQuery({
+    queryKey: QUERY_KEYS.dogs(user?.id || ''),
+    queryFn: async () => {
+      if (!user?.id) {
+        throw new Error('사용자 인증이 필요합니다.');
+      }
+      return await DogService.getUserDogs(user.id);
+    },
+    enabled: !!user?.id,
   });
+
+  React.useEffect(() => {
+    if (query.data) {
+      setDogs(query.data);
+      setLoading(false);
+      setError(null);
+    }
+  }, [query.data, setDogs, setLoading, setError]);
+
+  React.useEffect(() => {
+    if (query.error) {
+      setError((query.error as Error).message);
+      setLoading(false);
+    }
+  }, [query.error, setError, setLoading]);
+
+  React.useEffect(() => {
+    if (query.isFetching) {
+      setLoading(true);
+    }
+  }, [query.isFetching, setLoading]);
+
+  return query;
 };
 
 /**
- * ✅ 강아지 추가 훅 (Create)
+ * 특정 강아지 조회 훅
  */
-export const useAddDog = () => {
+export const useDog = (dogId: string) => {
+  const { setSelectedDog } = useDogStore();
+
+  const query = useQuery({
+    queryKey: QUERY_KEYS.dog(dogId),
+    queryFn: async () => {
+      if (!dogId) return null;
+      return await DogService.getDogById(dogId);
+    },
+    enabled: !!dogId,
+    select: data => data,
+  });
+
+  React.useEffect(() => {
+    if (query.data) {
+      setSelectedDog(query.data);
+    }
+  }, [query.data, setSelectedDog]);
+
+  return query;
+};
+
+/**
+ * 강아지 등록 훅
+ */
+export const useCreateDog = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const { addDog } = useDogStore();
 
   return useMutation({
-    mutationFn: async (dog: Omit<Dog, "id" | "createdAt" | "updatedAt">) => await createDog(dog),
-    onSuccess: (_, variables) => {
-      alert(`✅ ${variables.name} 강아지가 성공적으로 등록되었습니다! 🐶`);
-      queryClient.invalidateQueries({ queryKey: ["dogs"] });
+    mutationFn: async (dogData: DogFormData) => {
+      if (!user?.id) {
+        throw new Error('사용자 인증이 필요합니다.');
+      }
+      return await DogService.createDog(user.id, dogData);
     },
-    onError: (error) => {
-      console.error("🚨 강아지 추가 실패:", error);
-      alert("⚠️ 강아지 추가 중 오류가 발생했습니다.");
+    onSuccess: data => {
+      addDog(data);
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.dogs(user?.id || ''),
+      });
     },
   });
 };
 
 /**
- * ✅ 강아지 삭제 훅 (Delete)
+ * 강아지 수정 훅
+ */
+export const useUpdateDog = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const { updateDog } = useDogStore();
+
+  return useMutation({
+    mutationFn: async ({
+      dogId,
+      dogData,
+    }: {
+      dogId: string;
+      dogData: Partial<DogFormData>;
+    }) => {
+      return await DogService.updateDog(dogId, dogData);
+    },
+    onSuccess: data => {
+      updateDog(data.id, data);
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.dogs(user?.id || ''),
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.dog(data.id),
+      });
+    },
+  });
+};
+
+/**
+ * 강아지 삭제 훅
  */
 export const useDeleteDog = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const { removeDog } = useDogStore();
 
   return useMutation({
-    mutationFn: async (dogId: string) => await deleteDog(dogId),
-    onSuccess: () => {
-      alert("✅ 강아지가 삭제되었습니다.");
-      queryClient.invalidateQueries({ queryKey: ["dogs"] });
+    mutationFn: async (dogId: string) => {
+      await DogService.deleteDog(dogId);
+      return dogId;
     },
-    onError: (error) => {
-      console.error("🚨 강아지 삭제 실패:", error);
-      alert("⚠️ 강아지 삭제 중 오류가 발생했습니다.");
+    onSuccess: data => {
+      removeDog(data);
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.dogs(user?.id || ''),
+      });
+    },
+  });
+};
+
+/**
+ * 강아지 검색 훅
+ */
+export const useSearchDogs = () => {
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!user?.id) {
+        throw new Error('사용자 인증이 필요합니다.');
+      }
+      // TODO: DogService에 searchDogs 메서드 구현 필요
+      // return await DogService.searchDogs(user.id, searchQuery);
+      return [];
     },
   });
 };

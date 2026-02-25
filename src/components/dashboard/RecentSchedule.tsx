@@ -1,35 +1,13 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { fetchRecentSchedules } from "@/lib/firebase/schedules";
-import { Schedule } from "@/types/schedules";
+import React from 'react';
 
+// TODO: Supabase로 마이그레이션 후 schedules 서비스 연동 필요
 const RecentSchedule = () => {
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
-
-  useEffect(() => {
-    const loadSchedules = async () => {
-      const data = await fetchRecentSchedules();
-      setSchedules(data);
-    };
-
-    loadSchedules();
-  }, []);
-
   return (
     <div className="schedule-card">
       <h3>📅 최근 주요일정</h3>
-      {schedules.length === 0 ? (
-        <p>가까운 일정이 없습니다.</p>
-      ) : (
-        <ul>
-          {schedules.slice(0, 2).map((schedule) => (
-            <li key={schedule.id}>
-              <strong>{schedule.type}</strong>: {schedule.date}
-            </li>
-          ))}
-        </ul>
-      )}
+      <p>가까운 일정이 없습니다.</p>
     </div>
   );
 };
