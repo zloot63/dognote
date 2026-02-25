@@ -7,7 +7,7 @@ import {
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
-import { ButtonProps } from '@/components/ui/button';
+import { ButtonProps } from '@/components/ui/Button';
 
 const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
   <nav
