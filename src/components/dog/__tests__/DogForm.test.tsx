@@ -186,17 +186,16 @@ vi.mock('@/components/ui/ImageUpload', () => ({
   ),
 }));
 
-// NextAuth 세션 모킹
-vi.mock('next-auth/react', () => ({
-  useSession: vi.fn(() => ({
-    data: {
-      user: {
-        id: 'test-user-id',
-        email: 'test@example.com',
-        name: 'Test User',
-      },
+// useAuth 모킹 (Supabase Auth)
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: vi.fn(() => ({
+    user: {
+      id: 'test-user-id',
+      email: 'test@example.com',
+      name: 'Test User',
     },
-    status: 'authenticated',
+    isAuthenticated: true,
+    isLoading: false,
   })),
 }));
 

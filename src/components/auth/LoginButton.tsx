@@ -1,30 +1,30 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LoginButtonProps {
-  provider: 'google' | 'naver' | 'kakao' | 'apple';
+  provider: 'google' | 'github' | 'kakao';
 }
 
 export default function LoginButton({ provider }: LoginButtonProps) {
+  const { signInWithOAuth } = useAuth();
+
   const providerNames: Record<string, string> = {
     google: 'Google',
-    naver: 'Naver',
+    github: 'GitHub',
     kakao: 'Kakao',
-    apple: 'Apple',
   };
 
   const providerColors: Record<string, { background: string; color: string }> =
     {
       google: { background: '#EA4335', color: '#FFFFFF' },
-      naver: { background: '#03C75A', color: '#FFFFFF' },
+      github: { background: '#24292e', color: '#FFFFFF' },
       kakao: { background: '#FEE500', color: '#3C1E1E' },
-      apple: { background: '#000000', color: '#FFFFFF' },
     };
 
   const handleLogin = async () => {
     try {
-      await signIn(provider);
+      await signInWithOAuth(provider);
     } catch (error) {
       console.error(`🚨 ${providerNames[provider]} 로그인 실패:`, error);
       alert(

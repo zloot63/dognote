@@ -23,17 +23,16 @@ vi.mock('@/lib/supabase', () => ({
   },
 }));
 
-// NextAuth 세션 모킹
-vi.mock('next-auth/react', () => ({
-  useSession: vi.fn(() => ({
-    data: {
-      user: {
-        id: 'user-123',
-        email: 'test@example.com',
-        name: '테스트 사용자',
-      },
+// useAuth 모킹 (Supabase Auth)
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: vi.fn(() => ({
+    user: {
+      id: 'user-123',
+      email: 'test@example.com',
+      name: '테스트 사용자',
     },
-    status: 'authenticated',
+    isAuthenticated: true,
+    isLoading: false,
   })),
 }));
 
@@ -644,13 +643,14 @@ describe('DogsPage', () => {
   // === AI 자동화 룰: 세션 관리 테스트 ===
   describe('Session Management', () => {
     it('redirects when user is not authenticated', () => {
-      const mockUseSession = vi.fn(() => ({
-        data: null,
-        status: 'unauthenticated',
+      const mockUseAuth = vi.fn(() => ({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
       }));
 
-      vi.doMock('next-auth/react', () => ({
-        useSession: mockUseSession,
+      vi.doMock('@/hooks/useAuth', () => ({
+        useAuth: mockUseAuth,
       }));
 
       renderWithProviders(<DogsPage />);
@@ -660,13 +660,14 @@ describe('DogsPage', () => {
     });
 
     it('shows loading when session is loading', () => {
-      const mockUseSession = vi.fn(() => ({
-        data: null,
-        status: 'loading',
+      const mockUseAuth = vi.fn(() => ({
+        user: null,
+        isAuthenticated: false,
+        isLoading: true,
       }));
 
-      vi.doMock('next-auth/react', () => ({
-        useSession: mockUseSession,
+      vi.doMock('@/hooks/useAuth', () => ({
+        useAuth: mockUseAuth,
       }));
 
       renderWithProviders(<DogsPage />);

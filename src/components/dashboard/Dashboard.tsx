@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 // import { useFetchDogs } from "@/hooks/useDogs"; // 임시 비활성화
 import Layout from '@/components/layout/Layout';
 import DogProfile from '@/components/dashboard/DogProfile';
@@ -16,7 +16,7 @@ import AddDogForm from '@/components/dog/AddDogForm';
  * ✅ Dashboard 페이지 (강아지 정보 & 일정 관리)
  */
 export default function Dashboard() {
-  useSession(); // ✅ 세션 상태 확인 (세션 데이터는 직접 사용하지 않음)
+  useAuth(); // ✅ 세션 상태 확인 (세션 데이터는 직접 사용하지 않음)
 
   // 임시 목업 데이터 (실제로는 useFetchDogs 훅 사용)
   const dogs = [
