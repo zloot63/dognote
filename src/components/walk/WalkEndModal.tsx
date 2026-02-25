@@ -9,7 +9,7 @@ import {
   CardTitle,
   Badge,
   Checkbox,
-  TextArea,
+  Textarea,
 } from '@/components/ui';
 import { formatDistance, formatDuration } from '@/lib/gps';
 import { cn } from '@/lib/utils';
@@ -193,7 +193,7 @@ const WalkEndModal: React.FC<WalkEndModalProps> = ({
               <label className="text-sm font-medium">
                 추가 메모 (선택사항)
               </label>
-              <TextArea
+              <Textarea
                 value={notes}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setNotes(e.target.value)
