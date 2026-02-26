@@ -7,7 +7,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Separator } from '@/components/ui/separator';
+import { Divider } from '@/components/ui/Divider';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -134,7 +134,7 @@ export default function SignInPage() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
+              <Divider className="w-full" />
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-gray-50 text-gray-500">또는</span>

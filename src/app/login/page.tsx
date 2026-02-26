@@ -1,22 +1,22 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import LoginButton from '@/components/auth/LoginButton';
 
 export default function LoginPage() {
-  const { status } = useSession();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (isAuthenticated) {
       console.warn('✅ 로그인 성공, 홈으로 이동');
       router.replace('/'); // ✅ replace 사용 (뒤로가기 방지)
     }
-  }, [status, router]);
+  }, [isAuthenticated, router]);
 
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         🔄 로그인 상태 확인 중...
@@ -30,9 +30,8 @@ export default function LoginPage() {
 
       {/* ✅ OAuth 로그인 버튼 */}
       <LoginButton provider="google" />
-      <LoginButton provider="naver" />
+      <LoginButton provider="github" />
       <LoginButton provider="kakao" />
-      <LoginButton provider="apple" />
     </div>
   );
 }

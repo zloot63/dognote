@@ -1,6 +1,2 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-
-export const getSession = async () => {
-  return await getServerSession(authOptions);
-};
+// This file is deprecated. Use src/hooks/useAuth.ts or src/lib/supabase/auth.ts instead.
+export {};

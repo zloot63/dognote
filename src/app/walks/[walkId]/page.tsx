@@ -3,6 +3,8 @@
 import { useParams } from 'next/navigation';
 import WalkDetail from '@/components/walk/WalkDetail';
 
+export const runtime = 'edge';
+
 // TODO: Supabase walks 서비스 연동 필요
 export default function WalkDetailPage() {
   const params = useParams();
