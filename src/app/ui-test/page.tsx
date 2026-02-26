@@ -21,6 +21,9 @@ import {
   Modal,
   useToast,
   Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
   EnhancedBreadcrumb,
   Container,
   Grid,
@@ -493,18 +496,38 @@ export default function UITestPage() {
                 <div>
                   <h4 className="font-semibold text-neutral-800 mb-3">툴팁</h4>
                   <div className="flex gap-3">
-                    <Tooltip>
-                      <Button variant="outline">툴팁 테스트</Button>
-                      <span>이것은 툴팁 메시지입니다</span>
-                    </Tooltip>
-                    <Tooltip>
-                      <Button variant="outline">위쪽 툴팁</Button>
-                      <span>위쪽에 표시되는 툴팁</span>
-                    </Tooltip>
-                    <Tooltip>
-                      <Button variant="outline">오른쪽 툴팁</Button>
-                      <span>오른쪽에 표시되는 툴팁</span>
-                    </Tooltip>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline">툴팁 테스트</Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <span>이것은 툴팁 메시지입니다</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline">위쪽 툴팁</Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <span>위쪽에 표시되는 툴팁</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline">오른쪽 툴팁</Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <span>오른쪽에 표시되는 툴팁</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               </div>
