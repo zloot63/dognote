@@ -1,6 +1,6 @@
 # 🔧 환경 설정 가이드 (Environment Setup)
 
-*DogNote 프로젝트 개발 환경 구축을 위한 단계별 가이드*
+_DogNote 프로젝트 개발 환경 구축을 위한 단계별 가이드_
 
 ---
 
@@ -19,6 +19,7 @@
 ## 1. 시스템 요구사항
 
 ### **최소 요구사항**
+
 - **OS**: macOS 10.15+, Windows 10+, Ubuntu 18.04+
 - **Node.js**: v18.17.0 이상 (LTS 권장)
 - **npm**: v9.0.0 이상 또는 **yarn**: v3.0.0 이상
@@ -27,20 +28,17 @@
 - **저장공간**: 2GB 이상 여유 공간
 
 ### **권장 사양**
+
 - **OS**: macOS 13+, Windows 11, Ubuntu 22.04+
 - **Node.js**: v20.x (최신 LTS)
 - **메모리**: 16GB RAM
 - **프로세서**: 멀티코어 CPU (Apple Silicon, Intel i5 이상)
 
 ### **지원 브라우저**
+
 ```json
 {
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie <= 11"
-  ]
+  "browserslist": ["> 1%", "last 2 versions", "not dead", "not ie <= 11"]
 }
 ```
 
@@ -51,6 +49,7 @@
 ### **A. Node.js 설치**
 
 #### **Option 1: 공식 설치 프로그램 (권장)**
+
 ```bash
 # macOS/Linux - nvm 사용
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -62,6 +61,7 @@ nvm use --lts
 ```
 
 #### **Option 2: 패키지 매니저**
+
 ```bash
 # macOS - Homebrew
 brew install node
@@ -75,6 +75,7 @@ sudo apt-get install -y nodejs
 ```
 
 #### **설치 확인**
+
 ```bash
 node --version  # v20.x.x 이상
 npm --version   # v9.x.x 이상
@@ -94,6 +95,7 @@ sudo apt update && sudo apt install git
 ```
 
 #### **Git 설정**
+
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
@@ -141,6 +143,7 @@ yarn install
 ```
 
 #### **설치되는 주요 패키지**
+
 ```json
 {
   "dependencies": {
@@ -170,6 +173,7 @@ code .env.local
 ```
 
 #### **.env.local 설정 예시**
+
 ```bash
 # Firebase 설정 (개발환경)
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
@@ -211,6 +215,7 @@ NEXT_PUBLIC_MAX_WALK_DURATION_MINUTES=240
 ### **C. 서비스 활성화**
 
 #### **Authentication 설정**
+
 ```bash
 # Firebase Console에서 설정
 1. Authentication → 시작하기
@@ -221,6 +226,7 @@ NEXT_PUBLIC_MAX_WALK_DURATION_MINUTES=240
 ```
 
 #### **Firestore Database 설정**
+
 ```bash
 # Firebase Console에서 설정
 1. Firestore Database → 데이터베이스 만들기
@@ -230,6 +236,7 @@ NEXT_PUBLIC_MAX_WALK_DURATION_MINUTES=240
 ```
 
 #### **Storage 설정**
+
 ```bash
 # Firebase Console에서 설정
 1. Storage → 시작하기
@@ -264,6 +271,7 @@ firebase init
 ### **VS Code 설정**
 
 #### **A. workspace 설정 (.vscode/settings.json)**
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -285,11 +293,12 @@ firebase init
 ```
 
 #### **B. 권장 확장프로그램 (.vscode/extensions.json)**
+
 ```json
 {
   "recommendations": [
     "bradlc.vscode-tailwindcss",
-    "ms-vscode.vscode-typescript-next", 
+    "ms-vscode.vscode-typescript-next",
     "esbenp.prettier-vscode",
     "ms-vscode.vscode-eslint",
     "ms-vscode.vscode-json",
@@ -301,6 +310,7 @@ firebase init
 ```
 
 #### **C. 디버깅 설정 (.vscode/launch.json)**
+
 ```json
 {
   "version": "0.2.0",
@@ -366,6 +376,7 @@ npm run lint
 ### **A. 자주 발생하는 문제**
 
 #### **Node.js 버전 문제**
+
 ```bash
 # 에러: "Node.js version is not supported"
 # 해결: Node.js LTS 버전 설치
@@ -374,6 +385,7 @@ nvm use --lts
 ```
 
 #### **포트 충돌 문제**
+
 ```bash
 # 에러: "Port 3000 is already in use"
 # 해결: 다른 포트 사용 또는 프로세스 종료
@@ -382,6 +394,7 @@ netstat -ano | findstr :3000   # Windows에서 PID 확인 후 종료
 ```
 
 #### **의존성 설치 실패**
+
 ```bash
 # 해결: 캐시 클리어 후 재설치
 npm cache clean --force
@@ -390,6 +403,7 @@ npm install
 ```
 
 #### **Firebase 연결 오류**
+
 ```bash
 # 에러: "Firebase configuration is invalid"
 # 해결: 환경 변수 확인
@@ -400,6 +414,7 @@ echo $NEXT_PUBLIC_FIREBASE_API_KEY  # 값 확인
 ### **B. 성능 최적화**
 
 #### **개발 서버 속도 개선**
+
 ```bash
 # .env.local에 추가
 NEXT_PRIVATE_SKIP_VALIDATIONS=1
@@ -407,6 +422,7 @@ DISABLE_ESLINT_PLUGIN=true  # 개발 시에만 사용
 ```
 
 #### **빌드 속도 개선**
+
 ```bash
 # next.config.ts 설정
 export default {
@@ -438,18 +454,21 @@ npm audit             # 보안 취약점 검사
 ## 📚 추가 리소스
 
 ### **공식 문서**
+
 - **[Next.js 설치 가이드](https://nextjs.org/docs/getting-started/installation)**
 - **[Firebase 웹 설정](https://firebase.google.com/docs/web/setup)**
 - **[VS Code 설정 가이드](https://code.visualstudio.com/docs/setup/setup-overview)**
 
 ### **커뮤니티 리소스**
+
 - **[Next.js GitHub](https://github.com/vercel/next.js)**
 - **[Firebase 커뮤니티](https://firebase.google.com/community)**
 - **[React 개발자 도구](https://react.dev/learn/react-developer-tools)**
 
 ---
 
-*환경 설정에 문제가 있거나 질문이 있다면 팀 채널이나 GitHub Issues에 문의해 주세요.*
+_환경 설정에 문제가 있거나 질문이 있다면 팀 채널이나 GitHub Issues에 문의해 주세요._
 
 **문서 히스토리:**
+
 - v1.0: 2025-08-31 (환경 설정 가이드 초안 작성)

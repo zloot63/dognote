@@ -9,20 +9,33 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/dashboard';
 
   if (code) {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (!error) {
-      // Cloudflare Pages 환경에서는 request.headers.get('x-forwarded-host')를 사용할 수 없을 수 있음
-      // origin을 우선적으로 사용하고, 필요한 경우 환경 변수 등으로 호스트를 설정하는 것이 좋음
-
-      return NextResponse.redirect(`${origin}${next}`);
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error(
+        'Supabase environment variables are missing in callback route'
+      );
+      // 환경 변수가 없을 때 에러 페이지로 리다이렉트
+      return NextResponse.redirect(`${origin}/auth/error?error=Configuration`);
     }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    try {
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        console.error('Error exchanging code for session:', error);
+        return NextResponse.redirect(`${origin}/auth/error?error=Verification`);
+      }
+    } catch (err) {
+      console.error('Unexpected error in callback route:', err);
+      return NextResponse.redirect(`${origin}/auth/error?error=Default`);
+    }
+
+    return NextResponse.redirect(`${origin}${next}`);
   }
 
-  // 에러 시 로그인 페이지로 리디렉션
+  // 코드가 없는 경우
   return NextResponse.redirect(`${origin}/auth/signin`);
 }
