@@ -88,6 +88,9 @@ export function useAuth() {
           provider,
           options: {
             redirectTo: `${window.location.origin}/auth/callback`,
+            // PKCE 흐름 강제 설정 (타입 정의에 없을 수 있으나 런타임에는 동작함)
+            // @ts-expect-error: flowType is not in the type definition but supported by Supabase
+            flowType: 'pkce',
           },
         });
         if (error) throw error;
