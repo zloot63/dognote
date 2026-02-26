@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
@@ -9,18 +9,8 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/dashboard';
 
   if (code) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.error(
-        'Supabase environment variables are missing in callback route'
-      );
-      // 환경 변수가 없을 때 에러 페이지로 리다이렉트
-      return NextResponse.redirect(`${origin}/auth/error?error=Configuration`);
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // 서버용 Supabase 클라이언트 생성 (쿠키 처리 포함)
+    const supabase = await createClient();
 
     try {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
