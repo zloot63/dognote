@@ -1,13 +1,13 @@
 ## DogNote
 
 **DogNote** is an open-source app to manage your dog's health and walking history.  
-It is built on Firebase and supports Google & Apple login, saving dog profiles, walking routes, and
-more.
+It is built on **Supabase** and supports Google & Apple login, saving dog profiles, walking routes,
+and more.
 
 ### 🔧 Tech Stack
 
 - Next.js + TypeScript
-- Firebase Authentication & Firestore
+- Supabase (Postgres, Auth, Storage)
 - TailwindCSS
 
 ### ✨ Features

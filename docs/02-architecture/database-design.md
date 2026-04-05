@@ -1,8 +1,8 @@
 # 🗄️ 데이터베이스 설계 (Database Design)
 
-_버전: 2.0_  
-_최종 업데이트: 2025-08-31_  
-_승인자: Tech Lead, Database Architect_
+_버전: 3.0_  
+_최종 업데이트: 2025-04-05_  
+_데이터베이스: Supabase PostgreSQL_
 
 ---
 
@@ -10,728 +10,375 @@ _승인자: Tech Lead, Database Architect_
 
 1. [개요](#개요)
 2. [설계 원칙](#설계-원칙)
-3. [현재 문제점 분석](#현재-문제점-분석)
-4. [개선된 데이터 모델](#개선된-데이터-모델)
-5. [Firestore 스키마](#firestore-스키마)
-6. [인덱싱 전략](#인덱싱-전략)
-7. [보안 규칙](#보안-규칙)
-8. [성능 최적화](#성능-최적화)
-9. [마이그레이션 계획](#마이그레이션-계획)
+3. [스키마 설계](#스키마-설계)
+4. [테이블 정의](#테이블-정의)
+5. [RLS (Row Level Security)](#rls-row-level-security)
+6. [인덱스 전략](#인덱스-전략)
+7. [관계형 모델](#관계형-모델)
 
 ---
 
 ## 1. 개요
 
-### 1.1 문서 목적
+### 1.1 데이터베이스 선택
 
-DogNote 프로젝트의 데이터베이스 설계를 정의하며, 확장성, 유지보수성, 그리고 다른 데이터베이스로의
-이식성을 고려하여 작성되었습니다.
-
-### 1.2 데이터베이스 선택
-
-- **Primary DB**: Firebase Firestore (NoSQL 문서 데이터베이스)
+- **Primary DB**: Supabase PostgreSQL (관계형 데이터베이스)
+- **Authentication**: Supabase Auth
+- **파일 저장소**: Supabase Storage
 - **캐싱**: TanStack Query (클라이언트 사이드)
-- **파일 저장소**: Firebase Storage
-- **실시간 동기화**: Firestore 실시간 리스너
+
+### 1.2 마이그레이션 이력
+
+- **v3.0**: Firebase Firestore → Supabase PostgreSQL 마이그레이션 완료
+- **v2.0**: Firestore 스키마 개선
+- **v1.0**: 초기 Firestore 설계
 
 ---
 
 ## 2. 설계 원칙
 
-### 2.1 확장성 (Scalability)
+### 2.1 정규화
 
-- **수평적 확장**: Firestore의 자동 샤딩 활용
-- **쿼리 최적화**: 복합 인덱스로 성능 보장
-- **데이터 분산**: 사용자별 서브컬렉션 구조
+- 3NF (제3정규형) 준수
+- 데이터 중복 최소화
+- 참조 무결성 보장 (Foreign Key)
 
-### 2.2 유지보수성 (Maintainability)
+### 2.2 보안
 
-- **명확한 스키마**: TypeScript 인터페이스로 타입 정의
-- **일관된 네이밍**: camelCase 필드명, 복수형 컬렉션명
-- **버전 관리**: 스키마 변경 시 하위 호환성 보장
+- Row Level Security (RLS) 적용
+- 사용자별 데이터 격리
+- 세밀한 접근 제어
 
-### 2.3 보안성 (Security)
+### 2.3 확장성
 
-- **데이터 격리**: 사용자별 완전 분리된 데이터 구조
-- **최소 권한**: 세밀한 Firestore 보안 규칙
-- **감사 추적**: 모든 변경사항 타임스탬프 기록
-
----
-
-## 3. 현재 문제점 분석
-
-### 3.1 데이터 정합성 문제 ❌
-
-```typescript
-// 문제가 있는 기존 구조
-interface User {
-  dogs: string[]; // 양방향 참조 문제
-}
-
-interface Dog {
-  userId: string; // 동기화 이슈 발생 가능
-}
-```
-
-### 3.2 스키마 불일치 ❌
-
-- Firebase Timestamp와 ISO 문자열 혼재
-- 선택적 필드의 일관성 부족
-- Read/Write 타입 분리 부족
-
-### 3.3 확장성 제약 ❌
-
-- NoSQL 특성을 제대로 활용하지 못한 설계
-- 복합 쿼리를 위한 인덱스 설계 부족
-- 데이터 중복 vs 쿼리 성능 간 균형 부족
+- 인덱스 기반 쿼리 최적화
+- JSONB 필드로 유연한 스키마 지원
+- 파티셔닝 전략 수립
 
 ---
 
-## 4. 개선된 데이터 모델
+## 3. 스키마 설계
 
-### 4.1 핵심 엔티티 관계
+### 3.1 ERD
 
 ```mermaid
 erDiagram
-    User ||--o{ Dog : owns
-    Dog ||--o{ Walk : records
-    Dog ||--o{ HealthRecord : has
-    Dog ||--o{ Vaccination : schedules
-    User ||--o{ PointTransaction : earns
-    User ||--o{ SharedAccess : grants
+    USER ||--o{ DOG : owns
+    DOG ||--o{ WALK : has
+    DOG ||--o{ HEALTH_RECORD : has
+    DOG ||--o{ VACCINATION : schedules
+    USER ||--o{ POINT_TRANSACTION : earns
+    USER ||--o{ USER_SETTING : has
 
-    User {
-        string id PK
-        string email UK
-        string displayName
-        string photoURL
-        timestamp createdAt
-        boolean onboardingCompleted
-        number totalPoints
+    USER {
+        uuid id PK
+        string email
+        string name
+        string avatar_url
+        timestamp created_at
+        timestamp updated_at
     }
 
-    Dog {
-        string id PK
+    DOG {
+        uuid id PK
+        uuid user_id FK
         string name
         string breed
-        timestamp birthDate
-        number weightKg
-        string photoURL
-        string mood
-        boolean isActive
+        date birth_date
+        decimal weight
+        string profile_image_url
+        timestamp created_at
+        timestamp updated_at
     }
 
-    Walk {
-        string id PK
-        timestamp startedAt
-        timestamp endedAt
-        number distanceMeters
-        number durationMinutes
-        string pathGeoJSON
-        string[] issues
-        string note
-        number pointsEarned
-        string[] dogIds
-        string status
+    WALK {
+        uuid id PK
+        uuid user_id FK
+        uuid dog_id FK
+        timestamp start_time
+        timestamp end_time
+        decimal distance
+        jsonb route
+        text notes
+        timestamp created_at
     }
 
-    HealthRecord {
-        string id PK
+    HEALTH_RECORD {
+        uuid id PK
+        uuid dog_id FK
+        uuid user_id FK
         string type
-        string value
-        timestamp recordedAt
-        string note
+        decimal weight
+        text notes
+        timestamp recorded_at
+        timestamp created_at
     }
-```
 
-### 4.2 타입 정의
+    VACCINATION {
+        uuid id PK
+        uuid dog_id FK
+        uuid user_id FK
+        string vaccine_name
+        date scheduled_date
+        date administered_date
+        boolean is_completed
+        timestamp created_at
+    }
 
-```typescript
-// 기본 타입 정의
-type Timestamp = FirebaseFirestore.Timestamp;
-type GeoPoint = FirebaseFirestore.GeoPoint;
+    POINT_TRANSACTION {
+        uuid id PK
+        uuid user_id FK
+        integer points
+        string type
+        string description
+        timestamp created_at
+    }
 
-// 사용자 관련 타입
-interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  photoURL?: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  lastActiveAt: Timestamp;
-  onboardingCompleted: boolean;
-  totalPoints: number;
-  preferences: UserPreferences;
-}
-
-interface UserPreferences {
-  language: 'ko' | 'en';
-  notifications: {
-    walk: boolean;
-    health: boolean;
-    vaccination: boolean;
-  };
-  privacy: {
-    shareWalkData: boolean;
-    allowDataAnalysis: boolean;
-  };
-}
-
-// 반려견 관련 타입
-interface Dog {
-  id: string;
-  name: string;
-  breed: string;
-  birthDate: Timestamp;
-  weightKg: number;
-  gender: 'male' | 'female';
-  photoURL?: string;
-  mood: 'happy' | 'normal' | 'sad' | 'sick';
-  isActive: boolean;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  medicalInfo?: {
-    allergies: string[];
-    medications: string[];
-    specialNeeds: string;
-  };
-}
-
-// 산책 관련 타입
-interface Walk {
-  id: string;
-  startedAt: Timestamp;
-  endedAt?: Timestamp;
-  distanceMeters: number;
-  durationMinutes: number;
-  averageSpeed: number;
-  pathGeoJSON?: GeoJSON.LineString;
-  startLocation?: GeoPoint;
-  endLocation?: GeoPoint;
-  weather?: WeatherData;
-  issues: WalkIssue[];
-  note?: string;
-  photos?: string[];
-  pointsEarned: number;
-  status: 'draft' | 'active' | 'completed' | 'cancelled';
-  dogIds: string[];
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-
-interface WalkIssue {
-  type: 'health' | 'behavior' | 'environment' | 'other';
-  severity: 'low' | 'medium' | 'high';
-  description: string;
-  timestamp: Timestamp;
-}
-
-interface WeatherData {
-  temperature: number;
-  humidity: number;
-  condition: 'sunny' | 'cloudy' | 'rainy' | 'snowy';
-  windSpeed: number;
-}
-
-// 건강 관리 타입
-interface HealthRecord {
-  id: string;
-  type: 'weight' | 'medication' | 'symptom' | 'visit' | 'other';
-  value: string | number;
-  unit?: string;
-  recordedAt: Timestamp;
-  note?: string;
-  attachments?: string[];
-  createdBy: string;
-  createdAt: Timestamp;
-}
-
-interface Vaccination {
-  id: string;
-  vaccineName: string;
-  dueDate: Timestamp;
-  completedAt?: Timestamp;
-  clinicName?: string;
-  batchNumber?: string;
-  nextDueDate?: Timestamp;
-  done: boolean;
-  reminder: boolean;
-  note?: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-
-// 포인트 시스템 타입
-interface PointTransaction {
-  id: string;
-  type: 'earn' | 'spend' | 'bonus' | 'penalty';
-  amount: number;
-  source: 'walk' | 'achievement' | 'bonus' | 'admin';
-  description: string;
-  relatedId?: string; // walkId, achievementId 등
-  createdAt: Timestamp;
-  expiredAt?: Timestamp;
-}
+    USER_SETTING {
+        uuid id PK
+        uuid user_id FK
+        string language
+        string theme
+        jsonb notification_prefs
+        timestamp created_at
+        timestamp updated_at
+    }
 ```
 
 ---
 
-## 5. Firestore 스키마
+## 4. 테이블 정의
 
-### 5.1 컬렉션 구조
+### 4.1 users (Supabase Auth 연동)
 
-```
-📁 users/                           # 사용자 컬렉션
-├── {userId}/                       # 사용자 문서
-│   ├── dogs/                       # 반려견 서브컬렉션
-│   │   └── {dogId}/                # 반려견 문서
-│   │       ├── walks/              # 산책 기록
-│   │       ├── healthRecords/      # 건강 기록
-│   │       └── vaccinations/       # 예방접종 기록
-│   ├── pointTransactions/          # 포인트 거래 내역
-│   └── sharedAccess/               # 공유 접근 권한
+```sql
+-- Supabase Auth와 자동 연동되는 users 테이블
+-- 별도 생성 불필요, auth.users 사용
 ```
 
-### 5.2 문서 경로 예시
+### 4.2 dogs
 
-```typescript
-// Firestore 경로 정의
-const COLLECTIONS = {
-  USERS: 'users',
-  DOGS: (userId: string) => `users/${userId}/dogs`,
-  WALKS: (userId: string, dogId: string) => `users/${userId}/dogs/${dogId}/walks`,
-  HEALTH_RECORDS: (userId: string, dogId: string) => `users/${userId}/dogs/${dogId}/healthRecords`,
-  VACCINATIONS: (userId: string, dogId: string) => `users/${userId}/dogs/${dogId}/vaccinations`,
-  POINTS: (userId: string) => `users/${userId}/pointTransactions`,
-  SHARED_ACCESS: (userId: string) => `users/${userId}/sharedAccess`,
-} as const;
+```sql
+create table dogs (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) not null,
+  name text not null,
+  breed text,
+  birth_date date,
+  weight numeric(5,2),
+  profile_image_url text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
-// 타입 안전한 문서 참조
-const getUserDoc = (userId: string) => firestore().collection(COLLECTIONS.USERS).doc(userId);
-
-const getDogsCollection = (userId: string) => firestore().collection(COLLECTIONS.DOGS(userId));
-
-const getWalksCollection = (userId: string, dogId: string) =>
-  firestore().collection(COLLECTIONS.WALKS(userId, dogId));
+-- 인덱스
+create index idx_dogs_user_id on dogs(user_id);
+create index idx_dogs_created_at on dogs(created_at);
 ```
 
----
+### 4.3 walks
 
-## 6. 인덱싱 전략
+```sql
+create table walks (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) not null,
+  dog_id uuid references dogs(id) not null,
+  start_time timestamp with time zone not null,
+  end_time timestamp with time zone,
+  distance numeric(10,2),
+  route jsonb,
+  notes text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
-### 6.1 복합 인덱스 정의
-
-```json
-{
-  "indexes": [
-    {
-      "collectionGroup": "walks",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "startedAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "walks",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "dogIds", "arrayConfig": "CONTAINS" },
-        { "fieldPath": "startedAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "healthRecords",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "type", "order": "ASCENDING" },
-        { "fieldPath": "recordedAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "vaccinations",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "done", "order": "ASCENDING" },
-        { "fieldPath": "dueDate", "order": "ASCENDING" }
-      ]
-    }
-  ],
-  "fieldOverrides": [
-    {
-      "collectionGroup": "walks",
-      "fieldPath": "pathGeoJSON",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "healthRecords",
-      "fieldPath": "attachments",
-      "ttl": false,
-      "indexes": [{ "order": "ASCENDING", "queryScope": "COLLECTION" }]
-    }
-  ]
-}
+-- 인덱스
+create index idx_walks_user_id on walks(user_id);
+create index idx_walks_dog_id on walks(dog_id);
+create index idx_walks_start_time on walks(start_time);
 ```
 
-### 6.2 쿼리 최적화 예시
+### 4.4 health_records
 
-```typescript
-// 최적화된 쿼리 예시
-export class WalkRepository {
-  // 특정 기간 산책 조회 (인덱스 활용)
-  async getWalksByDateRange(userId: string, dogId: string, startDate: Date, endDate: Date) {
-    return await firestore()
-      .collection(COLLECTIONS.WALKS(userId, dogId))
-      .where('status', '==', 'completed')
-      .where('startedAt', '>=', Timestamp.fromDate(startDate))
-      .where('startedAt', '<=', Timestamp.fromDate(endDate))
-      .orderBy('startedAt', 'desc')
-      .limit(50)
-      .get();
-  }
+```sql
+create table health_records (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) not null,
+  dog_id uuid references dogs(id) not null,
+  type text not null, -- 'weight', 'medication', 'checkup', etc.
+  weight numeric(5,2),
+  notes text,
+  recorded_at timestamp with time zone not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
-  // 다중 반려견 산책 조회 (배열 인덱스 활용)
-  async getWalksByMultipleDogs(userId: string, dogIds: string[]) {
-    const queries = dogIds.map(dogId =>
-      firestore()
-        .collection(COLLECTIONS.WALKS(userId, dogId))
-        .where('dogIds', 'array-contains', dogId)
-        .orderBy('startedAt', 'desc')
-        .limit(10)
-        .get()
-    );
+-- 인덱스
+create index idx_health_records_dog_id on health_records(dog_id);
+create index idx_health_records_recorded_at on health_records(recorded_at);
+```
 
-    const results = await Promise.all(queries);
-    return results.flatMap(result => result.docs);
-  }
-}
+### 4.5 vaccinations
+
+```sql
+create table vaccinations (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) not null,
+  dog_id uuid references dogs(id) not null,
+  vaccine_name text not null,
+  scheduled_date date not null,
+  administered_date date,
+  is_completed boolean default false,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 인덱스
+create index idx_vaccinations_dog_id on vaccinations(dog_id);
+create index idx_vaccinations_scheduled_date on vaccinations(scheduled_date);
+create index idx_vaccinations_is_completed on vaccinations(is_completed) where is_completed = false;
+```
+
+### 4.6 point_transactions
+
+```sql
+create table point_transactions (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) not null,
+  points integer not null,
+  type text not null, -- 'walk', 'bonus', 'purchase', etc.
+  description text,
+  reference_id uuid, -- walks.id 등 참조
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 인덱스
+create index idx_point_transactions_user_id on point_transactions(user_id);
+create index idx_point_transactions_created_at on point_transactions(created_at);
+```
+
+### 4.7 user_settings
+
+```sql
+create table user_settings (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) not null unique,
+  language text default 'ko',
+  theme text default 'light',
+  notification_prefs jsonb default '{}',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 인덱스
+create index idx_user_settings_user_id on user_settings(user_id);
 ```
 
 ---
 
-## 7. 보안 규칙
+## 5. RLS (Row Level Security)
 
-### 7.1 Firestore 보안 규칙
+### 5.1 활성화
 
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // 유틸리티 함수
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
-
-    function isValidUserData(data) {
-      return data.keys().hasAll(['email', 'displayName', 'createdAt']) &&
-             data.email is string &&
-             data.displayName is string &&
-             data.createdAt is timestamp;
-    }
-
-    function isValidDogData(data) {
-      return data.keys().hasAll(['name', 'breed', 'birthDate']) &&
-             data.name is string &&
-             data.breed is string &&
-             data.birthDate is timestamp &&
-             data.weightKg is number &&
-             data.weightKg > 0 &&
-             data.weightKg < 200;
-    }
-
-    // 사용자 컬렉션
-    match /users/{userId} {
-      allow read, write: if isOwner(userId) &&
-                           (request.method != 'create' || isValidUserData(request.resource.data));
-
-      // 반려견 서브컬렉션
-      match /dogs/{dogId} {
-        allow read, write: if isOwner(userId) &&
-                             (request.method != 'create' || isValidDogData(request.resource.data));
-
-        // 산책 기록 서브컬렉션
-        match /walks/{walkId} {
-          allow read, write: if isOwner(userId);
-          // 특별 규칙: draft 상태의 산책은 2시간 후 자동 삭제
-          allow delete: if isOwner(userId) ||
-                           (resource.data.status == 'draft' &&
-                            resource.data.createdAt < timestamp.date() - duration.hours(2));
-        }
-
-        // 건강 기록 서브컬렉션
-        match /healthRecords/{recordId} {
-          allow read, write: if isOwner(userId);
-        }
-
-        // 예방접종 서브컬렉션
-        match /vaccinations/{vaccId} {
-          allow read, write: if isOwner(userId);
-        }
-      }
-
-      // 포인트 거래 내역 (읽기 전용, Cloud Function만 수정 가능)
-      match /pointTransactions/{transactionId} {
-        allow read: if isOwner(userId);
-        allow write: if false; // Cloud Function만 접근 가능
-      }
-
-      // 공유 접근 권한
-      match /sharedAccess/{accessId} {
-        allow read: if isOwner(userId) ||
-                       request.auth.uid in resource.data.authorizedUsers;
-        allow write: if isOwner(userId);
-      }
-    }
-
-    // 관리자 전용 컬렉션
-    match /admin/{document=**} {
-      allow read, write: if isAuthenticated() &&
-                           request.auth.token.admin == true;
-    }
-
-    // 글로벌 설정 (읽기 전용)
-    match /config/{configId} {
-      allow read: if isAuthenticated();
-      allow write: if false;
-    }
-  }
-}
+```sql
+alter table dogs enable row level security;
+alter table walks enable row level security;
+alter table health_records enable row level security;
+alter table vaccinations enable row level security;
+alter table point_transactions enable row level security;
+alter table user_settings enable row level security;
 ```
 
-### 7.2 Storage 보안 규칙
+### 5.2 정책 설정
 
-```javascript
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    // 사용자별 파일 저장소
-    match /users/{userId}/dogs/{dogId}/{fileName} {
-      allow read, write: if request.auth != null &&
-                           request.auth.uid == userId &&
-                           fileName.matches('.*\\.(jpg|jpeg|png|webp)$') &&
-                           request.resource.size < 5 * 1024 * 1024; // 5MB 제한
-    }
+```sql
+-- dogs 테이블 RLS
+CREATE POLICY "Users can only access their own dogs"
+  ON dogs FOR ALL
+  USING (auth.uid() = user_id);
 
-    // 사용자 프로필 이미지
-    match /users/{userId}/profile/{fileName} {
-      allow read, write: if request.auth != null &&
-                           request.auth.uid == userId &&
-                           fileName.matches('.*\\.(jpg|jpeg|png|webp)$') &&
-                           request.resource.size < 2 * 1024 * 1024; // 2MB 제한
-    }
-  }
-}
+-- walks 테이블 RLS
+CREATE POLICY "Users can only access their own walks"
+  ON walks FOR ALL
+  USING (auth.uid() = user_id);
+
+-- health_records 테이블 RLS
+CREATE POLICY "Users can only access their own health records"
+  ON health_records FOR ALL
+  USING (auth.uid() = user_id);
+
+-- vaccinations 테이블 RLS
+CREATE POLICY "Users can only access their own vaccinations"
+  ON vaccinations FOR ALL
+  USING (auth.uid() = user_id);
+
+-- point_transactions 테이블 RLS
+CREATE POLICY "Users can only access their own points"
+  ON point_transactions FOR ALL
+  USING (auth.uid() = user_id);
+
+-- user_settings 테이블 RLS
+CREATE POLICY "Users can only access their own settings"
+  ON user_settings FOR ALL
+  USING (auth.uid() = user_id);
 ```
 
 ---
 
-## 8. 성능 최적화
+## 6. 인덱스 전략
 
-### 8.1 쿼리 최적화 전략
+### 6.1 필수 인덱스
 
-```typescript
-// 배치 읽기 최적화
-export class BatchQueryOptimizer {
-  async getDogsSummary(userId: string): Promise<DogSummary[]> {
-    const dogsSnapshot = await firestore()
-      .collection(COLLECTIONS.DOGS(userId))
-      .where('isActive', '==', true)
-      .get();
+| 테이블             | 인덱스명                  | 컬럼                     | 용도                 |
+| ------------------ | ------------------------- | ------------------------ | -------------------- |
+| dogs               | idx_dogs_user_id          | user_id                  | 사용자별 반려견 조회 |
+| walks              | idx_walks_user_id_dog_id  | (user_id, dog_id)        | 산책 기록 필터링     |
+| walks              | idx_walks_start_time      | start_time               | 날짜별 정렬          |
+| vaccinations       | idx_vaccinations_upcoming | (dog_id, scheduled_date) | 예정된 접종 조회     |
+| point_transactions | idx_points_user_created   | (user_id, created_at)    | 포인트 히스토리      |
 
-    const dogIds = dogsSnapshot.docs.map(doc => doc.id);
+### 6.2 복합 인덱스
 
-    // 병렬로 최근 산책 데이터 조회
-    const recentWalksPromises = dogIds.map(dogId =>
-      firestore()
-        .collection(COLLECTIONS.WALKS(userId, dogId))
-        .where('status', '==', 'completed')
-        .orderBy('startedAt', 'desc')
-        .limit(1)
-        .get()
-    );
+```sql
+-- 산책 통계 조회용 복합 인덱스
+create index idx_walks_user_date on walks(user_id, start_time desc);
 
-    const recentWalksResults = await Promise.all(recentWalksPromises);
-
-    return dogsSnapshot.docs.map((dogDoc, index) => ({
-      id: dogDoc.id,
-      ...(dogDoc.data() as Dog),
-      lastWalk: recentWalksResults[index].docs[0]?.data() as Walk | undefined,
-    }));
-  }
-}
-
-// 캐싱 전략
-export class CachedRepository<T> {
-  private cache = new Map<string, { data: T; timestamp: number }>();
-  private TTL = 5 * 60 * 1000; // 5분
-
-  async get(key: string, fetcher: () => Promise<T>): Promise<T> {
-    const cached = this.cache.get(key);
-
-    if (cached && Date.now() - cached.timestamp < this.TTL) {
-      return cached.data;
-    }
-
-    const data = await fetcher();
-    this.cache.set(key, { data, timestamp: Date.now() });
-    return data;
-  }
-
-  invalidate(key: string) {
-    this.cache.delete(key);
-  }
-
-  invalidatePattern(pattern: RegExp) {
-    for (const key of this.cache.keys()) {
-      if (pattern.test(key)) {
-        this.cache.delete(key);
-      }
-    }
-  }
-}
-```
-
-### 8.2 데이터 중복화 전략
-
-```typescript
-// 성능을 위한 선택적 데이터 중복화
-interface WalkWithDogInfo extends Walk {
-  dogInfo: {
-    name: string;
-    breed: string;
-    photoURL?: string;
-  }[];
-}
-
-// 산책 저장 시 반려견 기본 정보도 함께 저장
-export const saveWalkWithDogInfo = async (
-  userId: string,
-  walkData: Omit<Walk, 'id' | 'createdAt' | 'updatedAt'>,
-  dogs: Dog[]
-) => {
-  const walkDoc = firestore().collection(COLLECTIONS.WALKS(userId, walkData.dogIds[0])).doc();
-
-  const walkWithDogInfo: WalkWithDogInfo = {
-    ...walkData,
-    id: walkDoc.id,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-    dogInfo: dogs.map(dog => ({
-      name: dog.name,
-      breed: dog.breed,
-      photoURL: dog.photoURL,
-    })),
-  };
-
-  await walkDoc.set(walkWithDogInfo);
-  return walkWithDogInfo;
-};
+-- 건강 기록 조회용
+create index idx_health_dog_type on health_records(dog_id, type, recorded_at desc);
 ```
 
 ---
 
-## 9. 마이그레이션 계획
+## 7. 관계형 모델
 
-### 9.1 단계별 마이그레이션
+### 7.1 참조 무결성
 
-#### Phase 1: 스키마 정규화 (4주)
+- 모든 테이블은 `user_id`로 auth.users 참조
+- walks, health_records, vaccinations는 dog_id로 dogs 참조
+- ON DELETE CASCADE 적용 고려 (설정별 결정)
 
-- [ ] 기존 데이터 백업 및 분석
-- [ ] 새로운 타입 정의 적용
-- [ ] 점진적 필드 추가/수정
-- [ ] 하위 호환성 유지
+### 7.2 트리거 (자동 업데이트)
 
-#### Phase 2: 성능 최적화 (2주)
+```sql
+-- updated_at 자동 갱신 트리거
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = timezone('utc'::text, now());
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
 
-- [ ] 복합 인덱스 추가
-- [ ] 불필요한 필드 제거
-- [ ] 쿼리 최적화
-- [ ] 캐싱 계층 추가
+CREATE TRIGGER update_dogs_updated_at
+  BEFORE UPDATE ON dogs
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-#### Phase 3: 고급 기능 (4주)
-
-- [ ] 다중 반려견 동시 산책 지원
-- [ ] 공유 접근 권한 시스템
-- [ ] 고급 분석 데이터 구조
-- [ ] 외부 API 연동 준비
-
-### 9.2 마이그레이션 스크립트 예시
-
-```typescript
-// 마이그레이션 유틸리티
-export class DatabaseMigrator {
-  async migrateUserSchema(userId: string) {
-    const userDoc = await firestore().collection('users').doc(userId).get();
-
-    if (!userDoc.exists) return;
-
-    const userData = userDoc.data();
-    const updates: Partial<User> = {};
-
-    // 신규 필드 추가
-    if (!userData?.preferences) {
-      updates.preferences = {
-        language: 'ko',
-        notifications: {
-          walk: true,
-          health: true,
-          vaccination: true,
-        },
-        privacy: {
-          shareWalkData: false,
-          allowDataAnalysis: true,
-        },
-      };
-    }
-
-    // 타입 변환
-    if (userData?.totalPoints && typeof userData.totalPoints === 'string') {
-      updates.totalPoints = parseInt(userData.totalPoints, 10) || 0;
-    }
-
-    if (Object.keys(updates).length > 0) {
-      updates.updatedAt = Timestamp.now();
-      await userDoc.ref.update(updates);
-    }
-  }
-
-  async migrateAllUsers() {
-    const usersSnapshot = await firestore().collection('users').get();
-
-    const migrationPromises = usersSnapshot.docs.map(doc => this.migrateUserSchema(doc.id));
-
-    await Promise.all(migrationPromises);
-  }
-}
+CREATE TRIGGER update_user_settings_updated_at
+  BEFORE UPDATE ON user_settings
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 ```
 
 ---
-
-## 📎 참고 자료
-
-### A. Firestore 베스트 프랙티스
-
-- [Firestore 데이터 모델링 가이드](https://firebase.google.com/docs/firestore/manage-data/structure-data)
-- [Firestore 보안 규칙 가이드](https://firebase.google.com/docs/firestore/security/get-started)
-- [Firestore 인덱싱 전략](https://firebase.google.com/docs/firestore/query-data/indexing)
-
-### B. 관련 문서
-
-- [시스템 아키텍처](./system-architecture.md)
-- [마이그레이션 가이드](./migration-guide.md)
-- [API 문서](../04-development/api-documentation.md)
-
----
-
-_본 문서는 데이터베이스 스키마 변경 시 업데이트되며, 모든 변경사항은 마이그레이션 계획을 통해
-관리됩니다._
 
 **문서 히스토리:**
 
-- v1.0: 2025-08-03 (초기 데이터베이스 설계)
-- v2.0: 2025-08-31 (GlobalRules 표준 적용, 보안 강화, 성능 최적화)
+- v3.0: 2025-04-05 - Supabase PostgreSQL 마이그레이션 완료
+- v2.0: 2025-08-31 - Firestore 스키마 개선
+- v1.0: 2025-01-16 - 초기 설계
